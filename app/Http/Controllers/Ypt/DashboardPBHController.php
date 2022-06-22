@@ -501,7 +501,7 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select kode_bidang,nama from bidang where kode_lokasi='".$kode_lokasi."'
+            $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -624,15 +624,15 @@ class DashboardPBHController extends Controller
 
             if($status_admin == "A"){
 
-                $res = DB::connection($this->db)->select("select kode_bidang,nama from bidang where kode_lokasi='".$kode_lokasi."'
+                $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."'
                 ");
             }else{
 
                 $res = DB::connection($this->db)->select("select distinct a.kode_bidang,c.nama 
-                from pp a
+                from agg_pp a
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
-                left join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='".$kode_lokasi."' 
+                left join agg_bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi and a.tahun=c.tahun
+                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."'
                 ");
             }
 
@@ -654,6 +654,51 @@ class DashboardPBHController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = "Error ".$e;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getFilterDefaultDash(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik_user= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $gt = DB::connection($this->db)->select("select max(periode) as periode from periode where kode_lokasi='$kode_lokasi' ");
+            $periode = count($gt) > 0 ? $gt[0]->periode : date('Ym');
+
+            
+            $gt2 = DB::connection($this->db)->select("select a.kode_pp, b.nama as nama_pp from karyawan a
+            inner join agg_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.nik='$nik_user'
+            where a.kode_lokasi='$kode_lokasi' and b.tahun='".substr($periode,0,4)."'");
+
+            $kode_pp = count($gt2) > 0 ? $gt2[0]->kode_pp : '-';
+            $nama_pp = count($gt2) > 0 ? $gt2[0]->nama_pp : '-';
+
+            $gt2 = DB::connection($this->db)->select("
+            select distinct b.kode_bidang, c.nama as nama_bidang from karyawan a
+            inner join agg_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and a.nik='$nik_user'
+            inner join agg_bidang c on b.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and b.tahun='".substr($periode,0,4)."'");
+            
+            $kode_bidang = count($gt2) > 0 ? $gt2[0]->kode_bidang : '-';
+            $nama_bidang = count($gt2) > 0 ? $gt2[0]->nama_bidang : '-';
+            
+            $success['status'] = true;
+            $success['periode'] = $periode;
+            $success['kode_pp'] = $kode_pp;
+            $success['nama_pp'] = $nama_pp;
+            $success['kode_bidang'] = $kode_bidang;
+            $success['nama_bidang'] = $nama_bidang;
+            $success['tahun'] = substr($periode,0,4);
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

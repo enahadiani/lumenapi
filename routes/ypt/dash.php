@@ -177,6 +177,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('pp','Ypt\DashboardPBHController@getPP');
     $router->get('pp-karyawan','Ypt\DashboardPBHController@getPPKaryawan');
     $router->get('bidang-karyawan','Ypt\DashboardPBHController@getBidangKaryawan');
+    $router->get('dash-filter-default','Ypt\DashboardPBHController@getFilterDefaultDash');
 
 });
 
