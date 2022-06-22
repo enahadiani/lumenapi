@@ -23,6 +23,8 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('dataof-modul','Siaga\DashboardController@getDataOfModul');
     $router->get('data-other','Siaga\DashboardController@getDataOther');
     
+    $router->get('data-fp-box','Siaga\DashboardFPController@getDataBox');
+    
 });
 
 
