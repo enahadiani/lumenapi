@@ -540,7 +540,7 @@ class DashboardPBHController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->db)->select("select kode_pp,nama from pp where kode_lokasi='".$kode_lokasi."' $filter
+            $res = DB::connection($this->db)->select("select kode_pp,nama from agg_pp where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."' $filter
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -571,6 +571,7 @@ class DashboardPBHController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
             if(isset($request->kode_bidang) && $request->kode_bidang != ""){
                 $filter = " and a.kode_bidang = '$request->kode_bidang' ";
@@ -578,10 +579,17 @@ class DashboardPBHController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_pp,a.nama from pp a
-            inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
-            where a.kode_lokasi='".$kode_lokasi."' $filter
-            ");
+            if($status_admin == "A"){
+                $res = DB::connection($this->db)->select("select a.kode_pp,a.nama from agg_pp a where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."' $filter
+                ");
+            }else{
+
+                $res = DB::connection($this->db)->select("select distinct a.kode_pp,a.nama from agg_pp a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
+                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."' $filter
+                ");
+            }
+
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -611,14 +619,24 @@ class DashboardPBHController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin = $data->status_admin;
             }
 
-            $res = DB::connection($this->db)->select("select a.kode_bidang,c.nama 
-            from pp a
-            inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
-            inner join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='".$kode_lokasi."' 
-            ");
+            if($status_admin == "A"){
+
+                $res = DB::connection($this->db)->select("select kode_bidang,nama from bidang where kode_lokasi='".$kode_lokasi."'
+                ");
+            }else{
+
+                $res = DB::connection($this->db)->select("select distinct a.kode_bidang,c.nama 
+                from pp a
+                inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
+                left join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' 
+                ");
+            }
+
+
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
