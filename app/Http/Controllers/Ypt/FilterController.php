@@ -150,10 +150,10 @@ class FilterController extends Controller
                 $sql="select a.kode_bidang, a.nama from bidang a where a.kode_lokasi='$kode_lokasi' ";
 
             }else{
-                $sql = "select a.kode_bidang,c.nama 
+                $sql = "select distinct a.kode_bidang,c.nama 
                 from pp a
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik'
-                inner join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
+                left join bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' 
                 ";
             }
