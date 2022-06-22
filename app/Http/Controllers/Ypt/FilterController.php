@@ -592,8 +592,22 @@ class FilterController extends Controller
                 $periode = $res[0]->periode;
             }
 
+            $kode_bidang = "-";
+            $nama_bidang = "-";
+            $sql = "select b.kode_bidang,c.nama as nama_bidang from agg_user a 
+            inner join agg_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
+            inner join agg_bidang c on b.kode_bidang=c.kode_bidang and b.kode_lokasi=c.kode_lokasi 
+            where a.nik='".$nik."' and a.kode_lokasi='".$kode_lokasi."' and c.tahun='".substr($periode,0,4)."' ";
+            $res2 = DB::connection($this->db)->select($sql);
+            if(count($res2) > 0){
+                $kode_bidang = $res2[0]->kode_bidang;
+                $nama_bidang = $res2[0]->nama_bidang;
+            }
+
             $success['status'] = true;
             $success['periode'] = $periode;
+            $success['kode_bidang'] = $kode_bidang;
+            $success['nama_bidang'] = $nama_bidang;
             $success['message'] = "Success!";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
