@@ -2599,19 +2599,27 @@ class LaporanController extends Controller
             $bln = substr($periode,4,2);
             $tahunseb = intval($tahun)-1;
 
-            // $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
-            // $res = DB::connection($this->db)->update($sql);
+            $sql="exec sp_neraca2_dw '$kode_fs','A','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            $res = DB::connection($this->db)->getPdo()->exec($sql);
             
-            $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4 as n1,n5 as n2,rowindex 
-                from exs_neraca 
-                $where and modul='A'
+            // $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4 as n1,n5 as n2,rowindex 
+            //     from exs_neraca 
+            //     $where and modul='A'
+			// order by rowindex ";
+            $sql="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n1,n2,rowindex 
+                from neraca_tmp 
+                where nik_user='$nik_user' and modul='A'
 			order by rowindex ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4 as n1,n5 as n2,rowindex 
-                from exs_neraca 
-                $where and modul='P'
+            // $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n4*-1 as n1,n5*-1 as n2,rowindex 
+            //     from exs_neraca 
+            //     $where and modul='P'
+			// order by rowindex ";
+            $sql2="select kode_neraca,kode_fs,kode_lokasi,nama,tipe,jenis_akun,level_spasi,n1*-1 as n1,n2*-1 as n2,rowindex 
+                from neraca_tmp 
+                where nik_user='$nik_user' and modul='P'
 			order by rowindex ";
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
