@@ -349,14 +349,22 @@ class FilterController extends Controller
         
     }
 
-    function getFilterFakultas(){
+    function getFilterFakultas(Request $request){
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $status_admin= $data->status_admin;
             }
-            $sql="select kode_fakultas,nama from exs_fakultas where kode_lokasi='$kode_lokasi' ";
+            if($status_admin == "A"){
+                $sql="select kode_fakultas,nama from aka_fakultas where kode_lokasi='$kode_lokasi' ";
+            }else{
+                $sql = "select a.kode_fakultas,a.nama  
+				from aka_fakultas a 
+				inner join karyawan b on a.kode_fakultas=substring(b.kode_pp,1,2) and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and b.nik='".$nik."' ";
+            }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -604,10 +612,22 @@ class FilterController extends Controller
                 $nama_bidang = $res2[0]->nama_bidang;
             }
 
+            $kode_fakultas = "-";
+            $nama_fakultas = "-";
+            $sql = "select a.kode_fakultas,a.nama as nama_fakultas
+            from aka_fakultas a inner join karyawan b on a.kode_fakultas=substring(b.kode_pp,1,2) and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='".$kode_lokasi."' and b.nik='".$nik."'";
+            $res3 = DB::connection($this->db)->select($sql);
+            if(count($res3) > 0){
+                $kode_fakultas = $res3[0]->kode_fakultas;
+                $nama_fakultas = $res3[0]->nama_fakultas;
+            }
+
             $success['status'] = true;
             $success['periode'] = $periode;
             $success['kode_bidang'] = $kode_bidang;
             $success['nama_bidang'] = $nama_bidang;
+            $success['kode_fakultas'] = $kode_fakultas;
+            $success['nama_fakultas'] = $nama_fakultas;
             $success['message'] = "Success!";
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {

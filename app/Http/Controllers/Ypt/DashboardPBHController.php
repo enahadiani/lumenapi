@@ -304,47 +304,61 @@ class DashboardPBHController extends Controller
                 $filter_bidang = " ";
             }
 
-            $sql="select a.kode_lokasi,b.periode,substring(dbo.fnNamaBulan(b.periode),1,3) as nama,sum(a.nilai) as nilai,count(a.no_aju) as jml
-            from it_aju_m a
-            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
-            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun_seb' $filter_pp $filter_bidang
-            group by a.kode_lokasi,b.periode
-            order by a.kode_lokasi,b.periode
+            $sql="select a.kode_lokasi,
+            sum(case when substring(b.periode,5,2) = '01' then a.nilai else null end) as n1,
+            sum(case when substring(b.periode,5,2) = '02' then a.nilai else null end) as n2,
+            sum(case when substring(b.periode,5,2) = '03' then a.nilai else null end) as n3,
+            sum(case when substring(b.periode,5,2) = '04' then a.nilai else null end) as n4,
+            sum(case when substring(b.periode,5,2) = '05' then a.nilai else null end) as n5,
+            sum(case when substring(b.periode,5,2) = '06' then a.nilai else null end) as n6,
+            sum(case when substring(b.periode,5,2) = '07' then a.nilai else null end) as n7,
+            sum(case when substring(b.periode,5,2) = '08' then a.nilai else null end) as n8,
+            sum(case when substring(b.periode,5,2) = '09' then a.nilai else null end) as n9,
+            sum(case when substring(b.periode,5,2) = '10' then a.nilai else null end) as n10,
+            sum(case when substring(b.periode,5,2) = '11' then a.nilai else null end) as n11,
+            sum(case when substring(b.periode,5,2) = '12' then a.nilai else null end) as n12
+                        from it_aju_m a
+                        inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun_seb' $filter_pp $filter_bidang
+                        group by a.kode_lokasi
+                        order by a.kode_lokasi
             ";
             $select = DB::connection($this->db)->select($sql);
+            $select = json_decode(json_encode($select),true);
 
-            $sql2="select a.kode_lokasi,b.periode,substring(dbo.fnNamaBulan(b.periode),1,3) as nama,sum(a.nilai) as nilai,count(a.no_aju) as jml
-            from it_aju_m a
-            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
-            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun' $filter_pp $filter_bidang
-            group by a.kode_lokasi,b.periode
-            order by a.kode_lokasi,b.periode
+            $sql2="select a.kode_lokasi,
+            sum(case when substring(b.periode,5,2) = '01' then a.nilai else null end) as n1,
+            sum(case when substring(b.periode,5,2) = '02' then a.nilai else null end) as n2,
+            sum(case when substring(b.periode,5,2) = '03' then a.nilai else null end) as n3,
+            sum(case when substring(b.periode,5,2) = '04' then a.nilai else null end) as n4,
+            sum(case when substring(b.periode,5,2) = '05' then a.nilai else null end) as n5,
+            sum(case when substring(b.periode,5,2) = '06' then a.nilai else null end) as n6,
+            sum(case when substring(b.periode,5,2) = '07' then a.nilai else null end) as n7,
+            sum(case when substring(b.periode,5,2) = '08' then a.nilai else null end) as n8,
+            sum(case when substring(b.periode,5,2) = '09' then a.nilai else null end) as n9,
+            sum(case when substring(b.periode,5,2) = '10' then a.nilai else null end) as n10,
+            sum(case when substring(b.periode,5,2) = '11' then a.nilai else null end) as n11,
+            sum(case when substring(b.periode,5,2) = '12' then a.nilai else null end) as n12
+                        from it_aju_m a
+                        inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+                        inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun' $filter_pp $filter_bidang
+                        group by a.kode_lokasi
+                        order by a.kode_lokasi
             ";
             $select2 = DB::connection($this->db)->select($sql2);
+            $select2 = json_decode(json_encode($select2),true);
             $series = array();
             $i=0;
             $data = array();
-            foreach($select as $dt) {
-                $value = [
-                    'name' => $dt->nama,
-                    'y' => abs($dt->nilai),
-                    'key' => $dt->periode
-                ];
-                array_push($data, $value);
-                $i++;
+            for($i=1; $i <= 12; $i++) {
+                array_push($data, floatval($select[0]["n$i"]));
             }
 
             $data2 = array();
-            foreach($select2 as $dt2) {
-                $value = [
-                    'name' => $dt2->nama,
-                    'y' => abs($dt2->nilai),
-                    'key' => $dt2->periode
-                ];
-                array_push($data2, $value);
-                $i++;
+            for($i=1; $i <= 12; $i++) {
+                array_push($data2, floatval($select2[0]["n$i"]));
             }
             $success['status'] = true;
             $success['message'] = "Success!";
@@ -383,18 +397,98 @@ class DashboardPBHController extends Controller
                 $filter_bidang = " ";
             }
 
-            $sql="select a.kode_lokasi,a.periode,sum(case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end) as n1,
-            sum(case when datediff(day,a.tanggal,c.tanggal)=3 then 1 else 0 end) as n2,
-            sum(case when datediff(day,a.tanggal,c.tanggal)=4 then 1 else 0 end) as n3,
-            sum(case when datediff(day,a.tanggal,c.tanggal)>4 then 1 else 0 end) as n4
-            from it_aju_m a
-            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
-            group by a.kode_lokasi,a.periode
-            order by a.kode_lokasi,a.periode
+            $sql="select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2) = '01' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when datediff(day,a.tanggal,c.tanggal)<= 2 then 1 else 0 end ) else 0 end) as n12
+                    from it_aju_m a
+                    inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                    inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+                    group by a.kode_lokasi
+                    order by a.kode_lokasi
             ";
             $select = DB::connection($this->db)->select($sql);
+            $select = json_decode(json_encode($select),true);
+
+            
+            $sql="select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2) = '01' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when datediff(day,a.tanggal,c.tanggal) = 3 then 1 else 0 end ) else 0 end) as n12
+                    from it_aju_m a
+                    inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                    inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+                    group by a.kode_lokasi
+                    order by a.kode_lokasi
+            ";
+            $select2 = DB::connection($this->db)->select($sql);
+            $select2 = json_decode(json_encode($select2),true);
+
+            $sql="select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2) = '01' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when datediff(day,a.tanggal,c.tanggal) = 4 then 1 else 0 end ) else 0 end) as n12
+                    from it_aju_m a
+                    inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                    inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+                    group by a.kode_lokasi
+                    order by a.kode_lokasi
+            ";
+            $select3 = DB::connection($this->db)->select($sql);
+            $select3 = json_decode(json_encode($select3),true);
+
+            $sql="select a.kode_lokasi,
+            sum(case when substring(a.periode,5,2) = '01' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when datediff(day,a.tanggal,c.tanggal) > 4 then 1 else 0 end ) else 0 end) as n12
+                    from it_aju_m a
+                    inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+                    inner join kas_m c on a.no_kas=c.no_kas and a.kode_lokasi=c.kode_lokasi
+                    where a.kode_lokasi='$kode_lokasi'  and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+                    group by a.kode_lokasi
+                    order by a.kode_lokasi
+            ";
+            $select4 = DB::connection($this->db)->select($sql);
+            $select4 = json_decode(json_encode($select4),true);
 
             
             $series[0] = array(
@@ -419,12 +513,11 @@ class DashboardPBHController extends Controller
             );
             $i=0;
             $data = array();
-            foreach($select as $dt) {
-                array_push($series[0]['data'], floatval($dt->n1));
-                array_push($series[1]['data'], floatval($dt->n2));
-                array_push($series[2]['data'], floatval($dt->n3));
-                array_push($series[3]['data'], floatval($dt->n4));
-                $i++;
+            for($i=1; $i <= 12; $i++) {
+                array_push($series[0]['data'], floatval($select[0]["n$i"]));
+                array_push($series[1]['data'], floatval($select2[0]["n$i"]));
+                array_push($series[2]['data'], floatval($select3[0]["n$i"]));
+                array_push($series[3]['data'], floatval($select4[0]["n$i"]));
             }
 
             $success['status'] = true;
@@ -461,22 +554,34 @@ class DashboardPBHController extends Controller
                 $filter_bidang = " ";
             }
 
-            $sql="select a.kode_lokasi,b.periode,count(a.no_aju) as jml
+            $sql="select a.kode_lokasi,
+            count(case when substring(b.periode,5,2) = '01' then a.no_aju else null end) as n1,
+            count(case when substring(b.periode,5,2) = '02' then a.no_aju else null end) as n2,
+            count(case when substring(b.periode,5,2) = '03' then a.no_aju else null end) as n3,
+            count(case when substring(b.periode,5,2) = '04' then a.no_aju else null end) as n4,
+            count(case when substring(b.periode,5,2) = '05' then a.no_aju else null end) as n5,
+            count(case when substring(b.periode,5,2) = '06' then a.no_aju else null end) as n6,
+            count(case when substring(b.periode,5,2) = '07' then a.no_aju else null end) as n7,
+            count(case when substring(b.periode,5,2) = '08' then a.no_aju else null end) as n8,
+            count(case when substring(b.periode,5,2) = '09' then a.no_aju else null end) as n9,
+            count(case when substring(b.periode,5,2) = '10' then a.no_aju else null end) as n10,
+            count(case when substring(b.periode,5,2) = '11' then a.no_aju else null end) as n11,
+            count(case when substring(b.periode,5,2) = '12' then a.no_aju else null end) as n12
             from it_aju_m a
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
             inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
-            group by a.kode_lokasi,b.periode
-            order by a.kode_lokasi,b.periode
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang 
+            group by a.kode_lokasi
+            order by a.kode_lokasi
             ";
             $select = DB::connection($this->db)->select($sql);
+            $select = json_decode(json_encode($select),true);
 
             $series = array();
             $i=0;
             $data = array();
-            foreach($select as $dt) {
-                array_push($data, floatval($dt->jml));
-                $i++;
+            for($i=1; $i <= 12; $i++) {
+                array_push($data, floatval($select[0]["n$i"]));
             }
 
             $success['status'] = true;

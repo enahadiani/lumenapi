@@ -66,6 +66,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-labarugi-agg','Ypt\LaporanController@getLabaRugiAgg');
     $router->get('lap-labarugi-agg-dir','Ypt\LaporanController@getLabaRugiAggDir');
     $router->get('lap-labarugi-agg-fak','Ypt\LaporanController@getLabaRugiAggFak');
+    $router->get('lap-labarugi-agg-fak2','Ypt\LaporanController@getLabaRugiAggFak2');
     $router->get('lap-labarugi-agg-prodi','Ypt\LaporanController@getLabaRugiAggProdi');
     $router->get('lap-neraca2','Ypt\LaporanController@getNeraca2');
     $router->get('lap-investasi','Ypt\LaporanController@getInvestasi');
@@ -73,6 +74,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('lap-labarugi-agg-detail','Ypt\LaporanController@getLabaRugiAggDetail');
     $router->get('lap-labarugi-agg-dir-detail','Ypt\LaporanController@getLabaRugiAggDirDetail');
     $router->get('lap-labarugi-agg-fak-detail','Ypt\LaporanController@getLabaRugiAggFakDetail');
+    $router->get('lap-labarugi-agg-fak2-detail','Ypt\LaporanController@getLabaRugiAggFak2Detail');
     $router->get('lap-labarugi-agg-prodi-detail','Ypt\LaporanController@getLabaRugiAggProdiDetail');
     $router->get('lap-neraca2-detail','Ypt\LaporanController@getNeraca2Detail');
     $router->get('lap-investasi-detail','Ypt\LaporanController@getInvestasiDetail');
