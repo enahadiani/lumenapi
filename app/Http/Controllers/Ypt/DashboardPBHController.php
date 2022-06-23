@@ -597,6 +597,97 @@ class DashboardPBHController extends Controller
         }
     }
 
+    public function getJmlPengajuan(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $tahun = $r->tahun;
+            $tahun_seb = intval($tahun) - 1 ; 
+            if(isset($r->kode_pp) && $r->kode_pp != ""){
+                $filter_pp = " and a.kode_pp='$r->kode_pp' ";
+            }else{
+                $filter_pp = " ";
+            }
+
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter_bidang = " and p.kode_bidang='$r->kode_bidang' ";
+            }else{
+                $filter_bidang = " ";
+            }
+
+            $sql="select a.kode_lokasi,
+            count(case when substring(a.periode,5,2) = '01' then a.no_aju else null end) as n1,
+            count(case when substring(a.periode,5,2) = '02' then a.no_aju else null end) as n2,
+            count(case when substring(a.periode,5,2) = '03' then a.no_aju else null end) as n3,
+            count(case when substring(a.periode,5,2) = '04' then a.no_aju else null end) as n4,
+            count(case when substring(a.periode,5,2) = '05' then a.no_aju else null end) as n5,
+            count(case when substring(a.periode,5,2) = '06' then a.no_aju else null end) as n6,
+            count(case when substring(a.periode,5,2) = '07' then a.no_aju else null end) as n7,
+            count(case when substring(a.periode,5,2) = '08' then a.no_aju else null end) as n8,
+            count(case when substring(a.periode,5,2) = '09' then a.no_aju else null end) as n9,
+            count(case when substring(a.periode,5,2) = '10' then a.no_aju else null end) as n10,
+            count(case when substring(a.periode,5,2) = '11' then a.no_aju else null end) as n11,
+            count(case when substring(a.periode,5,2) = '12' then a.no_aju else null end) as n12
+            from it_aju_m a
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang 
+            group by a.kode_lokasi
+            order by a.kode_lokasi
+            ";
+            $select = DB::connection($this->db)->select($sql);
+            $select = json_decode(json_encode($select),true);
+
+            $sql="select a.kode_lokasi,
+            count(case when substring(b.periode,5,2) = '01' then a.no_aju else null end) as n1,
+            count(case when substring(b.periode,5,2) = '02' then a.no_aju else null end) as n2,
+            count(case when substring(b.periode,5,2) = '03' then a.no_aju else null end) as n3,
+            count(case when substring(b.periode,5,2) = '04' then a.no_aju else null end) as n4,
+            count(case when substring(b.periode,5,2) = '05' then a.no_aju else null end) as n5,
+            count(case when substring(b.periode,5,2) = '06' then a.no_aju else null end) as n6,
+            count(case when substring(b.periode,5,2) = '07' then a.no_aju else null end) as n7,
+            count(case when substring(b.periode,5,2) = '08' then a.no_aju else null end) as n8,
+            count(case when substring(b.periode,5,2) = '09' then a.no_aju else null end) as n9,
+            count(case when substring(b.periode,5,2) = '10' then a.no_aju else null end) as n10,
+            count(case when substring(b.periode,5,2) = '11' then a.no_aju else null end) as n11,
+            count(case when substring(b.periode,5,2) = '12' then a.no_aju else null end) as n12
+            from it_aju_m a
+            inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            inner join pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang 
+            group by a.kode_lokasi
+            order by a.kode_lokasi
+            ";
+            $select2 = DB::connection($this->db)->select($sql);
+            $select2 = json_decode(json_encode($select2),true);
+
+            $series = array();
+            $i=0;
+            $data = array();
+            $data2 = array();
+            for($i=1; $i <= 12; $i++) {
+                array_push($data, floatval($select[0]["n$i"]));
+                array_push($data2, floatval($select2[0]["n$i"]));
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = array(
+                'pengajuan' => $data,
+                'selesai' => $data2,
+            );
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getBidang(Request $request)
     {
         try {
