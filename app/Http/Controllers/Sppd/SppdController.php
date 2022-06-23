@@ -362,6 +362,7 @@ class SppdController extends Controller
             'PBYR.*.kode_akun' =>'max:20',
             'PBYR.*.kode_drk' =>'max:30',
             'PBYR.*.periode' =>'max:6',
+            'PBYR.*.no_ref1' =>'max:20',
             'AJU' =>'required|array',
             'AJU.*.nip' =>'max:20',
             'AJU.*.nama_perjalanan' =>'max:200',
@@ -503,7 +504,8 @@ class SppdController extends Controller
                                 // where a.no_aju='".$no_agenda."' and a.kode_lokasi='".$kode_lokasi."'";
                                 
                                 // array_push($exec,$sql4);
-                                $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."')";
+                                $no_ref1 = (isset($datam[0]['no_ref1']) ? $datam[0]['no_ref1'] : '-');
+                                $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
                                 //$success['tmp7']=$sql;
                                 $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
     
@@ -563,6 +565,7 @@ class SppdController extends Controller
             'PBYR.*.kode_akun' =>'max:20',
             'PBYR.*.kode_drk' =>'max:30',
             'PBYR.*.periode' =>'max:6',
+            'PBYR.*.no_ref1' =>'max:20',
             'AJU' =>'required|array',
             'AJU.*.no_spj_igracias' => 'required', 
             'AJU.*.nip' =>'max:20',
@@ -719,7 +722,8 @@ class SppdController extends Controller
                                     // where a.no_aju='".$no_agenda."' and a.kode_lokasi='".$kode_lokasi."'";
                                     
                                     // array_push($exec,$sql4);
-                                    $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."')";
+                                    $no_ref1 = isset($data[0]['no_ref1']) ? $data[0]['no_ref1'] : '-';
+                                    $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
                                     //$success['tmp7']=$sql;
                                     $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
         
