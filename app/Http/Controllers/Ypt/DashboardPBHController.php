@@ -305,20 +305,21 @@ class DashboardPBHController extends Controller
             }
 
             $sql="select a.kode_lokasi,
-            sum(case when substring(b.periode,5,2) = '01' then a.nilai else null end) as n1,
-            sum(case when substring(b.periode,5,2) = '02' then a.nilai else null end) as n2,
-            sum(case when substring(b.periode,5,2) = '03' then a.nilai else null end) as n3,
-            sum(case when substring(b.periode,5,2) = '04' then a.nilai else null end) as n4,
-            sum(case when substring(b.periode,5,2) = '05' then a.nilai else null end) as n5,
-            sum(case when substring(b.periode,5,2) = '06' then a.nilai else null end) as n6,
-            sum(case when substring(b.periode,5,2) = '07' then a.nilai else null end) as n7,
-            sum(case when substring(b.periode,5,2) = '08' then a.nilai else null end) as n8,
-            sum(case when substring(b.periode,5,2) = '09' then a.nilai else null end) as n9,
-            sum(case when substring(b.periode,5,2) = '10' then a.nilai else null end) as n10,
-            sum(case when substring(b.periode,5,2) = '11' then a.nilai else null end) as n11,
-            sum(case when substring(b.periode,5,2) = '12' then a.nilai else null end) as n12
-                        from it_aju_m a
-                        inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            sum(case when substring(b.periode,5,2) = '01' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n1,
+            sum(case when substring(b.periode,5,2) = '02' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n2,
+            sum(case when substring(b.periode,5,2) = '03' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n3,
+            sum(case when substring(b.periode,5,2) = '04' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n4,
+            sum(case when substring(b.periode,5,2) = '05' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n5,
+            sum(case when substring(b.periode,5,2) = '06' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n6,
+            sum(case when substring(b.periode,5,2) = '07' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n7,
+            sum(case when substring(b.periode,5,2) = '08' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n8,
+            sum(case when substring(b.periode,5,2) = '09' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n9,
+            sum(case when substring(b.periode,5,2) = '10' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n10,
+            sum(case when substring(b.periode,5,2) = '11' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n11,
+            sum(case when substring(b.periode,5,2) = '12' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n12
+                        from it_aju_d a
+						inner join it_aju_m c on a.no_aju=c.no_aju and a.kode_lokasi=c.kode_lokasi
+                        inner join kas_m b on c.no_kas=b.no_kas and c.kode_lokasi=b.kode_lokasi
                         inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun_seb' 
                         where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun_seb' $filter_pp $filter_bidang
                         group by a.kode_lokasi
@@ -328,20 +329,21 @@ class DashboardPBHController extends Controller
             $select = json_decode(json_encode($select),true);
 
             $sql2="select a.kode_lokasi,
-            sum(case when substring(b.periode,5,2) = '01' then a.nilai else null end) as n1,
-            sum(case when substring(b.periode,5,2) = '02' then a.nilai else null end) as n2,
-            sum(case when substring(b.periode,5,2) = '03' then a.nilai else null end) as n3,
-            sum(case when substring(b.periode,5,2) = '04' then a.nilai else null end) as n4,
-            sum(case when substring(b.periode,5,2) = '05' then a.nilai else null end) as n5,
-            sum(case when substring(b.periode,5,2) = '06' then a.nilai else null end) as n6,
-            sum(case when substring(b.periode,5,2) = '07' then a.nilai else null end) as n7,
-            sum(case when substring(b.periode,5,2) = '08' then a.nilai else null end) as n8,
-            sum(case when substring(b.periode,5,2) = '09' then a.nilai else null end) as n9,
-            sum(case when substring(b.periode,5,2) = '10' then a.nilai else null end) as n10,
-            sum(case when substring(b.periode,5,2) = '11' then a.nilai else null end) as n11,
-            sum(case when substring(b.periode,5,2) = '12' then a.nilai else null end) as n12
-                        from it_aju_m a
-                        inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
+            sum(case when substring(b.periode,5,2) = '01' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n1,
+            sum(case when substring(b.periode,5,2) = '02' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n2,
+            sum(case when substring(b.periode,5,2) = '03' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n3,
+            sum(case when substring(b.periode,5,2) = '04' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n4,
+            sum(case when substring(b.periode,5,2) = '05' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n5,
+            sum(case when substring(b.periode,5,2) = '06' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n6,
+            sum(case when substring(b.periode,5,2) = '07' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n7,
+            sum(case when substring(b.periode,5,2) = '08' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n8,
+            sum(case when substring(b.periode,5,2) = '09' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n9,
+            sum(case when substring(b.periode,5,2) = '10' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n10,
+            sum(case when substring(b.periode,5,2) = '11' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n11,
+            sum(case when substring(b.periode,5,2) = '12' then (case a.dc when 'D' then a.nilai else -a.nilai end) else 0 end) as n12
+                        from it_aju_d a
+						inner join it_aju_m c on a.no_aju=c.no_aju and a.kode_lokasi=c.kode_lokasi
+                        inner join kas_m b on c.no_kas=b.no_kas and c.kode_lokasi=b.kode_lokasi
                         inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
                         where a.kode_lokasi='$kode_lokasi' and substring(b.periode,1,4)='$tahun' $filter_pp $filter_bidang
                         group by a.kode_lokasi
