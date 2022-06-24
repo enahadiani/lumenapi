@@ -9803,12 +9803,23 @@ class DashboardController extends Controller
                 $filter .= "";
             }
 
-			$sql="select a.no_bukti, convert(varchar, a.tanggal, 103) as tanggal, a.keterangan,a.kode_pp,a.flag_aktif,b.nama as nama_pp,c.nama as nama_buat 
-            from dash_buku a 
-            inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif=1 $filter
-            ";
+            if($status_admin == "A"){
+                $sql="select a.no_bukti, convert(varchar, a.tanggal, 103) as tanggal, a.keterangan,a.kode_pp,a.flag_aktif,b.nama as nama_pp,c.nama as nama_buat 
+                from dash_buku a 
+                inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+                where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif=1 $filter
+                ";
+
+            }else{
+                $sql="select a.no_bukti, convert(varchar, a.tanggal, 103) as tanggal, a.keterangan,a.kode_pp,a.flag_aktif,b.nama as nama_pp,c.nama as nama_buat 
+                from dash_buku a 
+                inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
+                inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
+                inner join karyawan_pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nik_user='$nik'
+                where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif=1 $filter
+                ";
+            }
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
