@@ -9816,7 +9816,7 @@ class DashboardController extends Controller
                 from dash_buku a 
                 inner join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
                 inner join karyawan c on a.nik_user=c.nik and a.kode_lokasi=c.kode_lokasi
-                inner join karyawan_pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nik_user='$nik'
+                inner join karyawan_pp d on a.kode_pp=d.kode_pp and a.kode_lokasi=d.kode_lokasi and d.nik='$nik'
                 where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif=1 $filter
                 ";
             }
