@@ -24,6 +24,14 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('data-other','Siaga\DashboardController@getDataOther');
     
     $router->get('data-fp-box','Siaga\DashboardFPController@getDataBox');
+    $router->get('data-fp-kontribusi-filter','Siaga\DashboardFPController@getFilterKontribusi');
+    $router->get('data-fp-kontribusi','Siaga\DashboardFPController@getKontribusi');
+    
+    $router->get('data-pend-box','Siaga\DashboardPendController@getDataBox');
+    $router->get('data-pend-kontribusi','Siaga\DashboardPendController@getKontribusi');
+    $router->get('data-pend-ytdvsyoy','Siaga\DashboardPendController@getYTDvsYoY');
+    $router->get('data-pend-per-bulan','Siaga\DashboardPendController@getPendBulan');
+    $router->get('data-pend-rkavsreal','Siaga\DashboardPendController@getRKAvsReal');
     
 });
 

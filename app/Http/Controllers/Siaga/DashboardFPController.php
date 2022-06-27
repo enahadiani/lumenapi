@@ -130,5 +130,91 @@ class DashboardFPController extends Controller
         }
     }
 
+    public function getKontribusi(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            
+            $periode = $r->periode;
+
+            $sql = "
+            select a.kode_klp,b.nama, sum(case when d.jenis_akun ='Pendapatan' then -d.n4 else d.n4 end) as nilai
+            from exs_klp_akun a
+            inner join exs_klp b on a.kode_klp=b.kode_klp and b.kode_lokasi='$kode_lokasi'
+            inner join relakun c on a.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
+            inner join exs_neraca d on c.kode_neraca=d.kode_neraca and c.kode_lokasi=d.kode_lokasi and c.kode_fs=d.kode_fs
+            where d.kode_neraca='$r->kode_neraca' and d.periode='$periode' and d.kode_lokasi='$kode_lokasi' and a.status='Aktif' and c.kode_fs='FS1'
+            group by a.kode_klp,b.nama";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+            $chart = [];
+            if(count($res) > 0){
+                foreach($res as $row){
+                    $value = [
+                        'name' => $row['kode_klp'],
+                        'y' => abs($row['nilai'])
+                    ];
+                    array_push($chart, $value);
+                }
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $chart;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getFilterKontribusi(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = array(
+                0 => array(
+                    'kode_neraca' => '41',
+                    'nama' => 'Revenue Contribution'
+                ),
+                1 => array(
+                    'kode_neraca' => '42',
+                    'nama' => 'COGS'
+                ),
+                2 => array(
+                    'kode_neraca' => '4T',
+                    'nama' => 'Gross Profit'
+                ),
+                3 => array(
+                    'kode_neraca' => '59',
+                    'nama' => 'OPEX'
+                ),
+                4 => array(
+                    'kode_neraca' => '74',
+                    'nama' => 'Net Income'
+                )
+            );
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     
 }
