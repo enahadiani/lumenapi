@@ -2690,36 +2690,29 @@ class LaporanController extends Controller
             $sql="select a.kode_pp,a.nama from pp a $whererek order by a.kode_pp ";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
-            $kode_pp = "";
-            $i=0;
-            foreach($rs as $row){
-                if($i == 0){
-                    $kode_pp .= "'$row->kode_pp'";
-                }else{
-                    $kode_pp .= ","."'$row->kode_pp'";
-                }
-                $i++;
-            }
-            $success['whererek'] = $sql;
             
-            $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
-            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
-            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
-            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
-            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
-            case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
-            case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
-            case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7
-            from exs_neraca_pp a
-            $where and a.modul='L' and a.kode_pp in ($kode_pp)
-            order by a.rowindex";
-            $res2 = DB::connection($this->db)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
-
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $i=0;
+                foreach($rs as $row){
+                    $res[$i]['detail'] = [];
+                    $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,a.kode_pp,
+                    case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+                    case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+                    case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+                    case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
+                    case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
+                    case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+                    case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7
+                    from exs_neraca_pp a
+                    $where and a.modul='L' and a.kode_pp = '$row->kode_pp'
+                    order by a.rowindex";
+                    $res2 = DB::connection($this->db)->select($sql2);
+                    $res[$i]['detail'] = json_decode(json_encode($res2),true);
+                    $i++;
+                }
+                
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['detail'] = $res2;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;    
                 return response()->json($success, $this->successStatus);     
@@ -2727,13 +2720,13 @@ class LaporanController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['detail'] = [];
                 $success['status'] = true;
                 // $success['sql'] = $sql;
                 return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
