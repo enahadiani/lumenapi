@@ -174,6 +174,40 @@ class DashboardFPController extends Controller
         }
     }
 
+    public function getMargin(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            
+            $periode = $r->periode;
+
+            $sql = "
+            select a.kode_klp,b.nama, sum(case when d.jenis_akun ='Pendapatan' then -d.n4 else d.n4 end) as nilai
+            from exs_klp_akun a
+            inner join exs_klp b on a.kode_klp=b.kode_klp and b.kode_lokasi='$kode_lokasi'
+            inner join relakun c on a.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
+            inner join exs_neraca d on c.kode_neraca=d.kode_neraca and c.kode_lokasi=d.kode_lokasi and c.kode_fs=d.kode_fs
+            where d.periode='$periode' and d.kode_lokasi='$kode_lokasi' and a.status='Aktif' and c.kode_fs='FS1'
+            group by a.kode_klp,b.nama";
+
+            $select = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($select),true);
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = $res;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     public function getFilterKontribusi(Request $r) {
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -216,5 +250,79 @@ class DashboardFPController extends Controller
         }
     }
 
+    public function getFPBulan(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $tahun = $r->tahun;
+
+            $sql="select a.kode_neraca,a.nama,
+            sum(case when substring(a.periode,5,2) = '01' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n12
+                        from exs_neraca a
+                        where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') and a.kode_fs='FS1'
+                        group by a.kode_neraca,a.nama
+                        order by a.kode_neraca,a.nama
+            ";
+            $select = DB::connection($this->db)->select($sql);
+            $select = json_decode(json_encode($select),true);
+            $series = array();
+            $c=0;
+            $series = array();
+            $pend = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            $beban = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            $hpp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            $net_income = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            foreach($select as $row){
+                $data = [];
+                for($i=1; $i <= 12; $i++) {
+                    array_push($data, floatval($row['n'.$i]));
+                }
+                switch($row['kode_neraca']){
+                    case '41' :
+                        $pend = $data;
+                    break;
+                    case '42' :
+                        $hpp = $data;
+                    break;
+                    case '59' :
+                        $beban = $data;
+                    break;
+                    case '74' :
+                        $net_income = $data;
+                    break;
+                }
+                $c++;
+            }
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['data'] = array(
+                'beban' => $beban,
+                'hpp' => $hpp,
+                'pendapatan' => $pend,
+                'net_income' => $net_income
+            );
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 }
