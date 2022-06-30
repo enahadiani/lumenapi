@@ -1149,29 +1149,31 @@ class MobileController extends Controller
 
             if(isset($request->kode_ta) && $request->kode_ta != ""){
                 $kode_ta = $request->kode_ta;
-                $res3 = DB::connection($this->db)->select("
+                $res3 = DB::connection($this->db)->select("SET NOCOUNT ON; 
                 select kode_ta,nama from sis_ta where kode_ta='$request->kode_ta' and kode_lokasi='$kode_lokasi'");
                 $res3 = json_decode(json_encode($res3),true);
             }else{
                 
-                $res3 = DB::connection($this->db)->select("
+                $res3 = DB::connection($this->db)->select("SET NOCOUNT ON; 
                 select kode_ta,nama from sis_ta where kode_pp='$kode_pp' and kode_lokasi='$kode_lokasi' and flag_aktif='1' ");
                 $res3 = json_decode(json_encode($res3),true);
     
                 $kode_ta = $res3[0]['kode_ta'];
             }
 
-            $res2 = DB::connection($this->db)->select("select distinct a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
+            $res2 = DB::connection($this->db)->select("SET NOCOUNT ON; select a.nik,a.kode_matpel,b.nama as nama_guru,c.nama as nama_matpel,c.skode as singkatan 
             from sis_guru_matpel_kelas a
             inner join sis_guru b on a.nik=b.nik and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
             inner join sis_matpel c on a.kode_matpel=c.kode_matpel and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
-            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' ");
+            where a.kode_pp='$kode_pp' and a.kode_matpel='$request->kode_matpel' and a.kode_kelas='$request->kode_kelas' and a.kode_ta='$kode_ta' 
+            group by a.nik,a.kode_matpel,b.nama,c.nama,c.skode");
             $res2 = json_decode(json_encode($res2),true);
 
-            $sql = "select distinct a.kode_kd,a.nama_kd,'-' as pelaksanaan,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester 
+            $sql = "SET NOCOUNT ON; select a.kode_kd,a.nama_kd,'-' as pelaksanaan,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester 
             from sis_nilai_m a 
             inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp
             where a.kode_pp='$kode_pp' and c.nis='$nik' and a.kode_lokasi='$kode_lokasi'  and a.kode_matpel='$request->kode_matpel' and a.kode_ta='$kode_ta' $filter 
+            group by a.kode_kd,a.nama_kd,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end 
             order by a.kode_kd";
             $rs = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($rs),true);
@@ -1179,7 +1181,8 @@ class MobileController extends Controller
             if(count($res3) > 0){ //mengecek apakah data kosong atau tidak
 
                 for($i=0;$i<count($res);$i++){
-                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan,a.pelaksanaan as deskripsi,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester
+                    $res[$i]['pelaksanaan'] = json_decode(json_encode(DB::connection($this->db)->select("SET NOCOUNT ON;
+                    select a.no_bukti,a.kode_jenis,b.nama as pelaksanaan,c.nilai,convert(varchar,a.tgl_input,103) as tgl,isnull(d.file_dok,'-') as file_dok,isnull(e.kkm,0) as kkm,a.kode_kd,case when c.nilai >= isnull(e.kkm,0) then 'lulus' else 'tidak' end as sts_kkm, case when c.nilai >= isnull(e.kkm,0) then 'Memuaskan, pertahankan diatas minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) else 'Belajar lebih giat jangan menyerah, minimum nilai KKM '+convert(varchar,isnull(e.kkm,0)) end as keterangan,a.pelaksanaan as deskripsi,case a.kode_sem when '1' then 'Ganjil' else 'Genap' end as semester
                     from sis_nilai_m a 
                     inner join sis_jenisnilai b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi and a.kode_pp=b.kode_pp
                     inner join sis_nilai c on a.no_bukti=c.no_bukti and a.kode_lokasi=c.kode_lokasi and a.kode_pp=c.kode_pp 
