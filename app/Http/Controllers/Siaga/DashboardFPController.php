@@ -55,69 +55,163 @@ class DashboardFPController extends Controller
             }
 
             $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+            $tahun_seb = intval($tahun)-1;
+            $bulan = substr($periode,4,2);
+            $periode_seb = $tahun_seb.$bulan;
 
-            $sql = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='41' and kode_fs='FS1' and modul='L'";
-            $select = DB::connection($this->db)->select($sql);
+            //PENDAPATAN
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
-            $sql2 = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='42' and kode_fs='FS1' and modul='L'";
-            $select2 = DB::connection($this->db)->select($sql2);
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
-            $sql3 = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='4T' and kode_fs='FS1' and modul='L'";
-            $select3 = DB::connection($this->db)->select($sql3);
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
-            $sql4 = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='59' and kode_fs='FS1' and modul='L'";
-            $select4 = DB::connection($this->db)->select($sql4);
+            $pend_capai_rka = ($pend_rka <> 0 ? round(($pend_real/$pend_rka)*100,1) : 0);
+            $pend_capai_yoy = ($pend_yoy <> 0 ? round((($pend_real-$pend_yoy)/$pend_yoy)*100,1) : 0);
+            //END PENDAPATAN
 
-            $sql5 = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='74' and kode_fs='FS1' and modul='L'";
-            $select5 = DB::connection($this->db)->select($sql5);
+            //HPP
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='42'";
+            $q = DB::connection($this->db)->select($sql);
+            $cogs_real = (count($q) > 0 ? round($q[0]->real) : 0);
+
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='42'";
+            $q = DB::connection($this->db)->select($sql);
+            $cogs_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
+
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='42'";
+            $q = DB::connection($this->db)->select($sql);
+            $cogs_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+
+            $cogs_capai_rka = ($cogs_rka <> 0 ? round(($cogs_real/$cogs_rka)*100,1) : 0);
+            $cogs_capai_yoy = ($cogs_yoy <> 0 ? round((($cogs_real-$cogs_yoy)/$cogs_yoy)*100,1) : 0);
+            //END HPP
+
+            //GROSS PROFIT
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='4T'";
+            $q = DB::connection($this->db)->select($sql);
+            $gross_real = (count($q) > 0 ? round($q[0]->real) : 0);
+
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='4T'";
+            $q = DB::connection($this->db)->select($sql);
+            $gross_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
+
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='4T'";
+            $q = DB::connection($this->db)->select($sql);
+            $gross_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+
+            $gross_capai_rka = ($gross_rka <> 0 ? round(($gross_real/$gross_rka)*100,1) : 0);
+            $gross_capai_yoy = ($gross_yoy <> 0 ? round((($gross_real-$gross_yoy)/$gross_yoy)*100,1) : 0);
+            //END GROSS PROFIT
+
+            //OPEX
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='59'";
+            $q = DB::connection($this->db)->select($sql);
+            $opex_real = (count($q) > 0 ? round($q[0]->real) : 0);
+
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='59'";
+            $q = DB::connection($this->db)->select($sql);
+            $opex_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
+
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='59'";
+            $q = DB::connection($this->db)->select($sql);
+            $opex_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+
+            $opex_capai_rka = ($opex_rka <> 0 ? round(($opex_real/$opex_rka)*100,1) : 0);
+            $opex_capai_yoy = ($opex_yoy <> 0 ? round((($opex_real-$opex_yoy)/$opex_yoy)*100,1) : 0);
+            //END OPEX
+
+            //NET INCOME
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='74'";
+            $q = DB::connection($this->db)->select($sql);
+            $net_real = (count($q) > 0 ? round($q[0]->real) : 0);
+
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='74'";
+            $q = DB::connection($this->db)->select($sql);
+            $net_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
+
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='74'";
+            $q = DB::connection($this->db)->select($sql);
+            $net_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+
+            $net_capai_rka = ($net_rka <> 0 ? round(($net_real/$net_rka)*100,1) : 0);
+            $net_capai_yoy = ($net_yoy <> 0 ? round((($net_real-$net_yoy)/$net_yoy)*100,1) : 0);
+            //END NET INCOME
 
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
                 'revenue' => [
-                    'nilai' => count($select) > 0 ? round($select[0]->nilai,0) : 0,
-                    'rka' => count($select) > 0 ? round($select[0]->rka,0) : 0,
-                    'yoy' => count($select) > 0 ? round($select[0]->yoy,0) : 0,
-                    'capai_rka' => count($select) > 0 ? ($select[0]->rka <> 0 ? round(($select[0]->nilai/$select[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select) > 0 ? ($select[0]->yoy <> 0 ? round((($select[0]->nilai-$select[0]->yoy)/$select[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $pend_real,
+                    'rka' => $pend_rka,
+                    'yoy' => $pend_yoy,
+                    'capai_rka' => $pend_capai_rka,
+                    'capai_yoy' => $pend_capai_yoy,
                 ],
                 'cogs' => [
-                    'nilai' => count($select2) > 0 ? round($select2[0]->nilai,0) : 0,
-                    'rka' => count($select2) > 0 ? round($select2[0]->rka,0) : 0,
-                    'yoy' => count($select2) > 0 ? round($select2[0]->yoy,0) : 0,
-                    'capai_rka' => count($select2) > 0 ? ($select2[0]->rka <> 0 ? round(($select2[0]->nilai/$select2[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select2) > 0 ? ($select2[0]->yoy <> 0 ? round((($select2[0]->nilai-$select2[0]->yoy)/$select2[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $cogs_real,
+                    'rka' => $cogs_rka,
+                    'yoy' => $cogs_yoy,
+                    'capai_rka' => $cogs_capai_rka,
+                    'capai_yoy' => $cogs_capai_yoy,
                 ],
                 'gross_profit' => [
-                    'nilai' => count($select3) > 0 ? round($select3[0]->nilai,0) : 0,
-                    'rka' => count($select3) > 0 ? round($select3[0]->rka,0) : 0,
-                    'yoy' => count($select3) > 0 ? round($select3[0]->yoy,0) : 0,
-                    'capai_rka' => count($select3) > 0 ? ($select3[0]->rka <> 0 ? round(($select3[0]->nilai/$select3[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select3) > 0 ? ($select3[0]->yoy <> 0 ? round((($select3[0]->nilai-$select3[0]->yoy)/$select3[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $gross_real,
+                    'rka' => $gross_rka,
+                    'yoy' => $gross_yoy,
+                    'capai_rka' => $gross_capai_rka,
+                    'capai_yoy' => $gross_capai_yoy,
                 ],
                 'opex' => [
-                    'nilai' => count($select4) > 0 ? round($select4[0]->nilai,0) : 0,
-                    'rka' => count($select4) > 0 ? round($select4[0]->rka,0) : 0,
-                    'yoy' => count($select4) > 0 ? round($select4[0]->yoy,0) : 0,
-                    'capai_rka' => count($select4) > 0 ? ($select4[0]->rka <> 0 ? round(($select4[0]->nilai/$select4[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select4) > 0 ? ($select4[0]->yoy <> 0 ? round((($select4[0]->nilai-$select4[0]->yoy)/$select4[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $opex_real,
+                    'rka' => $opex_rka,
+                    'yoy' => $opex_yoy,
+                    'capai_rka' => $opex_capai_rka,
+                    'capai_yoy' => $opex_capai_yoy,
                 ],
                 'net_income' => [
-                    'nilai' => count($select5) > 0 ? round($select5[0]->nilai,0) : 0,
-                    'rka' => count($select5) > 0 ? round($select5[0]->rka,0) : 0,
-                    'yoy' => count($select5) > 0 ? round($select5[0]->yoy,0) : 0,
-                    'capai_rka' => count($select5) > 0 ? ($select5[0]->rka <> 0 ? round(($select5[0]->nilai/$select5[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select5) > 0 ? ($select5[0]->yoy <> 0 ? round((($select5[0]->nilai-$select5[0]->yoy)/$select5[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $net_real,
+                    'rka' => $net_rka,
+                    'yoy' => $net_yoy,
+                    'capai_rka' => $net_capai_rka,
+                    'capai_yoy' => $net_capai_yoy,
                 ]
             ];
 

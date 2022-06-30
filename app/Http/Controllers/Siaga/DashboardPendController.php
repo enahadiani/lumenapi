@@ -55,21 +55,43 @@ class DashboardPendController extends Controller
             }
 
             $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+            $tahun_seb = intval($tahun)-1;
+            $bulan = substr($periode,4,2);
+            $periode_seb = $tahun_seb.$bulan;
 
-            $sql = "select case when jenis_akun='Pendapatan' then -n4 else n4 end as nilai, case when jenis_akun='Pendapatan' then -n2 else n2 end as rka,  case when jenis_akun='Pendapatan' then -n5 else n5 end as yoy, 0 as rkm 
-            from exs_neraca 
-            where periode='$periode' and kode_lokasi='$kode_lokasi' and kode_neraca='41' and kode_fs='FS1' and modul='L'";
-            $select = DB::connection($this->db)->select($sql);
+            //PENDAPATAN
+            $sql = "select isnull(sum(nilai),0) as real
+            from ds_real 
+            where periode='$periode' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
+
+            $sql = "select isnull(sum(nilai),0) as yoy
+            from ds_real 
+            where periode='$periode_seb' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
+
+            $sql = "select isnull(sum(rka),0) as rka
+            from ds_rka 
+            where periode='$periode' and kode_neraca='41'";
+            $q = DB::connection($this->db)->select($sql);
+            $pend_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+
+            $pend_capai_rka = ($pend_rka <> 0 ? round(($pend_real/$pend_rka)*100,1) : 0);
+            $pend_capai_yoy = ($pend_yoy <> 0 ? round((($pend_real-$pend_yoy)/$pend_yoy)*100,1) : 0);
+            //END PENDAPATAN
 
             $success['status'] = true;
             $success['message'] = "Success!";
             $success['data'] = [
                 'revenue' => [
-                    'nilai' => count($select) > 0 ? round($select[0]->nilai,0) : 0,
-                    'rka' => count($select) > 0 ? round($select[0]->rka,0) : 0,
-                    'yoy' => count($select) > 0 ? round($select[0]->yoy,0) : 0,
-                    'capai_rka' => count($select) > 0 ? ($select[0]->rka <> 0 ? round(($select[0]->nilai/$select[0]->rka)*100,1) : 0) : 0,
-                    'capai_yoy' => count($select) > 0 ? ($select[0]->yoy <> 0 ? round((($select[0]->nilai-$select[0]->yoy)/$select[0]->yoy)*100,1) : 0) : 0,
+                    'nilai' => $pend_real,
+                    'rka' => $pend_rka,
+                    'yoy' => $pend_yoy,
+                    'capai_rka' => $pend_capai_rka,
+                    'capai_yoy' => $pend_capai_yoy,
                 ]
             ];
 
