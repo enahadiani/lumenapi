@@ -238,7 +238,7 @@ class DashboardFPController extends Controller
 			select a.kode_klp,b.nama, sum(a.nilai) as nilai
 			from ds_real a
 			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where a.kode_neraca='$request->kode_neraca' and a.periode='$periode'
+			where a.kode_neraca='$r->kode_neraca' and a.periode='$periode'
 			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
@@ -276,11 +276,17 @@ class DashboardFPController extends Controller
             
             $periode = $r->periode;
 
-            $sql = "select a.kode_klp,b.nama, sum(a.nilai) as nilai
-			from ds_real a
-			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where a.periode='$periode'
-			group by a.kode_klp,b.nama";
+            $sql = "with dashCTE(kode_klp,nama,nilai)
+            as
+            (
+            select a.kode_klp,b.nama, sum(a.nilai) as nilai
+            from ds_real a
+            inner join exs_klp b on a.kode_klp=b.kode_klp 
+            where a.periode='$periode'
+            group by a.kode_klp,b.nama
+            )
+            SELECT kode_klp,nama,nilai,nilai * 100.0/(select sum(nilai) from dashCTE) as persen
+            from dashCTE;";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
