@@ -235,13 +235,11 @@ class DashboardFPController extends Controller
             $periode = $r->periode;
 
             $sql = "
-            select a.kode_klp,b.nama, sum(case when d.jenis_akun ='Pendapatan' then -d.n4 else d.n4 end) as nilai
-            from exs_klp_akun a
-            inner join exs_klp b on a.kode_klp=b.kode_klp and b.kode_lokasi='$kode_lokasi'
-            inner join relakun c on a.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
-            inner join exs_neraca d on c.kode_neraca=d.kode_neraca and c.kode_lokasi=d.kode_lokasi and c.kode_fs=d.kode_fs
-            where d.kode_neraca='$r->kode_neraca' and d.periode='$periode' and d.kode_lokasi='$kode_lokasi' and a.status='Aktif' and c.kode_fs='FS1'
-            group by a.kode_klp,b.nama";
+			select a.kode_klp,b.nama, sum(a.nilai) as nilai
+			from ds_real a
+			inner join exs_klp b on a.kode_klp=b.kode_klp 
+			where a.kode_neraca='$request->kode_neraca' and a.periode='$periode'
+			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -278,14 +276,11 @@ class DashboardFPController extends Controller
             
             $periode = $r->periode;
 
-            $sql = "
-            select a.kode_klp,b.nama, sum(case when d.jenis_akun ='Pendapatan' then -d.n4 else d.n4 end) as nilai
-            from exs_klp_akun a
-            inner join exs_klp b on a.kode_klp=b.kode_klp and b.kode_lokasi='$kode_lokasi'
-            inner join relakun c on a.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
-            inner join exs_neraca d on c.kode_neraca=d.kode_neraca and c.kode_lokasi=d.kode_lokasi and c.kode_fs=d.kode_fs
-            where d.periode='$periode' and d.kode_lokasi='$kode_lokasi' and a.status='Aktif' and c.kode_fs='FS1'
-            group by a.kode_klp,b.nama";
+            $sql = "select a.kode_klp,b.nama, sum(a.nilai) as nilai
+			from ds_real a
+			inner join exs_klp b on a.kode_klp=b.kode_klp 
+			where a.periode='$periode'
+			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -353,23 +348,23 @@ class DashboardFPController extends Controller
             
             $tahun = $r->tahun;
 
-            $sql="select a.kode_neraca,a.nama,
-            sum(case when substring(a.periode,5,2) = '01' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n1,
-            sum(case when substring(a.periode,5,2) = '02' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n2,
-            sum(case when substring(a.periode,5,2) = '03' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n3,
-            sum(case when substring(a.periode,5,2) = '04' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n4,
-            sum(case when substring(a.periode,5,2) = '05' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n5,
-            sum(case when substring(a.periode,5,2) = '06' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n6,
-            sum(case when substring(a.periode,5,2) = '07' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n7,
-            sum(case when substring(a.periode,5,2) = '08' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n8,
-            sum(case when substring(a.periode,5,2) = '09' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n9,
-            sum(case when substring(a.periode,5,2) = '10' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n10,
-            sum(case when substring(a.periode,5,2) = '11' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n11,
-            sum(case when substring(a.periode,5,2) = '12' then (case when a.jenis_akun <> 'Pendapatan' then a.n4 else -a.n4 end) else 0 end) as n12
-                        from exs_neraca a
-                        where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') and a.kode_fs='FS1'
-                        group by a.kode_neraca,a.nama
-                        order by a.kode_neraca,a.nama
+            $sql="select a.kode_neraca,
+            sum(case when substring(a.periode,5,2) = '01' then a.nilai else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then a.nilai else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then a.nilai else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then a.nilai else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then a.nilai else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then a.nilai else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then a.nilai else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then a.nilai else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then a.nilai else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then a.nilai else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then a.nilai else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then a.nilai else 0 end) as n12
+                        from ds_real a
+                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') 
+                        group by a.kode_neraca
+                        order by a.kode_neraca
             ";
             $select = DB::connection($this->db)->select($sql);
             $select = json_decode(json_encode($select),true);
