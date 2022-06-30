@@ -270,8 +270,8 @@ class DashboardPendController extends Controller
             if(count($res) > 0){
                 foreach($res as $row){
                     array_push($kategori,$row['kode_klp']);
-                    array_push($rka_ytd,floatval($row['rka']));
-                    array_push($real_ytd,floatval($row['real']));
+                    array_push($rka_ytd,floatval(abs($row['rka'])));
+                    array_push($real_ytd,floatval(abs($row['real'])));
                 }
             }
 
@@ -284,17 +284,18 @@ class DashboardPendController extends Controller
 
             $select2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($select2),true);
-            $real_fy = []; $rka_fy = []; 
+            $real_fy = []; $rka_fy = []; $kategori2 = [];
             if(count($res2) > 0){
                 foreach($res2 as $row){
-                    array_push($rka_fy,floatval($row['rka']));
-                    array_push($real_fy,floatval($row['real']));
+                    array_push($rka_fy,floatval(abs($row['rka'])));
+                    array_push($real_fy,floatval(abs($row['real'])));
+                    array_push($kategori2,$row['kode_klp']);
                 }
             }
 
             $success['status'] = true;
             $success['message'] = "Success!";
-            $success['kategori'] = $kategori;
+            $success['kategori'] = count($kategori) > count($kategori2) ? $kategori : $kategori2;
             $success['rka_ytd'] = $rka_ytd;
             $success['real_ytd'] = $real_ytd;
             $success['rka_fy'] = $rka_fy;
