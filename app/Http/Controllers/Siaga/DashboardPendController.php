@@ -58,24 +58,42 @@ class DashboardPendController extends Controller
             $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun)-1;
             $bulan = substr($periode,4,2);
+            $periode_awal = $tahun.'01';
             $periode_seb = $tahun_seb.$bulan;
+            $periode_awal_seb = $tahun_seb.'01';
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter .= " and kode_klp='$r->kode_klp' ";
+            }
+
+            $filter_periode = " periode='$periode' and ";
+            $filter_periode_seb = " periode='$periode_seb' and ";
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $filter_periode = " periode='$periode' and ";
+                    $filter_periode_seb = " periode='$periode_seb' and ";
+                }else{
+                    $filter_periode = " periode between '$periode_awal' and '$periode' and ";
+                    $filter_periode_seb = " periode between '$periode_awal_seb' and '$periode_seb' and ";
+                }
+            }
 
             //PENDAPATAN
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='41'";
+            where $filter_periode kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='41'";
+            where $filter_periode_seb kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='41'";
+            where $filter_periode kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -109,16 +127,37 @@ class DashboardPendController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
-            }
-            
+            }  
             
             $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+            $tahun_seb = intval($tahun)-1;
+            $bulan = substr($periode,4,2);
+            $periode_awal = $tahun.'01';
+            $periode_seb = $tahun_seb.$bulan;
+            $periode_awal_seb = $tahun_seb.'01';
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter .= " and a.kode_klp='$r->kode_klp' ";
+            }
+
+            $filter_periode = " a.periode='$periode' and ";
+            $filter_periode_seb = " a.periode='$periode_seb' and ";
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $filter_periode = " a.periode='$periode' and ";
+                    $filter_periode_seb = " a.periode='$periode_seb' and ";
+                }else{
+                    $filter_periode = " a.periode between '$periode_awal' and '$periode' and ";
+                    $filter_periode_seb = " a.periode between '$periode_awal_seb' and '$periode_seb' and ";
+                }
+            }
 
             $sql = "
 			select a.kode_klp,b.nama, sum(a.nilai) as nilai
 			from ds_real a
 			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where a.kode_neraca='41' and a.periode='$periode'
+			where $filter_periode a.kode_neraca='41' 
 			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
@@ -153,18 +192,43 @@ class DashboardPendController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            
             $periode = $r->periode;
             $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun)-1;
             $bulan = substr($periode,4,2);
+            $periode_awal = $tahun.'01';
             $periode_seb = $tahun_seb.$bulan;
+            $periode_awal_seb = $tahun_seb.'01';
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter .= " and a.kode_klp='$r->kode_klp' ";
+            }
 
-            $sql = "select a.kode_klp,b.nama,a.nilai as ytd,isnull(c.nilai,0) as yoy
-            from ds_real a
-            inner join exs_klp b on a.kode_klp=b.kode_klp 
-            left join ds_real c on a.kode_klp=c.kode_klp and a.kode_neraca=c.kode_neraca and c.periode='$periode_seb'
-            where a.kode_neraca='41' and a.periode='$periode'";
+            $filter_periode = " a.periode='$periode' and ";
+            $filter_periode_seb = " a.periode='$periode_seb' and ";
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $filter_periode = " a.periode='$periode' and ";
+                    $filter_periode_seb = " a.periode='$periode_seb' and ";
+                }else{
+                    $filter_periode = " a.periode between '$periode_awal' and '$periode' and ";
+                    $filter_periode_seb = " a.periode between '$periode_awal_seb' and '$periode_seb' and ";
+                }
+            }
+
+            $sql = "select a.kode_klp,a.nama, isnull(b.ytd,0) as ytd,  isnull(c.yoy,0) as yoy
+            from exs_klp a
+            left join (select a.kode_klp,sum(a.nilai) as ytd
+                        from ds_real a
+                        where $filter_periode a.kode_neraca='41'
+                        group by a.kode_klp
+                    ) b on a.kode_klp=b.kode_klp 
+            left join (select a.kode_klp,sum(a.nilai) as yoy
+                        from ds_real a
+                        where $filter_periode_seb a.kode_neraca='41'
+                        group by a.kode_klp
+                    ) c on a.kode_klp=c.kode_klp 
+            where (isnull(b.ytd,0) <> 0 or  isnull(c.yoy,0) <> 0)";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -255,13 +319,37 @@ class DashboardPendController extends Controller
             $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun)-1;
             $bulan = substr($periode,4,2);
+            $periode_awal = $tahun.'01';
             $periode_seb = $tahun_seb.$bulan;
+            $periode_awal_seb = $tahun_seb.'01';
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter .= " and a.kode_klp='$r->kode_klp' ";
+            }
 
-            $sql = "select a.kode_klp,b.nama,a.nilai as real,isnull(c.rka,0) as rka
-            from ds_real a
-            inner join exs_klp b on a.kode_klp=b.kode_klp 
-            left join ds_rka c on a.kode_klp=c.kode_klp and a.kode_neraca=c.kode_neraca and a.periode=c.periode
-            where a.kode_neraca='41' and a.periode='$periode'
+            $filter_periode = " a.periode='$periode' and ";
+            $filter_tahun = " substring(a.periode,1,4)='$tahun' and ";
+            if(isset($r->jenis) && $r->jenis != ""){
+                if($r->jenis == "PRD"){
+                    $filter_periode = " a.periode='$periode' and ";
+                }else{
+                    $filter_periode = " a.periode between '$periode_awal' and '$periode' and ";
+                }
+            }
+
+            $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
+            from exs_klp a
+            left join (select a.kode_klp,sum(a.nilai) as real
+                        from ds_real a
+                        where $filter_periode a.kode_neraca='41' 
+                        group by a.kode_klp
+                    ) b on a.kode_klp=b.kode_klp 
+            left join (select a.kode_klp,sum(a.rka) as rka
+                        from ds_rka a
+                        where $filter_periode a.kode_neraca='41' 
+                        group by a.kode_klp
+                    ) c on a.kode_klp=c.kode_klp 
+            where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)
             ";
 
             $select = DB::connection($this->db)->select($sql);
@@ -275,12 +363,19 @@ class DashboardPendController extends Controller
                 }
             }
 
-            $sql = "select a.kode_klp,b.nama,sum(a.nilai) as real,sum(isnull(c.rka,0)) as rka
-            from ds_real a
-            inner join exs_klp b on a.kode_klp=b.kode_klp 
-            left join ds_rka c on a.kode_klp=c.kode_klp and a.kode_neraca=c.kode_neraca and a.periode=c.periode
-            where a.kode_neraca='41' and substring(a.periode,1,4)='$tahun'
-			group by a.kode_klp,b.nama";
+            $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
+            from exs_klp a
+            left join (select a.kode_klp,sum(a.nilai) as real
+                        from ds_real a
+                        where $filter_tahun a.kode_neraca='41' 
+                        group by a.kode_klp
+                    ) b on a.kode_klp=b.kode_klp 
+            left join (select a.kode_klp,sum(a.rka) as rka
+                        from ds_rka a
+                        where $filter_tahun a.kode_neraca='41' 
+                        group by a.kode_klp
+                    ) c on a.kode_klp=c.kode_klp 
+            where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)";
 
             $select2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($select2),true);
