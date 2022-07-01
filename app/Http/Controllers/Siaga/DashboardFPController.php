@@ -336,17 +336,11 @@ class DashboardFPController extends Controller
                 }
             }
 
-            $sql = "with dashCTE(kode_klp,nama,nilai)
-            as
-            (
-            select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as nilai
+            $sql = "select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41') then -a.nilai else 0 end) as revenue,sum(case when a.kode_neraca in ('42') then a.nilai else 0 end) as cogs
             from ds_real a
             inner join exs_klp b on a.kode_klp=b.kode_klp 
             where $filter_periode and a.kode_klp in ('AD','BS','TS','RB')
-            group by a.kode_klp,b.nama
-            )
-            SELECT kode_klp,nama,nilai,nilai * 100.0/(select sum(nilai) from dashCTE) as persen
-            from dashCTE;";
+            group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);

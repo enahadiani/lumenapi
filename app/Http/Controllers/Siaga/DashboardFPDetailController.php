@@ -221,12 +221,12 @@ class DashboardFPDetailController extends Controller
             from exs_klp a
             left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as ytd
                         from ds_real a
-                        where $filter_periode a.kode_neraca='$r->kode_neraca'
+                        where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) b on a.kode_klp=b.kode_klp 
             left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as yoy
                         from ds_real a
-                        where $filter_periode_seb a.kode_neraca='$r->kode_neraca'
+                        where $filter_periode_seb a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) c on a.kode_klp=c.kode_klp 
             where (isnull(b.ytd,0) <> 0 or  isnull(c.yoy,0) <> 0)";
@@ -259,7 +259,10 @@ class DashboardFPDetailController extends Controller
             }
             
             $tahun = $r->tahun;
-
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter .= " and a.kode_klp='$r->kode_klp' ";
+            }
             $sql="select a.kode_klp,b.nama,
             sum(case when substring(a.periode,5,2) = '01' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n1,
             sum(case when substring(a.periode,5,2) = '02' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n2,
@@ -275,7 +278,7 @@ class DashboardFPDetailController extends Controller
             sum(case when substring(a.periode,5,2) = '12' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n12
                         from ds_real a
                         inner join exs_klp b on a.kode_klp=b.kode_klp 
-                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca='$r->kode_neraca'
+                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp,b.nama
                         order by a.kode_klp,b.nama
             ";
@@ -289,9 +292,17 @@ class DashboardFPDetailController extends Controller
                 for($i=1; $i <= 12; $i++) {
                     array_push($data, floatval($row['n'.$i]));
                 }
+                if($c % 2 == 0){
+                    $symbol = 'diamond';
+                }else{
+                    $symbol = 'square';
+                }
                 $series[$c] = array(
                     'name' => $row['nama'],
-                    'data' => $data
+                    'data' => $data,
+                    'marker' => array(
+                        'symbol' => $symbol
+                    )
                 );
                 $c++;
             }
@@ -342,12 +353,12 @@ class DashboardFPDetailController extends Controller
             from exs_klp a
             left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
                         from ds_real a
-                        where $filter_periode a.kode_neraca='$r->kode_neraca' 
+                        where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) b on a.kode_klp=b.kode_klp 
             left join (select a.kode_klp,sum(a.rka) as rka
                         from ds_rka a
-                        where $filter_periode a.kode_neraca='$r->kode_neraca' 
+                        where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) c on a.kode_klp=c.kode_klp 
             where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)
@@ -368,12 +379,12 @@ class DashboardFPDetailController extends Controller
             from exs_klp a
             left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
                         from ds_real a
-                        where $filter_tahun a.kode_neraca='$r->kode_neraca' 
+                        where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) b on a.kode_klp=b.kode_klp 
             left join (select a.kode_klp,sum(a.rka) as rka
                         from ds_rka a
-                        where $filter_tahun a.kode_neraca='$r->kode_neraca' 
+                        where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
                         group by a.kode_klp
                     ) c on a.kode_klp=c.kode_klp 
             where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)";
