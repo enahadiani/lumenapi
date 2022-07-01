@@ -79,13 +79,13 @@ class DashboardFPController extends Controller
             }
 
             //PENDAPATAN
-            $sql = "select isnull(sum(nilai),0) as real
+            $sql = "select isnull(sum(nilai),0)*-1 as real
             from ds_real 
             where $filter_periode kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
-            $sql = "select isnull(sum(nilai),0) as yoy
+            $sql = "select isnull(sum(nilai),0)*-1 as yoy
             from ds_real 
             where $filter_periode_seb kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
@@ -274,7 +274,7 @@ class DashboardFPController extends Controller
             }
 
             $sql = "
-			select a.kode_klp,b.nama, sum(a.nilai) as nilai
+			select a.kode_klp,b.nama, sum(case when a.kode_neraca='41' then a.nilai*-1 else a.nilai end) as nilai
 			from ds_real a
 			inner join exs_klp b on a.kode_klp=b.kode_klp 
 			where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
@@ -287,7 +287,7 @@ class DashboardFPController extends Controller
                 foreach($res as $row){
                     $value = [
                         'name' => $row['kode_klp'],
-                        'y' => abs($row['nilai'])
+                        'y' => floatval($row['nilai'])
                     ];
                     array_push($chart, $value);
                 }
@@ -339,7 +339,7 @@ class DashboardFPController extends Controller
             $sql = "with dashCTE(kode_klp,nama,nilai)
             as
             (
-            select a.kode_klp,b.nama, sum(a.nilai) as nilai
+            select a.kode_klp,b.nama, sum(case when a.kode_neraca='41' then -a.nilai else a.nilai end) as nilai
             from ds_real a
             inner join exs_klp b on a.kode_klp=b.kode_klp 
             where $filter_periode
@@ -418,18 +418,18 @@ class DashboardFPController extends Controller
                 $filter = " and a.kode_klp='$r->kode_klp' ";
             }
             $sql="select a.kode_neraca,
-            sum(case when substring(a.periode,5,2) = '01' then a.nilai else 0 end) as n1,
-            sum(case when substring(a.periode,5,2) = '02' then a.nilai else 0 end) as n2,
-            sum(case when substring(a.periode,5,2) = '03' then a.nilai else 0 end) as n3,
-            sum(case when substring(a.periode,5,2) = '04' then a.nilai else 0 end) as n4,
-            sum(case when substring(a.periode,5,2) = '05' then a.nilai else 0 end) as n5,
-            sum(case when substring(a.periode,5,2) = '06' then a.nilai else 0 end) as n6,
-            sum(case when substring(a.periode,5,2) = '07' then a.nilai else 0 end) as n7,
-            sum(case when substring(a.periode,5,2) = '08' then a.nilai else 0 end) as n8,
-            sum(case when substring(a.periode,5,2) = '09' then a.nilai else 0 end) as n9,
-            sum(case when substring(a.periode,5,2) = '10' then a.nilai else 0 end) as n10,
-            sum(case when substring(a.periode,5,2) = '11' then a.nilai else 0 end) as n11,
-            sum(case when substring(a.periode,5,2) = '12' then a.nilai else 0 end) as n12
+            sum(case when substring(a.periode,5,2) = '01' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then (case when a.kode_neraca='41' then -a.nilai else a.nilai end) else 0 end) as n12
                         from ds_real a
                         where substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') $filter
                         group by a.kode_neraca

@@ -79,13 +79,13 @@ class DashboardPendController extends Controller
             }
 
             //PENDAPATAN
-            $sql = "select isnull(sum(nilai),0) as real
+            $sql = "select isnull(sum(nilai),0)*-1 as real
             from ds_real 
             where $filter_periode kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
-            $sql = "select isnull(sum(nilai),0) as yoy
+            $sql = "select isnull(sum(nilai),0)*-1 as yoy
             from ds_real 
             where $filter_periode_seb kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
@@ -154,10 +154,10 @@ class DashboardPendController extends Controller
             }
 
             $sql = "
-			select a.kode_klp,b.nama, sum(a.nilai) as nilai
+			select a.kode_klp,b.nama, sum(case when a.kode_neraca='41' then a.nilai*-1 else a.nilai end) as nilai
 			from ds_real a
 			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where $filter_periode a.kode_neraca='41' 
+			where $filter_periode a.kode_neraca='41' $filter
 			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
@@ -167,7 +167,7 @@ class DashboardPendController extends Controller
                 foreach($res as $row){
                     $value = [
                         'name' => $row['kode_klp'],
-                        'y' => abs($row['nilai'])
+                        'y' => floatval($row['nilai'])
                     ];
                     array_push($chart, $value);
                 }
@@ -218,12 +218,12 @@ class DashboardPendController extends Controller
 
             $sql = "select a.kode_klp,a.nama, isnull(b.ytd,0) as ytd,  isnull(c.yoy,0) as yoy
             from exs_klp a
-            left join (select a.kode_klp,sum(a.nilai) as ytd
+            left join (select a.kode_klp,sum(a.nilai)*-1 as ytd
                         from ds_real a
                         where $filter_periode a.kode_neraca='41'
                         group by a.kode_klp
                     ) b on a.kode_klp=b.kode_klp 
-            left join (select a.kode_klp,sum(a.nilai) as yoy
+            left join (select a.kode_klp,sum(a.nilai)*-1 as yoy
                         from ds_real a
                         where $filter_periode_seb a.kode_neraca='41'
                         group by a.kode_klp
@@ -260,18 +260,18 @@ class DashboardPendController extends Controller
             $tahun = $r->tahun;
 
             $sql="select a.kode_klp,b.nama,
-            sum(case when substring(a.periode,5,2) = '01' then a.nilai else 0 end) as n1,
-            sum(case when substring(a.periode,5,2) = '02' then a.nilai else 0 end) as n2,
-            sum(case when substring(a.periode,5,2) = '03' then a.nilai else 0 end) as n3,
-            sum(case when substring(a.periode,5,2) = '04' then a.nilai else 0 end) as n4,
-            sum(case when substring(a.periode,5,2) = '05' then a.nilai else 0 end) as n5,
-            sum(case when substring(a.periode,5,2) = '06' then a.nilai else 0 end) as n6,
-            sum(case when substring(a.periode,5,2) = '07' then a.nilai else 0 end) as n7,
-            sum(case when substring(a.periode,5,2) = '08' then a.nilai else 0 end) as n8,
-            sum(case when substring(a.periode,5,2) = '09' then a.nilai else 0 end) as n9,
-            sum(case when substring(a.periode,5,2) = '10' then a.nilai else 0 end) as n10,
-            sum(case when substring(a.periode,5,2) = '11' then a.nilai else 0 end) as n11,
-            sum(case when substring(a.periode,5,2) = '12' then a.nilai else 0 end) as n12
+            sum(case when substring(a.periode,5,2) = '01' then a.nilai*-1 else 0 end) as n1,
+            sum(case when substring(a.periode,5,2) = '02' then a.nilai*-1 else 0 end) as n2,
+            sum(case when substring(a.periode,5,2) = '03' then a.nilai*-1 else 0 end) as n3,
+            sum(case when substring(a.periode,5,2) = '04' then a.nilai*-1 else 0 end) as n4,
+            sum(case when substring(a.periode,5,2) = '05' then a.nilai*-1 else 0 end) as n5,
+            sum(case when substring(a.periode,5,2) = '06' then a.nilai*-1 else 0 end) as n6,
+            sum(case when substring(a.periode,5,2) = '07' then a.nilai*-1 else 0 end) as n7,
+            sum(case when substring(a.periode,5,2) = '08' then a.nilai*-1 else 0 end) as n8,
+            sum(case when substring(a.periode,5,2) = '09' then a.nilai*-1 else 0 end) as n9,
+            sum(case when substring(a.periode,5,2) = '10' then a.nilai*-1 else 0 end) as n10,
+            sum(case when substring(a.periode,5,2) = '11' then a.nilai*-1 else 0 end) as n11,
+            sum(case when substring(a.periode,5,2) = '12' then a.nilai*-1 else 0 end) as n12
                         from ds_real a
                         inner join exs_klp b on a.kode_klp=b.kode_klp 
                         where substring(a.periode,1,4)='$tahun' and a.kode_neraca='41'
@@ -339,7 +339,7 @@ class DashboardPendController extends Controller
 
             $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
             from exs_klp a
-            left join (select a.kode_klp,sum(a.nilai) as real
+            left join (select a.kode_klp,sum(a.nilai)*-1 as real
                         from ds_real a
                         where $filter_periode a.kode_neraca='41' 
                         group by a.kode_klp
@@ -358,14 +358,14 @@ class DashboardPendController extends Controller
             if(count($res) > 0){
                 foreach($res as $row){
                     array_push($kategori,$row['kode_klp']);
-                    array_push($rka_ytd,floatval(abs($row['rka'])));
-                    array_push($real_ytd,floatval(abs($row['real'])));
+                    array_push($rka_ytd,floatval($row['rka']));
+                    array_push($real_ytd,floatval($row['real']));
                 }
             }
 
             $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
             from exs_klp a
-            left join (select a.kode_klp,sum(a.nilai) as real
+            left join (select a.kode_klp,sum(a.nilai)*-1 as real
                         from ds_real a
                         where $filter_tahun a.kode_neraca='41' 
                         group by a.kode_klp
@@ -382,8 +382,8 @@ class DashboardPendController extends Controller
             $real_fy = []; $rka_fy = []; $kategori2 = [];
             if(count($res2) > 0){
                 foreach($res2 as $row){
-                    array_push($rka_fy,floatval(abs($row['rka'])));
-                    array_push($real_fy,floatval(abs($row['real'])));
+                    array_push($rka_fy,floatval($row['rka']));
+                    array_push($real_fy,floatval($row['real']));
                     array_push($kategori2,$row['kode_klp']);
                 }
             }
