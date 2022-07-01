@@ -342,7 +342,7 @@ class DashboardFPController extends Controller
             select a.kode_klp,b.nama, sum(case when a.kode_neraca='41' then -a.nilai else a.nilai end) as nilai
             from ds_real a
             inner join exs_klp b on a.kode_klp=b.kode_klp 
-            where $filter_periode
+            where $filter_periode and a.kode_klp in ('AD','BS','TS','RB')
             group by a.kode_klp,b.nama
             )
             SELECT kode_klp,nama,nilai,nilai * 100.0/(select sum(nilai) from dashCTE) as persen
