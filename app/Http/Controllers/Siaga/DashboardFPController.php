@@ -419,5 +419,33 @@ class DashboardFPController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    public function getDefaultFilter(Request $r) {
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            
+            $periode = '-';
+            $sql = "select max(periode) as periode from ds_real";
+            $select = DB::connection($this->db)->select($sql);
+            if(count($select) > 0){
+                $periode = $select[0]->periode;
+            }
+
+            $success['status'] = true;
+            $success['message'] = "Success!";
+            $success['periode'] = $periode;
+
+            return response()->json($success, $this->successStatus); 
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['periode'] = "-";
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
 }
