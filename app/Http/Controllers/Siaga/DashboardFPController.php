@@ -59,23 +59,27 @@ class DashboardFPController extends Controller
             $tahun_seb = intval($tahun)-1;
             $bulan = substr($periode,4,2);
             $periode_seb = $tahun_seb.$bulan;
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter = " and kode_klp='$r->kode_klp' ";
+            }
 
             //PENDAPATAN
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='41'";
+            where periode='$periode' and kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='41'";
+            where periode='$periode_seb' and kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='41'";
+            where periode='$periode' and kode_neraca='41' $filter";
             $q = DB::connection($this->db)->select($sql);
             $pend_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -86,19 +90,19 @@ class DashboardFPController extends Controller
             //HPP
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='42'";
+            where periode='$periode' and kode_neraca='42' $filter";
             $q = DB::connection($this->db)->select($sql);
             $cogs_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='42'";
+            where periode='$periode_seb' and kode_neraca='42' $filter";
             $q = DB::connection($this->db)->select($sql);
             $cogs_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='42'";
+            where periode='$periode' and kode_neraca='42' $filter";
             $q = DB::connection($this->db)->select($sql);
             $cogs_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -109,19 +113,19 @@ class DashboardFPController extends Controller
             //GROSS PROFIT
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='4T'";
+            where periode='$periode' and kode_neraca='4T' $filter";
             $q = DB::connection($this->db)->select($sql);
             $gross_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='4T'";
+            where periode='$periode_seb' and kode_neraca='4T' $filter";
             $q = DB::connection($this->db)->select($sql);
             $gross_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='4T'";
+            where periode='$periode' and kode_neraca='4T' $filter";
             $q = DB::connection($this->db)->select($sql);
             $gross_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -132,19 +136,19 @@ class DashboardFPController extends Controller
             //OPEX
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='59'";
+            where periode='$periode' and kode_neraca='59' $filter";
             $q = DB::connection($this->db)->select($sql);
             $opex_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='59'";
+            where periode='$periode_seb' and kode_neraca='59' $filter";
             $q = DB::connection($this->db)->select($sql);
             $opex_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='59'";
+            where periode='$periode' and kode_neraca='59' $filter";
             $q = DB::connection($this->db)->select($sql);
             $opex_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -155,19 +159,19 @@ class DashboardFPController extends Controller
             //NET INCOME
             $sql = "select isnull(sum(nilai),0) as real
             from ds_real 
-            where periode='$periode' and kode_neraca='74'";
+            where periode='$periode' and kode_neraca='74' $filter";
             $q = DB::connection($this->db)->select($sql);
             $net_real = (count($q) > 0 ? round($q[0]->real) : 0);
 
             $sql = "select isnull(sum(nilai),0) as yoy
             from ds_real 
-            where periode='$periode_seb' and kode_neraca='74'";
+            where periode='$periode_seb' and kode_neraca='74' $filter";
             $q = DB::connection($this->db)->select($sql);
             $net_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
-            where periode='$periode' and kode_neraca='74'";
+            where periode='$periode' and kode_neraca='74' $filter";
             $q = DB::connection($this->db)->select($sql);
             $net_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
 
@@ -233,12 +237,16 @@ class DashboardFPController extends Controller
             
             
             $periode = $r->periode;
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter = " and a.kode_klp='$r->kode_klp' ";
+            }
 
             $sql = "
 			select a.kode_klp,b.nama, sum(a.nilai) as nilai
 			from ds_real a
 			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where a.kode_neraca='$r->kode_neraca' and a.periode='$periode'
+			where a.kode_neraca='$r->kode_neraca' and a.periode='$periode' $filter
 			group by a.kode_klp,b.nama";
 
             $select = DB::connection($this->db)->select($sql);
@@ -353,7 +361,10 @@ class DashboardFPController extends Controller
             }
             
             $tahun = $r->tahun;
-
+            $filter = "";
+            if(isset($r->kode_klp) && $r->kode_klp != ""){
+                $filter = " and a.kode_klp='$r->kode_klp' ";
+            }
             $sql="select a.kode_neraca,
             sum(case when substring(a.periode,5,2) = '01' then a.nilai else 0 end) as n1,
             sum(case when substring(a.periode,5,2) = '02' then a.nilai else 0 end) as n2,
@@ -368,7 +379,7 @@ class DashboardFPController extends Controller
             sum(case when substring(a.periode,5,2) = '11' then a.nilai else 0 end) as n11,
             sum(case when substring(a.periode,5,2) = '12' then a.nilai else 0 end) as n12
                         from ds_real a
-                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') 
+                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('41','42','59','74') $filter
                         group by a.kode_neraca
                         order by a.kode_neraca
             ";
