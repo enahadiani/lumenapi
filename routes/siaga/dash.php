@@ -23,11 +23,18 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('dataof-modul','Siaga\DashboardController@getDataOfModul');
     $router->get('data-other','Siaga\DashboardController@getDataOther');
     
+    $router->get('data-fp-default-filter','Siaga\DashboardFPController@getDefaultFilter');
     $router->get('data-fp-box','Siaga\DashboardFPController@getDataBox');
     $router->get('data-fp-kontribusi-filter','Siaga\DashboardFPController@getFilterKontribusi');
     $router->get('data-fp-kontribusi','Siaga\DashboardFPController@getKontribusi');
     $router->get('data-fp-per-bulan','Siaga\DashboardFPController@getFPBulan');
     $router->get('data-fp-margin','Siaga\DashboardFPController@getMargin');
+    
+    $router->get('data-fp-detail-box','Siaga\DashboardFPDetailController@getDataBox');
+    $router->get('data-fp-detail-kontribusi','Siaga\DashboardFPDetailController@getKontribusi');
+    $router->get('data-fp-detail-ytdvsyoy','Siaga\DashboardFPDetailController@getYTDvsYoY');
+    $router->get('data-fp-detail-per-bulan','Siaga\DashboardFPDetailController@getChartBulan');
+    $router->get('data-fp-detail-rkavsreal','Siaga\DashboardFPDetailController@getRKAvsReal');
     
     $router->get('data-pend-box','Siaga\DashboardPendController@getDataBox');
     $router->get('data-pend-kontribusi','Siaga\DashboardPendController@getKontribusi');
