@@ -517,6 +517,86 @@ class LaporanController extends Controller
             return response()->json($success, $this->successStatus);
         }
     }
+
+    function getLabaRugiAgg(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $col_array = array('periode','kode_fs');
+            $db_col_name = array('a.periode','a.kode_fs');
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+
+            for($i = 0; $i<count($col_array); $i++){
+                if(ISSET($request->input($col_array[$i])[0])){
+                    if($request->input($col_array[$i])[0] == "range" AND ISSET($request->input($col_array[$i])[1]) AND ISSET($request->input($col_array[$i])[2])){
+                        $where .= " and (".$db_col_name[$i]." between '".$request->input($col_array[$i])[1]."' AND '".$request->input($col_array[$i])[2]."') ";
+                    }else if($request->input($col_array[$i])[0] == "=" AND ISSET($request->input($col_array[$i])[1])){
+                        $where .= " and ".$db_col_name[$i]." = '".$request->input($col_array[$i])[1]."' ";
+                    }else if($request->input($col_array[$i])[0] == "in" AND ISSET($request->input($col_array[$i])[1])){
+                        $tmp = explode(",",$request->input($col_array[$i])[1]);
+                        for($x=0;$x<count($tmp);$x++){
+                            if($x == 0){
+                                $this_in .= "'".$tmp[$x]."'";
+                            }else{
+            
+                                $this_in .= ","."'".$tmp[$x]."'";
+                            }
+                        }
+                        $where .= " and ".$db_col_name[$i]." in ($this_in) ";
+                    }
+                }
+            }
+            // $nik_user=$request->nik_user;
+            // $periode=$request->input('periode')[1];
+            // $kode_fs=$request->input('kode_fs')[1];
+            // $tahun = substr($periode,0,4);
+            // $bln = substr($periode,4,2);
+            // $tahunseb = intval($tahun)-1;
+
+            // $sql="exec sp_neraca2_gar_dw '$kode_fs','L','S','1','$periode','".$tahunseb.$bln."','$kode_lokasi','$nik_user' ";
+            // $res = DB::connection($this->db)->update($sql);
+            
+            $sql2="select a.kode_neraca,a.kode_fs,a.kode_lokasi,a.nama,a.tipe,a.level_spasi,
+            case a.jenis_akun when  'Pendapatan' then -a.n1 else a.n1 end as n1,
+            case a.jenis_akun when  'Pendapatan' then -a.n2 else a.n2 end as n2,
+            case a.jenis_akun when  'Pendapatan' then -a.n3 else a.n3 end as n3,
+            case a.jenis_akun when  'Pendapatan' then -a.n4 else a.n4 end as n4,
+            case a.jenis_akun when  'Pendapatan' then -a.n5 else a.n5 end as n5,
+            case a.jenis_akun when  'Pendapatan' then -a.n6 else a.n6 end as n6,
+            case a.jenis_akun when  'Pendapatan' then -a.n7 else a.n7 end as n7
+            from exs_neraca a
+            $where and a.modul='L' 
+            order by a.rowindex";
+            $res = DB::connection($this->db)->select($sql2);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;    
+                $success["query"] = $sql2;    
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                $success['sql2'] = $sql2;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
     
     
 

@@ -29,6 +29,13 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->get('lap-history-app-spb','Siaga\LaporanController@getHistoryAppSPB');
     $router->get('lap-aju-form-spb','Siaga\LaporanController@getAjuFormSPB');
 
+
+    //Report Laba-rugi Anggaran
+    $router->get('lap-labarugi-agg','Siaga\LaporanController@getLabaRugiAgg');
+
+    $router->get('filter-default-labarugi-agg','Siaga\FilterController@getFilterDefaultLabaRugiAgg');
+    $router->get('filter-periode-keu','Siaga\FilterController@getFilterPeriodeKeuangan');
+    $router->get('filter-fs','Siaga\FilterController@getFilterFS');
 });
 
 
