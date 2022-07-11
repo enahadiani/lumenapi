@@ -437,9 +437,7 @@ class DashboardFPController extends Controller
             ";
             $select = DB::connection($this->db)->select($sql);
             $select = json_decode(json_encode($select),true);
-            $series = array();
             $c=0;
-            $series = array();
             $pend = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             $beban = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
             $hpp = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
