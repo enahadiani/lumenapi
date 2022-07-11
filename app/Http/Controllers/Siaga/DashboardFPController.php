@@ -336,7 +336,13 @@ class DashboardFPController extends Controller
                 }
             }
 
-            $sql = "select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41') then -a.nilai else 0 end) as revenue,sum(case when a.kode_neraca in ('42') then a.nilai else 0 end) as cogs
+            $sql = "
+            select 'TOTAL' as kode_klp,'Total' as nama,sum(case when a.kode_neraca in ('41') then -a.nilai else 0 end) as revenue,sum(case when a.kode_neraca in ('42') then a.nilai else 0 end) as cogs
+            from ds_real a
+            inner join exs_klp b on a.kode_klp=b.kode_klp 
+            where $filter_periode 
+            union all
+            select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41') then -a.nilai else 0 end) as revenue,sum(case when a.kode_neraca in ('42') then a.nilai else 0 end) as cogs
             from ds_real a
             inner join exs_klp b on a.kode_klp=b.kode_klp 
             where $filter_periode and a.kode_klp in ('AD','BS','TS','RB')
