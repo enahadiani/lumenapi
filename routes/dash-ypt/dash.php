@@ -42,6 +42,11 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-ccr-trend-saldo','DashYpt\DashboardCCRController@getTrendSaldoPiutang');
     $router->get('data-ccr-bidang','DashYpt\DashboardCCRController@getBidang');  
     $router->get('data-ccr-umur-piutang','DashYpt\DashboardCCRController@getUmurPiutang');
+
+    $router->get('data-ccr-unit-box','DashYpt\DashboardCCRUnitController@getDataBox'); 
+    $router->get('data-ccr-unit-trend','DashYpt\DashboardCCRUnitController@getTrendCCR');  
+    $router->get('data-ccr-unit-trend-saldo','DashYpt\DashboardCCRUnitController@getTrendSaldoPiutang');
+    $router->get('data-ccr-unit-umur-piutang','DashYpt\DashboardCCRUnitController@getUmurPiutang');
     
     $router->get('data-cf-box','DashYpt\DashboardCFController@getDataBox');  
     $router->get('data-cf-chart-bulanan','DashYpt\DashboardCFController@getCashFlowBulanan');
@@ -69,6 +74,12 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-piutang-komposisi','DashYpt\DashboardPiutangController@getKomposisiPiutang');  
     $router->get('data-piutang-umur','DashYpt\DashboardPiutangController@getUmurPiutang');  
     $router->get('data-piutang-saldo','DashYpt\DashboardPiutangController@getTrendSaldoPiutang');  
+
+    
+    $router->get('data-piutang-unit-box','DashYpt\DashboardPiutangUnitController@getDataBox'); 
+    $router->get('data-piutang-unit-komposisi','DashYpt\DashboardPiutangUnitController@getKomposisiPiutang');  
+    $router->get('data-piutang-unit-umur','DashYpt\DashboardPiutangUnitController@getUmurPiutang');  
+    $router->get('data-piutang-unit-saldo','DashYpt\DashboardPiutangUnitController@getTrendSaldoPiutang');  
 
 
 });
