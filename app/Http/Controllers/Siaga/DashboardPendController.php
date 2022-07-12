@@ -164,12 +164,15 @@ class DashboardPendController extends Controller
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $chart = [];
-            $warna = ['#FCE597','#808080','#F7A783','#80B7BF'];
+            $warna = ['#FCE597','#808080','#F7A783','#80B7BF','#1d3f9c','#3dc9cc','#a07aaa'];
             $wklp = [
                 'AD' => $warna[0],
                 'BS' => $warna[1],
                 'RB' => $warna[2],
                 'TS' => $warna[3],
+                'BL' => $warna[4],
+                'PL' => $warna[5],
+                'BU' => $warna[6]
             ];
             if(count($res) > 0){
                 foreach($res as $row){
