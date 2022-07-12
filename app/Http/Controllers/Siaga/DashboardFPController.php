@@ -273,12 +273,21 @@ class DashboardFPController extends Controller
                 }
             }
 
-            $sql = "
-			select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41','4T','74') then a.nilai*-1 else a.nilai end) as nilai
-			from ds_real a
-			inner join exs_klp b on a.kode_klp=b.kode_klp 
-			where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
-			group by a.kode_klp,b.nama";
+            if($r->kode_neraca == "59"){
+                $sql = "select a.kode_neraca as kode_klp,b.nama, sum(case when a.kode_neraca in ('41','4T','74') then a.nilai*-1 else a.nilai end) as nilai
+                from ds_real a
+                inner join neraca b on a.kode_neraca=b.kode_neraca
+                where $filter_periode a.kode_neraca in ('51','55','53','54') $filter
+                group by a.kode_neraca,b.nama ";
+            }else{
+
+                $sql = "
+                select a.kode_klp,b.nama, sum(case when a.kode_neraca in ('41','4T','74') then a.nilai*-1 else a.nilai end) as nilai
+                from ds_real a
+                inner join exs_klp b on a.kode_klp=b.kode_klp 
+                where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
+                group by a.kode_klp,b.nama";
+            }
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -291,28 +300,33 @@ class DashboardFPController extends Controller
                 'TS' => $warna[3],
                 'BL' => $warna[4],
                 'PL' => $warna[5],
-                'BU' => $warna[6]
+                'BU' => $warna[6],
+                '53' => $warna[0],
+                '54' => $warna[1],
+                '51' => $warna[2],
+                '55' => $warna[3],
             ];
             if(count($res) > 0){
                 foreach($res as $row){
                     $nilai = floatval($row['nilai']);
+                    $kode_klp = $r->kode_neraca == "59" ? $row['nama'] : $row['kode_klp'];
                     if($nilai < 0){
                         $value = [
-                            'name' => $row['kode_klp'],
+                            'name' => $kode_klp,
                             'y' => abs($nilai),
                             'negative' => true,
                             'fillColor' => 'url(#custom-pattern)',                            
                             'color' => 'url(#custom-pattern)',
-                            'key' => $row['kode_klp']
+                            'key' => $kode_klp
                         ];
                     }else{
                         $value = [
-                            'name' => $row['kode_klp'],
+                            'name' => $kode_klp,
                             'y' => abs($nilai),
                             'negative' => false,
                             'fillColor' => $wklp[$row['kode_klp']],                            
                             'color' => $wklp[$row['kode_klp']],
-                            'key' => $row['kode_klp']
+                            'key' => $kode_klp
                         ];
                     }
                     array_push($chart, $value);
