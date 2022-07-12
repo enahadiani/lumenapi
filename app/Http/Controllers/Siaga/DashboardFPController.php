@@ -283,12 +283,35 @@ class DashboardFPController extends Controller
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
             $chart = [];
+            $warna = ['#FCE597','#808080','#F7A783','#80B7BF'];
+            $wklp = [
+                'AD' => $warna[0],
+                'BS' => $warna[1],
+                'RB' => $warna[2],
+                'TS' => $warna[3],
+            ];
             if(count($res) > 0){
                 foreach($res as $row){
-                    $value = [
-                        'name' => $row['kode_klp'],
-                        'y' => floatval($row['nilai'])
-                    ];
+                    $nilai = floatval($row['nilai']);
+                    if($nilai < 0){
+                        $value = [
+                            'name' => $row['kode_klp'],
+                            'y' => abs($nilai),
+                            'negative' => true,
+                            'fillColor' => 'url(#custom-pattern)',                            
+                            'color' => 'url(#custom-pattern)',
+                            'key' => $row['kode_klp']
+                        ];
+                    }else{
+                        $value = [
+                            'name' => $row['kode_klp'],
+                            'y' => abs($nilai),
+                            'negative' => false,
+                            'fillColor' => $wklp[$row['kode_klp']],                            
+                            'color' => $wklp[$row['kode_klp']],
+                            'key' => $row['kode_klp']
+                        ];
+                    }
                     array_push($chart, $value);
                 }
             }
