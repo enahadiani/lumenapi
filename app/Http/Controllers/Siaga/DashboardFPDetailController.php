@@ -434,7 +434,7 @@ class DashboardFPDetailController extends Controller
 
             $select2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($select2),true);
-            $real_fy = []; $rka_fy = []; $kategori= []; $prka_fy = []; $preal_fy = [];
+            $real_fy = []; $rka_fy = []; $kategori2= []; $prka_fy = []; $preal_fy = [];
             if(count($res2) > 0){
                 foreach($res2 as $row){
                     $persen = floatval($row['rka']) != 0 ? (floatval($row['real'])/floatval($row['rka']))*100 : 0;
