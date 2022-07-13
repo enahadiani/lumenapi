@@ -258,7 +258,7 @@ class DashboardFPDetailController extends Controller
             }
 
             if($r->kode_neraca == "59"){
-                $sql = "select a.kode_neraca,a.nama as kode_klp, isnull(b.ytd,0) as ytd,  isnull(c.yoy,0) as yoy
+                $sql = "select a.kode_neraca as kode_klp,a.nama, isnull(b.ytd,0) as ytd,  isnull(c.yoy,0) as yoy
                 from neraca a
                 left join (select a.kode_neraca,sum(a.nilai) as ytd
                             from ds_real a
