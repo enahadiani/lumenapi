@@ -180,7 +180,7 @@ class DashboardPendController extends Controller
                     if($nilai < 0){
                         $value = [
                             'name' => $row['kode_klp'],
-                            'y' => abs($nilai),
+                            'y' => $nilai,
                             'negative' => true,
                             'fillColor' => 'url(#custom-pattern)',                            
                             'color' => 'url(#custom-pattern)',
@@ -189,7 +189,7 @@ class DashboardPendController extends Controller
                     }else{
                         $value = [
                             'name' => $row['kode_klp'],
-                            'y' => abs($nilai),
+                            'y' => $nilai,
                             'negative' => false,
                             'fillColor' => $wklp[$row['kode_klp']],                            
                             'color' => $wklp[$row['kode_klp']],

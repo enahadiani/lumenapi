@@ -194,7 +194,7 @@ class DashboardFPDetailController extends Controller
                     if($nilai < 0){
                         $value = [
                             'name' => $kode_klp,
-                            'y' => abs($nilai),
+                            'y' => $nilai,
                             'negative' => true,
                             'fillColor' => 'url(#custom-pattern)',                            
                             'color' => 'url(#custom-pattern)',
@@ -203,7 +203,7 @@ class DashboardFPDetailController extends Controller
                     }else{
                         $value = [
                             'name' => $kode_klp,
-                            'y' => abs($nilai),
+                            'y' => $nilai,
                             'negative' => false,
                             'fillColor' => $wklp[$row['kode_klp']],                            
                             'color' => $wklp[$row['kode_klp']],
