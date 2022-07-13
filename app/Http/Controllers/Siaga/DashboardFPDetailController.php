@@ -414,7 +414,7 @@ class DashboardFPDetailController extends Controller
                     array_push($rka_ytd,floatval($row['rka']));
                     array_push($real_ytd,floatval($row['real']));
                     array_push($prka_ytd,100);
-                    array_push($prka_ytd,$persen);
+                    array_push($preal_ytd,$persen);
                 }
             }
 
@@ -442,7 +442,7 @@ class DashboardFPDetailController extends Controller
                     array_push($rka_fy,floatval($row['rka']));
                     array_push($real_fy,floatval($row['real']));
                     array_push($prka_fy,100);
-                    array_push($prka_fy,$persen);
+                    array_push($preal_fy,$persen);
                 }
             }
 
