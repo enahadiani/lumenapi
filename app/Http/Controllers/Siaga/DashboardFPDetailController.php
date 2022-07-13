@@ -412,20 +412,39 @@ class DashboardFPDetailController extends Controller
                 }
             }
 
-            $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
-            from exs_klp a
-            left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
-                        from ds_real a
-                        where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
-                        group by a.kode_klp
-                    ) b on a.kode_klp=b.kode_klp 
-            left join (select a.kode_klp,sum(a.rka) as rka
-                        from ds_rka a
-                        where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
-                        group by a.kode_klp
-                    ) c on a.kode_klp=c.kode_klp 
-            where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)
-            ";
+            if($r->kode_neraca == "59"){
+                $sql = "select a.kode_neraca as kode_klp,a.nama, isnull(b.real,0) as real, isnull(c.rka,0) as rka
+                from neraca a
+                left join (select a.kode_neraca,sum(a.nilai) as real
+                            from ds_real a
+                            where $filter_periode a.kode_neraca in ('51','55','53','54') $filter
+                            group by a.kode_neraca
+                        ) b on a.kode_neraca=b.kode_neraca 
+                left join (select a.kode_neraca,sum(a.rka) as rka
+                            from ds_rka a
+                            where $filter_periode a.kode_neraca in ('51','55','53','54') $filter
+                            group by a.kode_neraca
+                        ) c on a.kode_neraca=c.kode_neraca 
+                where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)
+                ";
+            }else{
+
+                $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
+                from exs_klp a
+                left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
+                            from ds_real a
+                            where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
+                            group by a.kode_klp
+                        ) b on a.kode_klp=b.kode_klp 
+                left join (select a.kode_klp,sum(a.rka) as rka
+                            from ds_rka a
+                            where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
+                            group by a.kode_klp
+                        ) c on a.kode_klp=c.kode_klp 
+                where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)
+                ";
+            }
+
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
@@ -441,19 +460,36 @@ class DashboardFPDetailController extends Controller
                 }
             }
 
-            $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
-            from exs_klp a
-            left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
-                        from ds_real a
-                        where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
-                        group by a.kode_klp
-                    ) b on a.kode_klp=b.kode_klp 
-            left join (select a.kode_klp,sum(a.rka) as rka
-                        from ds_rka a
-                        where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
-                        group by a.kode_klp
-                    ) c on a.kode_klp=c.kode_klp 
-            where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)";
+            if($r->kode_neraca == "59"){
+                $sql = "select a.kode_neraca as kode_klp,a.nama, isnull(b.real,0) as real, isnull(c.rka,0) as rka
+                from neraca a
+                left join (select a.kode_neraca,sum(a.nilai) as real
+                            from ds_real a
+                            where $filter_tahun a.kode_neraca in ('51','55','53','54') $filter
+                            group by a.kode_neraca
+                        ) b on a.kode_neraca=b.kode_neraca 
+                left join (select a.kode_neraca,sum(a.rka) as rka
+                            from ds_rka a
+                            where $filter_tahun a.kode_neraca in ('51','55','53','54') $filter
+                            group by a.kode_neraca
+                        ) c on a.kode_neraca=c.kode_neraca 
+                where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)";
+            }else{
+
+                $sql = "select a.kode_klp,a.nama, isnull(b.real,0) as real,  isnull(c.rka,0) as rka
+                from exs_klp a
+                left join (select a.kode_klp,sum(case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) as real
+                            from ds_real a
+                            where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
+                            group by a.kode_klp
+                        ) b on a.kode_klp=b.kode_klp 
+                left join (select a.kode_klp,sum(a.rka) as rka
+                            from ds_rka a
+                            where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
+                            group by a.kode_klp
+                        ) c on a.kode_klp=c.kode_klp 
+                where (isnull(b.real,0) <> 0 or  isnull(c.rka,0) <> 0)";
+            }
 
             $select2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($select2),true);
