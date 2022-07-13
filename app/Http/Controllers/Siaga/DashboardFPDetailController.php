@@ -303,25 +303,48 @@ class DashboardFPDetailController extends Controller
             if(isset($r->kode_klp) && $r->kode_klp != ""){
                 $filter .= " and a.kode_klp='$r->kode_klp' ";
             }
-            $sql="select a.kode_klp,b.nama,
-            sum(case when substring(a.periode,5,2) = '01' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n1,
-            sum(case when substring(a.periode,5,2) = '02' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n2,
-            sum(case when substring(a.periode,5,2) = '03' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n3,
-            sum(case when substring(a.periode,5,2) = '04' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n4,
-            sum(case when substring(a.periode,5,2) = '05' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n5,
-            sum(case when substring(a.periode,5,2) = '06' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n6,
-            sum(case when substring(a.periode,5,2) = '07' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n7,
-            sum(case when substring(a.periode,5,2) = '08' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n8,
-            sum(case when substring(a.periode,5,2) = '09' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n9,
-            sum(case when substring(a.periode,5,2) = '10' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n10,
-            sum(case when substring(a.periode,5,2) = '11' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n11,
-            sum(case when substring(a.periode,5,2) = '12' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n12
-                        from ds_real a
-                        inner join exs_klp b on a.kode_klp=b.kode_klp 
-                        where substring(a.periode,1,4)='$tahun' and a.kode_neraca='$r->kode_neraca' $filter
-                        group by a.kode_klp,b.nama
-                        order by a.kode_klp,b.nama
-            ";
+            if($r->kode_neraca == "59"){
+                $sql="select a.kode_neraca as kode_klp,b.nama,
+                sum(case when substring(a.periode,5,2) = '01' then a.nilai else 0 end) as n1,
+                sum(case when substring(a.periode,5,2) = '02' then a.nilai else 0 end) as n2,
+                sum(case when substring(a.periode,5,2) = '03' then a.nilai else 0 end) as n3,
+                sum(case when substring(a.periode,5,2) = '04' then a.nilai else 0 end) as n4,
+                sum(case when substring(a.periode,5,2) = '05' then a.nilai else 0 end) as n5,
+                sum(case when substring(a.periode,5,2) = '06' then a.nilai else 0 end) as n6,
+                sum(case when substring(a.periode,5,2) = '07' then a.nilai else 0 end) as n7,
+                sum(case when substring(a.periode,5,2) = '08' then a.nilai else 0 end) as n8,
+                sum(case when substring(a.periode,5,2) = '09' then a.nilai else 0 end) as n9,
+                sum(case when substring(a.periode,5,2) = '10' then a.nilai else 0 end) as n10,
+                sum(case when substring(a.periode,5,2) = '11' then a.nilai else 0 end) as n11,
+                sum(case when substring(a.periode,5,2) = '12' then a.nilai else 0 end) as n12
+                            from ds_real a
+                            inner join neraca b on a.kode_neraca=b.kode_neraca
+                            where substring(a.periode,1,4)='$tahun' and a.kode_neraca in ('51','55','53','54')  $filter
+                            group by a.kode_neraca,b.nama
+                            order by a.kode_neraca,b.nama
+                ";
+            }else{
+
+                $sql="select a.kode_klp,b.nama,
+                sum(case when substring(a.periode,5,2) = '01' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n1,
+                sum(case when substring(a.periode,5,2) = '02' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n2,
+                sum(case when substring(a.periode,5,2) = '03' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n3,
+                sum(case when substring(a.periode,5,2) = '04' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n4,
+                sum(case when substring(a.periode,5,2) = '05' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n5,
+                sum(case when substring(a.periode,5,2) = '06' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n6,
+                sum(case when substring(a.periode,5,2) = '07' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n7,
+                sum(case when substring(a.periode,5,2) = '08' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n8,
+                sum(case when substring(a.periode,5,2) = '09' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n9,
+                sum(case when substring(a.periode,5,2) = '10' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n10,
+                sum(case when substring(a.periode,5,2) = '11' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n11,
+                sum(case when substring(a.periode,5,2) = '12' then (case when a.kode_neraca in ('41','4T','74') then -a.nilai else a.nilai end) else 0 end) as n12
+                            from ds_real a
+                            inner join exs_klp b on a.kode_klp=b.kode_klp 
+                            where substring(a.periode,1,4)='$tahun' and a.kode_neraca='$r->kode_neraca' $filter
+                            group by a.kode_klp,b.nama
+                            order by a.kode_klp,b.nama
+                ";
+            }
             $select = DB::connection($this->db)->select($sql);
             $select = json_decode(json_encode($select),true);
             $series = array();
