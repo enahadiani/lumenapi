@@ -381,12 +381,15 @@ class DashboardPendController extends Controller
 
             $select = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($select),true);
-            $real_ytd = []; $rka_ytd = []; $kategori= [];
+            $real_ytd = []; $rka_ytd = []; $kategori= []; $prka_ytd = []; $preal_ytd = [];
             if(count($res) > 0){
                 foreach($res as $row){
+                    $persen = floatval($row['rka']) != 0 ? (floatval($row['real'])/floatval($row['rka']))*100 : 0;
                     array_push($kategori,$row['kode_klp']);
                     array_push($rka_ytd,floatval($row['rka']));
                     array_push($real_ytd,floatval($row['real']));
+                    array_push($prka_ytd,100);
+                    array_push($preal_ytd,$persen);
                 }
             }
 
@@ -406,12 +409,15 @@ class DashboardPendController extends Controller
 
             $select2 = DB::connection($this->db)->select($sql);
             $res2 = json_decode(json_encode($select2),true);
-            $real_fy = []; $rka_fy = []; $kategori2 = [];
+            $real_fy = []; $rka_fy = []; $kategori2= []; $prka_fy = []; $preal_fy = [];
             if(count($res2) > 0){
                 foreach($res2 as $row){
+                    $persen = floatval($row['rka']) != 0 ? (floatval($row['real'])/floatval($row['rka']))*100 : 0;
+                    array_push($kategori,$row['kode_klp']);
                     array_push($rka_fy,floatval($row['rka']));
                     array_push($real_fy,floatval($row['real']));
-                    array_push($kategori2,$row['kode_klp']);
+                    array_push($prka_fy,100);
+                    array_push($preal_fy,$persen);
                 }
             }
 
@@ -422,6 +428,10 @@ class DashboardPendController extends Controller
             $success['real_ytd'] = $real_ytd;
             $success['rka_fy'] = $rka_fy;
             $success['real_fy'] = $real_fy;
+            $success['prka_ytd'] = $prka_ytd;
+            $success['preal_ytd'] = $preal_ytd;
+            $success['prka_fy'] = $prka_fy;
+            $success['preal_fy'] = $preal_fy;
 
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
