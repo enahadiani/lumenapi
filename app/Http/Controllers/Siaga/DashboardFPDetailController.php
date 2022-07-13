@@ -413,7 +413,7 @@ class DashboardFPDetailController extends Controller
             }
 
             if($r->kode_neraca == "59"){
-                $sql = "select a.kode_neraca as kode_klp,a.nama, isnull(b.real,0) as real, isnull(c.rka,0) as rka
+                $sql = "select a.kode_neraca,a.nama as kode_klp, isnull(b.real,0) as real, isnull(c.rka,0) as rka
                 from neraca a
                 left join (select a.kode_neraca,sum(a.nilai) as real
                             from ds_real a
@@ -461,7 +461,7 @@ class DashboardFPDetailController extends Controller
             }
 
             if($r->kode_neraca == "59"){
-                $sql = "select a.kode_neraca as kode_klp,a.nama, isnull(b.real,0) as real, isnull(c.rka,0) as rka
+                $sql = "select a.kode_neraca,a.nama as kode_klp, isnull(b.real,0) as real, isnull(c.rka,0) as rka
                 from neraca a
                 left join (select a.kode_neraca,sum(a.nilai) as real
                             from ds_real a
