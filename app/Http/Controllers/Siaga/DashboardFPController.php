@@ -114,7 +114,7 @@ class DashboardFPController extends Controller
             $q = DB::connection($this->db)->select($sql);
             $cogs_yoy = (count($q) > 0 ? round($q[0]->yoy) : 0);
 
-            $sql = "select isnull(sum(rka),0) as rka
+            $sql = "select isnull(sum(rka),0)*-1  as rka
             from ds_rka 
             where $filter_periode kode_neraca='42' $filter";
             $q = DB::connection($this->db)->select($sql);
@@ -274,7 +274,7 @@ class DashboardFPController extends Controller
             }
 
             if($r->kode_neraca == "59"){
-                $sql = "select a.kode_neraca as kode_klp,b.nama, sum(case when a.kode_neraca in ('41','4T','74') then a.nilai*-1 else a.nilai end) as nilai
+                $sql = "select a.kode_neraca as kode_klp, case a.kode_neraca when '54' then 'OPHAR' else REPLACE(REPLACE(RTRIM(LTRIM(b.nama)),'BEBAN ',''),'BIAYA ','') end as nama, sum(case when a.kode_neraca in ('41','4T','74') then a.nilai*-1 else a.nilai end) as nilai
                 from ds_real a
                 inner join neraca b on a.kode_neraca=b.kode_neraca
                 where $filter_periode a.kode_neraca in ('51','55','53','54') $filter
