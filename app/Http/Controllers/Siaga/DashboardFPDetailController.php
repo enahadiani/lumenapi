@@ -92,11 +92,12 @@ class DashboardFPDetailController extends Controller
             $q = DB::connection($this->db)->select($sql);
             $pend_yoy = (count($q) > 0 ? (in_array($r->kode_neraca,$kode_jenis_pend) ? round($q[0]->yoy)*-1 : round($q[0]->yoy) ) : 0);
 
+            $kali_min = array('42');
             $sql = "select isnull(sum(rka),0) as rka
             from ds_rka 
             where $filter_periode kode_neraca='$r->kode_neraca' $filter";
             $q = DB::connection($this->db)->select($sql);
-            $pend_rka = (count($q) > 0 ? round($q[0]->rka) : 0);
+            $pend_rka = (count($q) > 0 ? (in_array($r->kode_neraca,$kali_min) ? round($q[0]->rka)*-1 : round($q[0]->rka) ) : 0);
 
             $pend_capai_rka = ($pend_rka <> 0 ? round(($pend_real/$pend_rka)*100,1) : 0);
             $pend_capai_yoy = ($pend_yoy <> 0 ? round((($pend_real-$pend_yoy)/$pend_yoy)*100,1) : 0);
@@ -453,7 +454,7 @@ class DashboardFPDetailController extends Controller
                             where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
                             group by a.kode_klp
                         ) b on a.kode_klp=b.kode_klp 
-                left join (select a.kode_klp,sum(a.rka) as rka
+                left join (select a.kode_klp,sum(case when a.kode_neraca='42' then -a.rka else a.rka end) as rka
                             from ds_rka a
                             where $filter_periode a.kode_neraca='$r->kode_neraca' $filter
                             group by a.kode_klp
@@ -500,7 +501,7 @@ class DashboardFPDetailController extends Controller
                             where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
                             group by a.kode_klp
                         ) b on a.kode_klp=b.kode_klp 
-                left join (select a.kode_klp,sum(a.rka) as rka
+                left join (select a.kode_klp,sum(case when a.kode_neraca='42' then -a.rka else a.rka end) as rka
                             from ds_rka a
                             where $filter_tahun a.kode_neraca='$r->kode_neraca' $filter
                             group by a.kode_klp
