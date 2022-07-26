@@ -77,11 +77,11 @@ class HashPasswordController extends Controller
             $j=0;$x=1;
             for($i=0; $i < $jum; $i++){
                 $j++;
-                if($x % 500 == 0){
+                if($x % 100 == 0){
                     $res[] = array('no'=>$i,'kode_pp'=>$request->input('kode_pp'),'nama'=>$request->input('kode_pp'),'jumlah'=>$j);
                     $j=0;
                 }
-                if($x == $jum && ($x % 500 != 0) ){
+                if($x == $jum && ($x % 100 != 0) ){
                     $res[] = array('no'=>$i,'kode_pp'=>$request->input('kode_pp'),'nama'=>$request->input('kode_pp'),'jumlah'=>$j);
                     $j=0;
                 }
