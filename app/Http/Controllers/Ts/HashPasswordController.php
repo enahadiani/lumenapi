@@ -40,7 +40,7 @@ class HashPasswordController extends Controller
             select 0 AS no,a.kode_pp, b.nama,count(a.nik) as jumlah
             from sis_hakakses a
             left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.password is null
+            where a.kode_lokasi='$request->kode_lokasi' and a.password is null
             group by a.kode_pp,b.nama ");
             $res = json_decode(json_encode($res),true);
             
@@ -101,6 +101,40 @@ class HashPasswordController extends Controller
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getLokasi(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $res = DB::connection($this->db)->select("
+            select kode_lokasi,nama
+            from lokasi a");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+            }
+            return response()->json($success, $this->successStatus);
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

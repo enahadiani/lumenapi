@@ -118,6 +118,7 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
 
     $router->get('hash-pass-pp','Ts\HashPasswordController@index');
     $router->get('hash-pass-pp-batch','Ts\HashPasswordController@getBatch');
+    $router->get('hash-pass-pp-lokasi','Ts\HashPasswordController@getLokasi');
     
     
 });
