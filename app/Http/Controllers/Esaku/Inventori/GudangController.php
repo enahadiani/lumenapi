@@ -36,6 +36,7 @@ class GudangController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->kode_gudang)){
@@ -44,12 +45,13 @@ class GudangController extends Controller
                 }else{
                     $filter = " and a.kode_gudang='$request->kode_gudang' ";
                 }
-                $sql= "select a.kode_gudang,a.nama,a.pic,a.telp,a.alamat,a.kode_pp,b.nama as nama_pp, c.nama as nama_pic from brg_gudang a 
+                $sql= "select a.kode_gudang,a.nama,a.pic,a.telp,a.alamat,a.kode_pp,b.nama as nama_pp, c.nama as nama_pic 
+                from brg_gudang a 
                 left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                 left join karyawan c on a.pic=c.nik and a.kode_lokasi=c.kode_lokasi 
-                where a.kode_lokasi='".$kode_lokasi."' $filter ";
+                where a.kode_lokasi='".$kode_lokasi."' and a.kode_gudang='$pabrik' $filter ";
             }else{
-                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_gudang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_gudang where kode_lokasi= '".$kode_lokasi."' and kode_gudang='$pabrik' ";
             }
 
             $res = DB::connection($this->sql)->select($sql);

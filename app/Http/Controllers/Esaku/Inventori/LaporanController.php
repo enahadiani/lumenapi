@@ -389,7 +389,7 @@ class LaporanController extends Controller
             ISNULL(a.debet, 0) AS debet, ISNULL(a.kredit, 0) AS kredit, d.h_avg, d.h_avg*a.stok AS nilai, b.sat_kecil, 
             b.nama AS nama_barang,c.nama AS nama_gudang
             FROM brg_stok a
-            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi 
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             INNER JOIN brg_gudang c ON a.kode_gudang=c.kode_gudang AND a.kode_lokasi=c.kode_lokasi 
             INNER JOIN brg_hpp d ON a.kode_lokasi=d.kode_lokasi AND a.kode_barang=d.kode_barang
             $where
@@ -523,7 +523,7 @@ class LaporanController extends Controller
             //     order by a.kode_barang,a.kode_gudang";
             $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total
             from brg_stok a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
             left join brg_hpp d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.nik_user=d.nik_user
             $where and a.nik_user='$nik_user'
@@ -553,7 +553,7 @@ class LaporanController extends Controller
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
                 inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
-                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
                 union all
                 select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
@@ -562,7 +562,7 @@ class LaporanController extends Controller
                 from brg_trans_d a
                 inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
                 inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
-                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi 
+                inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
                 )a order by a.tgl_ed";
             $res2 = DB::connection($this->sql)->select($sql4);
@@ -659,7 +659,7 @@ class LaporanController extends Controller
              b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total,isnull(a.so_awal,0) as so_awal,
              isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit, b.hpp, (a.stok * b.hpp) as saldo_persediaan
              from brg_stok a
-             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
              inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
              left join brg_hpp d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.nik_user=d.nik_user
              $where and a.nik_user='$nik_user'
@@ -757,7 +757,7 @@ class LaporanController extends Controller
 
             $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total
             from brg_trans_d a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             where a.kode_lokasi = '".$kode_lokasi."'  and a.no_bukti in ($nb) 
             order by a.no_bukti
             " ;
@@ -851,7 +851,7 @@ class LaporanController extends Controller
 
             $sql2="select a.no_bukti,a.kode_barang,b.nama as nama_brg,a.satuan,a.jumlah,a.bonus,a.tot_diskon,a.harga,a.total
             from brg_trans_d a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             where a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti in ($nb) 
             order by a.kode_barang
             " ;
@@ -954,7 +954,7 @@ class LaporanController extends Controller
             sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex,
             '0' as hpp,'0' as stok_akhir, '-' as keterangan, c.nik_user,a.dc
             from brg_trans_d a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
 			inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and c.tanggal in ($tgl) $nik_filter
 			group by c.tanggal,a.kode_barang,b.nama,b.sat_kecil,a.harga,c.nik_user,a.dc
@@ -1091,7 +1091,7 @@ class LaporanController extends Controller
             sum(a.bonus) as bonus,a.harga,sum(a.diskon) as diskon,sum((a.harga*a.jumlah)-a.diskon) as total,sum(a.total) as total_ex, sum(a.hpp) as hpp,
             e.stok_akhir, '-' as keterangan,c.nik_user
             from brg_trans_d a
-            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             inner join brg_jualpiu_dloc c on a.no_bukti=c.no_jual and a.kode_lokasi=c.kode_lokasi
 			left join (select a.no_bukti, a.kode_barang, isnull(sum(a.so_akhir),0) as stok_akhir, a.kode_lokasi from brg_lap_harian a
 			where a.kode_lokasi = '".$kode_lokasi."'
@@ -1198,7 +1198,7 @@ class LaporanController extends Controller
 
                 $sql2="select distinct a.no_bukti,a.kode_barang,b.nama as nama_brg,b.sat_kecil as satuan,a.jumlah,a.bonus,a.harga,a.diskon,(a.harga)*a.jumlah-a.diskon as total,a.stok
                 from brg_trans_d a
-                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
                 where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETBELI' and a.no_bukti in ($nb)
                 order by a.no_bukti
                 " ;
@@ -1302,7 +1302,7 @@ class LaporanController extends Controller
                     -a.jumlah as jumlah, a.bonus, a.harga, a.diskon, a.stok,
                     (a.harga*a.jumlah)-a.diskon as total 
                     from brg_trans_d a
-                    inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                    inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
                     where a.kode_lokasi='$kode_lokasi'  and a.form='BRGRETJ' and a.no_bukti = '".$res[$i]['no_jual']."'
                     order by a.no_bukti";
                     $res2 = DB::connection($this->sql)->select($sql2);
@@ -2162,7 +2162,7 @@ class LaporanController extends Controller
                 $success['status'] = true;
                 for($i=0;$i<count($res);$i++){
 
-                    $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='".$res[$i]['no_jual']."' and a.kode_lokasi='$kode_lokasi' ";
+                    $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik where a.no_bukti='".$res[$i]['no_jual']."' and a.kode_lokasi='$kode_lokasi' ";
                     $res2 = DB::connection($this->sql)->select($sql);
                     $res[$i]['detail'] = json_decode(json_encode($res2),true);
                 }

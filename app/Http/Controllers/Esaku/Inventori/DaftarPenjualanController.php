@@ -24,6 +24,7 @@ class DaftarPenjualanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             $sql1="SELECT no_open, no_jual, nilai, diskon, (nilai - diskon) AS total_trans, tobyr
@@ -34,7 +35,7 @@ class DaftarPenjualanController extends Controller
             a.diskon, ISNULL(a.ppn, 0) AS ppn
             FROM brg_trans_d a
             INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi
-            WHERE a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti = '".$request->query('no_bukti')."'";
+            WHERE a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti = '".$request->query('no_bukti')."' and b.pabrik='$pabrik' ";
 
             $res1 = DB::connection($this->sql)->select($sql1);
             $res1 = json_decode(json_encode($res1),true);

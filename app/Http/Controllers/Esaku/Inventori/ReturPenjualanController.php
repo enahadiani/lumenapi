@@ -66,6 +66,7 @@ class ReturPenjualanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -94,7 +95,7 @@ class ReturPenjualanController extends Controller
                        inner join brg_jualpiu_dloc b on a.no_bukti=b.no_jual and a.kode_lokasi=b.kode_lokasi
                        where a.form='BRGRETJ' and a.kode_lokasi='$kode_lokasi'
                        group by b.no_ref1,a.kode_barang,a.kode_lokasi ) c on a.kode_barang=c.kode_barang and a.no_bukti=c.no_ref1 and a.kode_lokasi=c.kode_lokasi 
-            where a.no_bukti='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' and a.form='BRGJUAL' and a.jumlah- isnull(c.jum_ret,0) > 0";
+            where a.no_bukti='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' and a.form='BRGJUAL' and a.jumlah- isnull(c.jum_ret,0) > 0 and b.pabrik='$pabrik' ";
             
             $res2 = DB::connection($this->sql)->select($sql);
             $res2 = json_decode(json_encode($res2),true);

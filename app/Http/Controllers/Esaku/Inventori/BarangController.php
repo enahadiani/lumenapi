@@ -19,9 +19,9 @@ class BarangController extends Controller
     public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    public function isUnik($isi,$kode_lokasi){
+    public function isUnik($isi,$kode_lokasi,$barcode,$pabrik){
         
-        $auth = DB::connection($this->sql)->select("select kode_barang from brg_barang where kode_barang ='".$isi."' and kode_lokasi='".$kode_lokasi."' ");
+        $auth = DB::connection($this->sql)->select("select kode_barang from brg_barang where kode_barang ='".$isi."' and kode_lokasi='".$kode_lokasi."' and barcode='".$barcode."' and pabrik = '".$pabrik."' ");
         $auth = json_decode(json_encode($auth),true);
         if(count($auth) > 0){
             return false;
@@ -37,6 +37,7 @@ class BarangController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             $url = url('api/toko-auth/storage');
@@ -44,15 +45,15 @@ class BarangController extends Controller
                 if($request->kode_barang == "all"){
                     $filter = "";
                 }else{
-                    $filter = " and a.kode_barang='$request->kode_barang' ";
+                    $filter = " and a.kode_barang='$request->kode_barang' and a.pabrik='$pabrik' ";
                 }
-                $sql= "select a.kode_barang,a.nama,a.sat_kecil as satuan,a.hna,a.pabrik as kode_gudang,a.flag_aktif,a.ss,a.sm1,a.sm2,a.mm1,a.mm2,a.fm1,a.fm2,a.kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,a.barcode,a.nilai_beli as hrg_satuan,a.ppn,a.profit,b.nama as nama_satuan,c.nama as nama_klp 
+                $sql= "select a.kode_barang,a.nama,a.sat_kecil as satuan,a.hna,a.pabrik as kode_gudang,a.flag_aktif,a.ss,a.sm1,a.sm2,a.mm1,a.mm2,a.fm1,a.fm2,a.kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,a.barcode,case isnull(a.nilai_beli,0) when 0 then a.hrg_satuan else a.nilai_beli end as hrg_satuan,a.ppn,a.profit,b.nama as nama_satuan,c.nama as nama_klp 
                 from brg_barang a
                 left join brg_satuan b on a.sat_kecil=b.kode_satuan and a.kode_lokasi=b.kode_lokasi
                 left join brg_barangklp c on a.kode_klp=c.kode_klp and a.kode_lokasi=c.kode_lokasi
-                where a.kode_lokasi='".$kode_lokasi."' $filter";
+                where a.kode_lokasi='".$kode_lokasi."' and a.pabrik='$pabrik' $filter";
             }else{
-                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as kode_gudang,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barang where kode_lokasi= '".$kode_lokasi."'";
+                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as kode_gudang,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barang where kode_lokasi= '".$kode_lokasi."' and pabrik='$pabrik'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
@@ -71,6 +72,7 @@ class BarangController extends Controller
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
@@ -126,7 +128,7 @@ class BarangController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if($this->isUnik($request->kode_barang,$kode_lokasi)){
+            if($this->isUnik($request->kode_barang,$kode_lokasi,$request->barcode,$request->kode_gudang)){
 
                 if($request->hasfile('file_gambar')){
                     $file = $request->file('file_gambar');
@@ -143,8 +145,8 @@ class BarangController extends Controller
                     $foto="-";
                 }
 
-                $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input,hpp,no_belicurr) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate(),?,?)";
+                $insert = "insert into brg_barang(kode_barang,nama,kode_lokasi,sat_kecil,sat_besar,jml_sat,hna,pabrik,flag_gen,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,file_gambar,barcode,hrg_satuan,ppn,profit,tgl_input,hpp,no_belicurr,nilai_beli) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate(),?,?,?)";
                 $ins = DB::connection($this->sql)->insert($insert, [
                     $request->kode_barang,
                     $request->nama,
@@ -170,7 +172,8 @@ class BarangController extends Controller
                     $request->ppn,
                     $request->profit,
                     0,
-                    '-'
+                    '-',
+                    $request->hrg_satuan,
                 ]);
                 
                 DB::connection($this->sql)->commit();
@@ -179,7 +182,7 @@ class BarangController extends Controller
                 $success['kode'] = $request->kode_barang;
             }else{
                 $success['status'] = false;
-                $success['message'] = "Error : Duplicate entry. No Barang sudah ada di database!";
+                $success['message'] = "Error : Duplicate entry. No Barang sudah ada di database! $request->kode_barang,$kode_lokasi,$request->barcode,$request->kode_gudang";
                 $success['kode'] = $request->kode_barang;
                 $success['jenis'] = "duplicate";
             }
@@ -246,9 +249,10 @@ class BarangController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
-            $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and kode_barang='$request->kode_barang' 
+            $sql = "select file_gambar from brg_barang where kode_lokasi='".$kode_lokasi."' and pabrik='$pabrik' and kode_barang='$request->kode_barang' 
             ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -277,7 +281,7 @@ class BarangController extends Controller
             }
             
             $update = "update brg_barang set nama = ?, sat_kecil= ?,sat_besar=?,jml_sat=?,hna=?,pabrik=?,flag_gen=?,flag_aktif=?,ss=?,sm1=?,sm2=?,mm1=?,mm2=?,fm1=?,fm2=?,kode_klp=?,file_gambar=?,barcode=?,hrg_satuan=?,ppn=?,profit=?,tgl_input=getdate() 
-            where kode_barang=? and kode_lokasi=?";
+            where kode_barang=? and kode_lokasi=? and pabrik=? ";
             $ins = DB::connection($this->sql)->update($update, [
                 $request->nama,
                 $request->sat_kecil,
@@ -301,7 +305,8 @@ class BarangController extends Controller
                 $request->ppn,
                 $request->profit,
                 $request->kode_barang,
-                $kode_lokasi
+                $kode_lokasi,
+                $request->kode_gudang,
             ]);
             
             DB::connection($this->sql)->commit();

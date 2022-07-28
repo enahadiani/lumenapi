@@ -83,6 +83,7 @@ class StockOpnameController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -92,7 +93,7 @@ class StockOpnameController extends Controller
             $sql="select a.no_bukti,convert(varchar,a.tanggal,103) as tanggal,a.keterangan as deskripsi
             from trans_m a inner join brg_gudang b on a.param1=b.kode_gudang and a.kode_lokasi=b.kode_lokasi 
             inner join karyawan_pp c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi and c.nik='".$nik."' 
-            where a.kode_lokasi='".$kode_lokasi."' and a.modul='IV' and a.form='BRGSOP'";
+            where a.kode_lokasi='".$kode_lokasi."' and a.modul='IV' and a.form='BRGSOP' and b.kode_gudang='$pabrik' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -139,8 +140,8 @@ class StockOpnameController extends Controller
             $sql=DB::connection($this->sql)->update("insert into brg_stok_tmp (kode_barang,nama_barang,satuan,stok,jumlah,selisih,barcode,kode_lokasi,nik_user,nu)
             select a.kode_barang,a.nama,a.sat_kecil as satuan,isnull(b.stok,0) as stok, 0 as jumlah, 0 as selisih, a.barcode, '$kode_lokasi' as kode_lokasi, '$nik' as nik_user,row_number() over (order by (select NULL)) 
             from brg_barang a 
-            inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang='".$request->kode_gudang."' and b.nik_user='".$nik."' 
-            where a.kode_lokasi='".$kode_lokasi."' order by a.kode_barang");
+            inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.pabrik=b.kode_gudang and b.nik_user='".$nik."' 
+            where a.kode_lokasi='".$kode_lokasi."' and a.pabrik='".$request->kode_gudang."' order by a.kode_barang");
 
             DB::connection($this->sql)->commit();
 
@@ -230,6 +231,7 @@ class StockOpnameController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -246,9 +248,9 @@ class StockOpnameController extends Controller
             $res = json_decode(json_encode($res),true);
 
             $sql2="select 0 as no,a.kode_barang,b.barcode, b.nama,a.satuan,c.stok, case dc when 'D' then a.stok+a.jumlah else a.stok-a.jumlah end as jumlah, case dc when 'D' then -a.jumlah else a.jumlah end as selisih 
-            from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+            from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             inner join brg_stok c on a.kode_barang=c.kode_barang and a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi and c.nik_user='".$nik."' 
-            where a.no_bukti='".$no_bukti."' and a.kode_lokasi='".$kode_lokasi."' order by a.kode_barang";
+            where a.no_bukti='".$no_bukti."' and a.kode_gudang='$pabrik' and a.kode_lokasi='".$kode_lokasi."' order by a.kode_barang";
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
             

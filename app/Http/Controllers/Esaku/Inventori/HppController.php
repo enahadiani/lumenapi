@@ -199,6 +199,7 @@ class HppController extends Controller
                 $nik= $rs->nik;
                 $kode_lokasi= $rs->kode_lokasi;
                 $status_admin=$rs->status_admin;
+                $pabrik= $data->pabrik;
             }
 
             $tanggal = $this->reverseDate($request->tanggal,"/","-");
@@ -242,8 +243,9 @@ class HppController extends Controller
                                 select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
                                 isnull(round(e.h_avg,2),0) as h_avg,
                                 round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
-                                    from brg_barang a cross join brg_gudang b
-                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' 
+                                    from brg_barang a 
+                                    inner join brg_gudang b on a.pabrik=b.kode_gudang and a.kode_lokasi=b.kode_lokasi
+                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik'
                                 ) a 
                                 inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
                                 left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
@@ -342,6 +344,7 @@ class HppController extends Controller
                 $nik= $rs->nik;
                 $kode_lokasi= $rs->kode_lokasi;
                 $status_admin= $rs->status_admin;
+                $pabrik= $data->pabrik;
             }
             
             $tanggal = $this->reverseDate($request->tanggal,"/","-");
@@ -393,8 +396,8 @@ class HppController extends Controller
                                 select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
                                 isnull(round(e.h_avg,2),0) as h_avg,
                                 round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
-                                    from brg_barang a cross join brg_gudang b
-                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' 
+                                    from brg_barang a inner join brg_gudang b on a.pabrik=b.kode_gudang and a.kode_lokasi=b.kode_lokasi
+                                    where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik'
                                 ) a 
                                 inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
                                 left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
@@ -526,6 +529,7 @@ class HppController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             $res = DB::connection($this->db)->select("select a.tanggal,a.no_bukti,a.periode,keterangan as deskripsi,a.nilai1,a.no_dokumen,a.modul as jenis,a.nik2 as nik_periksa,b.nama as nama_periksa 
@@ -537,9 +541,9 @@ class HppController extends Controller
             $res2 = DB::connection($this->db)->select("select 0 as no,a.kode_barang,a.nama,a.pabrik,a.sat_kecil,b.jumlah,b.h_avg,b.nilai_hpp as hpp,c.kode_pp, c.kode_gudang,f.akun_pers,f.akun_hpp 
             from brg_barang a 					 
             inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
-            inner join brg_hpp_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+            inner join brg_hpp_d b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.pabrik=b.kode_gudang
             inner join brg_gudang c on b.kode_gudang=c.kode_gudang and b.kode_lokasi=c.kode_lokasi 
-            where b.no_hpp='$no_bukti' and b.kode_lokasi='$kode_lokasi'");
+            where b.no_hpp='$no_bukti' and b.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik' ");
             $res2= json_decode(json_encode($res2),true);
 
             $reslok = DB::connection($this->db)->select("select a.nama,a.no_telp,a.alamat,a.kodepos,a.kota,a.email
@@ -579,6 +583,7 @@ class HppController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
             $periode = $request->periode;
             $exec1 = DB::connection($this->db)->update("exec sp_brg_hpp ?, ?, ?",[$periode,$kode_lokasi,$nik]);
@@ -587,8 +592,8 @@ class HppController extends Controller
                         select a.kode_barang,a.nama,a.pabrik,a.kode_gudang,a.kode_pp,a.sat_kecil,f.akun_pers,f.akun_hpp ,isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0) as jumlah, 
                         isnull(round(e.h_avg,2),0) as h_avg,
                         round((isnull(b.sawal,0)+isnull(c.beli,0)-isnull(d.sakhir,0)) * isnull(e.h_avg,0),0) as hpp from (select a.kode_barang,a.sat_kecil,'-' as pabrik,a.nama,b.kode_gudang,b.kode_pp,a.kode_lokasi,a.kode_klp 
-                            from brg_barang a cross join brg_gudang b
-                            where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' 
+                            from brg_barang a inner join brg_gudang b on a.pabrik=b.kode_gudang and a.kode_lokasi=b.kode_lokasi
+                            where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik'
                         ) a 
                         inner join brg_barangklp f on a.kode_klp=f.kode_klp and a.kode_lokasi=f.kode_lokasi 
                         left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
@@ -624,7 +629,7 @@ class HppController extends Controller
                 $brgIlegal = 0;
 
 		        $strSQL =  "select distinct 0 as no,a.kode_barang,a.tgl_ed
-					from brg_trans_d a left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+					from brg_trans_d a left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.pabrik='$pabrik'
 					where b.kode_barang is null and a.modul='BRGBELI' and a.periode >= '".substr($periode,0,4)."' and a.periode <= '".$periode."' and a.kode_lokasi='".$kode_lokasi."' ";
                 $res2 = DB::connection($this->db)->select($strSQL);						
                 $res2= json_decode(json_encode($res2),true);

@@ -65,6 +65,7 @@ class Pembelian3Controller extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -91,7 +92,7 @@ class Pembelian3Controller extends Controller
                 $success["tgl"] =null;
             }
 
-            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon,b.nama,b.sat_kecil from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' ";
+            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon,b.nama,b.sat_kecil from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' and b.pabrik='$pabrik' ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -122,6 +123,7 @@ class Pembelian3Controller extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -131,16 +133,18 @@ class Pembelian3Controller extends Controller
             $periode = date('Ym');
             $tahun = date('Y');
 
-            $kodeGudang = ($kode_lokasi == 100 ? 'GT1' : 'G01');
+            $kodeGudang = $pabrik;
 
             $sql="select a.kode_barang,a.nama,a.hna as harga,a.barcode,a.sat_kecil as satuan,x.akun_pers as kode_akun,isnull(a.nilai_beli,0) as harga_seb,isnull(d.sakhir,0) as saldo,a.flag_ppn
             from ( select a.kode_barang,a.nama,a.hna,a.barcode,a.sat_kecil,a.nilai_beli,b.kode_gudang,a.kode_klp,a.kode_lokasi,isnull(a.flag_ppn, 0) as flag_ppn
-			from brg_barang a cross join brg_gudang b
-			where a.kode_lokasi='$kode_lokasi' and b.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
+			from brg_barang a 
+            inner join brg_gudang b on a.pabrik=b.kode_gudang and a.kode_lokasi=b.kode_lokasi			
+			where a.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
 			) a
             inner join brg_barangklp x on a.kode_klp=x.kode_klp and a.kode_lokasi=x.kode_lokasi 
-            left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal from brg_sawal 
-                        where periode='$tahun-01' and kode_lokasi='$kode_lokasi' 
+            left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
+                        from brg_sawal 
+                        where periode='".$tahun."01' and kode_lokasi='$kode_lokasi' 
                         group by kode_lokasi,kode_barang,kode_gudang 
             ) b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang 
             
@@ -189,6 +193,7 @@ class Pembelian3Controller extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -205,7 +210,7 @@ class Pembelian3Controller extends Controller
             $sql2="select a.nu, a.kode_barang,isnull(b.nilai_beli,0) as hrg_seb,a.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,b.nama,a.stok, isnull(b.hna,0) as harga_jual 
             from brg_trans_d  a 
             left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
-            where  a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' ";
+            where  a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and b.pabrik='$pabrik' ";
 
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
@@ -257,6 +262,7 @@ class Pembelian3Controller extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -301,13 +307,7 @@ class Pembelian3Controller extends Controller
                 $akunpiu = "-";
             }
 
-            $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
-            $rsg = DB::connection($this->sql)->select($sqlg);
-            if(count($rsg) > 0){
-                $kodeGudang=$rsg[0]->kode_gudang;
-            }else{
-                $kodeGudang="-";
-            }
+            $kodeGudang=$pabrik;
 
             $exec = array();
 
@@ -399,6 +399,7 @@ class Pembelian3Controller extends Controller
 
                 $update = DB::connection($this->sql)->table('brg_barang')
                 ->where('kode_lokasi', $kode_lokasi)
+                ->where('pabrik', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
             }
             

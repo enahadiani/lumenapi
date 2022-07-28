@@ -205,6 +205,7 @@ class CloseKasirController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -236,7 +237,7 @@ class CloseKasirController extends Controller
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
                 inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
                 inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
-                where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
+                where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' and b.pabrik='$pabrik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
                 if(count($spro)>0){
@@ -469,6 +470,7 @@ class CloseKasirController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -499,7 +501,7 @@ class CloseKasirController extends Controller
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
                 inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
                 inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
-                where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' group by a.akun_pdpt
+                where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' and b.pabrik='$pabrik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
                 if(count($spro)>0){

@@ -103,6 +103,7 @@ class ReturPembelianController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -120,7 +121,7 @@ class ReturPembelianController extends Controller
                        inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi
                        where a.form='BRGRETBELI' and a.kode_lokasi='$kode_lokasi'
                        group by b.no_ref1,a.kode_barang,a.kode_lokasi ) c on a.kode_barang=c.kode_barang and a.no_bukti=c.no_ref1 and a.kode_lokasi=c.kode_lokasi 
-            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.form='BRGBELI' and a.jumlah- isnull(c.jum_ret,0) > 0";
+            where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi' and a.form='BRGBELI' and a.jumlah- isnull(c.jum_ret,0) > 0 and b.pabrik='$pabrik' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -219,6 +220,7 @@ class ReturPembelianController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -227,13 +229,7 @@ class ReturPembelianController extends Controller
 
             if($request->total_return <= $request->saldo){
 
-                $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
-                $rsg=DB::connection($this->sql)->select($sqlg);
-                if(count($rsg) > 0){
-                    $kodeGudang=$rsg[0]->kode_gudang;
-                }else{
-                    $kodeGudang="-";
-                }
+                $kodeGudang=$pabrik;
     
                 $str_format="0001";
                 $periode = $request->periode;
