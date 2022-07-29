@@ -15,10 +15,10 @@ class PembelianController extends Controller
      * @return \Illuminate\Http\Response
      */
     public $successStatus = 200;
-    public $db = 'tokoaws';
+    public $sql = 'tokoaws';
     public $guard = 'toko';
 
-    public function index(Request $r)
+    public function index(Request $request)
     {
         try {
             
@@ -27,12 +27,12 @@ class PembelianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $sql="select no_bukti,nik_user,tanggal,param2 as kode_vendor,(nilai1+nilai2-nilai3) as total from trans_m where kode_lokasi='".$kode_lokasi."' and nik_user='".$nik."' and form = 'BRGBELI' ";
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -54,9 +54,9 @@ class PembelianController extends Controller
         
     }    
 
-    public function getNota(Request $r)
+    public function getNota(Request $request)
     {
-        $this->validate($r, [
+        $this->validate($request, [
             'no_bukti' => 'required'
         ]);
 
@@ -68,15 +68,15 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
   
             $success["nik"]=$nik;
-            $success["no_bukti"] = $r->no_bukti;
+            $success["no_bukti"] = $request->no_bukti;
 
-            $sql="select * from trans_m where no_bukti='$r->no_bukti' and kode_lokasi='$kode_lokasi' ";
-            $get = DB::connection($this->db)->select($sql);
+            $sql="select * from trans_m where no_bukti='$request->no_bukti' and kode_lokasi='$kode_lokasi' ";
+            $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
                 $success["totpemb"]=$get[0]['nilai1'];
@@ -92,8 +92,8 @@ class PembelianController extends Controller
                 $success["tgl"] =null;
             }
 
-            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon,b.nama,b.sat_kecil from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$r->no_bukti' and a.kode_lokasi='$kode_lokasi' and b.pabrik='$pabrik' ";
-            $res = DB::connection($this->db)->select($sql);
+            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon,b.nama,b.sat_kecil from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_bukti' and a.kode_lokasi='$kode_lokasi' and b.pabrik='$pabrik' ";
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -115,7 +115,7 @@ class PembelianController extends Controller
         
     }
 
-    public function getBarang(Request $r)
+    public function getBarang(Request $request)
     {
 
         try {
@@ -126,8 +126,8 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
             
             $periode = date('Ym');
@@ -160,7 +160,7 @@ class PembelianController extends Controller
             ) d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.kode_gudang=d.kode_gudang 								 
             where a.kode_lokasi='$kode_lokasi'";
             
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -182,9 +182,9 @@ class PembelianController extends Controller
         
     }
 
-    public function show(Request $r)
+    public function show(Request $request)
     {
-        $this->validate($r, [
+        $this->validate($request, [
             'no_bukti' => 'required'
         ]);
 
@@ -196,15 +196,15 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
-            $no_bukti = $r->no_bukti;
+            $no_bukti = $request->no_bukti;
 
             $sql = "select no_bukti,nik_user,nilai1 as total,nilai2 as ppn,nilai3 as diskon,param2 as kode_vendor,no_dokumen,convert(varchar,tanggal,103) as tanggal,keterangan from trans_m where form='BRGBELI' and kode_lokasi='$kode_lokasi' and nik_user='$nik' and no_bukti='$no_bukti' 
             ";
 
-            $res = DB::connection($this->db)->select($sql);
+            $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             $sql2="select a.nu, a.kode_barang,isnull(b.nilai_beli,0) as hrg_seb,a.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,b.nama,a.stok, isnull(b.hna,0) as harga_jual 
@@ -212,7 +212,7 @@ class PembelianController extends Controller
             left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
             where  a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and b.pabrik='$pabrik' ";
 
-            $res2 = DB::connection($this->db)->select($sql2);
+            $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -235,54 +235,10 @@ class PembelianController extends Controller
         }
         
     }
-
-    public function showTmp(Request $r)
-    {
-        $this->validate($r, [
-            'nik_user' => 'required'
-        ]);
-
-        try {
-            
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $pabrik= $data->pabrik;
-            }
-
-            $nik_user = $r->nik_user;
-            
-            $sql2="select ROW_NUMBER() OVER(ORDER BY a.nu ASC) AS no,a.nu as no_urut,a.kode_barang,a.harga_jual,a.harga_seb,a.satuan as satuan_barang,a.jumlah as qty_barang,a.harga as harga_barang,a.diskon as disc_barang,a.total as sub_barang,b.nama as nama_barang,a.stok as stok_barang,a.kode_akun
-            from brg_trans_d_tmp a 
-            left join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
-            where a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.nik_user='$nik_user' and a.kode_gudang='$pabrik' ";
-
-            $res = DB::connection($this->db)->select($sql2);
-            $res = json_decode(json_encode($res),true);
-
-            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
-                $success['status'] = true;
-                $success['data'] = $res;
-                $success['message'] = "Success!";     
-            }
-            else{
-                $success['message'] = "Data Kosong!";
-                $success['data'] = [];
-                $success['status'] = false;
-            }
-            return response()->json($success, $this->successStatus);
-        } catch (\Throwable $e) {
-            $success['status'] = false;
-            $success['data'] = [];
-            $success['message'] = "Error ".$e;
-            return response()->json($success, $this->successStatus);
-        }
-        
-    }
    
-    public function store(Request $r)
+    public function store(Request $request)
     {
-        $this->validate($r, [
+        $this->validate($request, [
             'kode_vendor' => 'required',
             'no_faktur' => 'required',
             'keterangan' => 'required',
@@ -290,10 +246,17 @@ class PembelianController extends Controller
             'total_trans' => 'required',
             'total_diskon' => 'required',
             'total_ppn' => 'required',
-            'nik_user' => 'required'
+            'kode_akun' => 'required|array',
+            'kode_barang' => 'required|array',
+            'qty_barang' => 'required|array',
+            'harga_barang' => 'required|array',
+            'satuan_barang' => 'required|array',
+            'disc_barang' => 'required|array',
+            'sub_barang' => 'required|array',
+            'harga_jual' => 'required|array'
         ]);
 
-        DB::connection($this->db)->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -302,8 +265,8 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $str_format="0000";
@@ -312,7 +275,7 @@ class PembelianController extends Controller
             $prefix="PO/".substr($periode,2,4)."/".$kode_lokasi."/";
             $sql="select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
 
-            $get = DB::connection($this->db)->select($sql);
+            $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
                 $id = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -321,7 +284,7 @@ class PembelianController extends Controller
             }
 
             $sql="select kode_spro,flag from spro where kode_spro in ('PPNM','BELIDIS') and kode_lokasi = '".$kode_lokasi."'";
-            $spro = DB::connection($this->db)->select($sql);
+            $spro = DB::connection($this->sql)->select($sql);
             if(count($spro) > 0){
                 foreach ($spro as $row){
                     if ($row->kode_spro == "PPNM") $akunPPN=$row->flag;
@@ -329,14 +292,14 @@ class PembelianController extends Controller
                 }
             }
 
-            $sql3 = "select akun_hutang from vendor where kode_vendor ='".$r->kode_vendor."' and kode_lokasi = '".$kode_lokasi."'";
-            $res = DB::connection($this->db)->select($sql3);
+            $sql3 = "select akun_hutang from vendor where kode_vendor ='".$request->kode_vendor."' and kode_lokasi = '".$kode_lokasi."'";
+            $res = DB::connection($this->sql)->select($sql3);
             if (count($res) > 0)
             {
                 $akunHutang = $res[0]->akun_hutang;									
             }	
 
-            $spro3 = DB::connection($this->db)->select(" select kode_spro,flag  from spro where kode_lokasi='$kode_lokasi' and kode_spro='CUSTINV'");
+            $spro3 = DB::connection($this->sql)->select(" select kode_spro,flag  from spro where kode_lokasi='$kode_lokasi' and kode_spro='CUSTINV'");
             $spro3 = json_decode(json_encode($spro3),true);
             if(count($spro3)>0){
                 $akunpiu=$spro3[0]["flag"];
@@ -349,10 +312,12 @@ class PembelianController extends Controller
             $exec = array();
 
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
-            values (?,?,getdate(),?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-            DB::connection($this->db)->insert($insertM, [
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            // $sqlm = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGBELI','F','-','-','".$request->kode_pp."',getdate(),'".$request->no_faktur."','Pembelian Persediaan','IDR',1,$request->total_trans,$request->total_ppn,$request->total_diskon,'-','-','-','-','-','-','-','".$request->kode_vendor."','".$akunHutang."')");
+            DB::connection($this->sql)->insert($insertM, [
                 $id,
                 $kode_lokasi,
+                date('Y-m-d H:i:s'),
                 $nik,
                 $periode,
                 'IV',
@@ -360,14 +325,15 @@ class PembelianController extends Controller
                 'F',
                 '-',
                 '-',
-                $r->kode_pp,
-                $r->no_faktur,
-                $r->keterangan,
+                $request->kode_pp,
+                date('Y-m-d H:i:s'),
+                $request->no_faktur,
+                $request->keterangan,
                 'IDR',
                 1,
-                $r->total_trans,
-                $r->total_ppn,
-                $r->total_diskon,
+                $request->total_trans,
+                $request->total_ppn,
+                $request->total_diskon,
                 '-',
                 '-',
                 '-',
@@ -375,77 +341,113 @@ class PembelianController extends Controller
                 '-',
                 '-',
                 '-',
-                $r->kode_vendor,
+                $request->kode_vendor,
                 $akunHutang
             ]);
 			
             $insertB = "insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) 
-            values (?,?,getdate(),?,?,?,?,?,?,?,?,getdate(),?,?,?,getdate(),?,?,?,?)";
-            DB::connection($this->db)->insert($insertB, [
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            // $sqlb = DB::connection($this->sql)->insert("insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) values ('".$id."','".$kode_lokasi."',getdate(), 'Pembelian Persediaan','".$request->kode_vendor."','IDR',1,'".$request->kode_pp."',$request->total_trans,'".$periode."','".$nik."',getdate(),'".$akunHutang."',$request->total_ppn,'-',getdate(),0,$request->total_diskon, 'BELI','$kodeGudang')");
+            DB::connection($this->sql)->insert($insertB, [
                $id,
                $kode_lokasi,
+               date('Y-m-d H:i:s'), 
                'Pembelian Persediaan',
-               $r->kode_vendor,
+               $request->kode_vendor,
                'IDR',
                1,
-               $r->kode_pp,
-               $r->total_trans,
+               $request->kode_pp,
+               $request->total_trans,
                $periode,
                $nik,
+               date('Y-m-d H:i:s'),
                $akunHutang,
-               $r->total_ppn,
+               $request->total_ppn,
                '-',
+               date('Y-m-d H:i:s'),
                0,
-               $r->total_diskon, 
+               $request->total_diskon, 
                'BELI',
                $kodeGudang 
             ]);
                         
+            $series = array();
+            $series2 = array();
+            $group = array();
+            $nilai = 0;
             $diskItem = 0;
-            $gt = DB::connection($this->db)->select("select kode_akun,sum(total) as total,sum(diskon)as total_diskon  
-            from brg_trans_d_tmp 
-            where nik_user=? and form='BRGBELI'
-            group by kode_akun",[$r->input('nik_user')]);
-            if(count($gt) > 0){
-                for($x=0; $x<count($gt);$x++){
-                    $insertJ = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                    values (?,?,getdate(),?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                    DB::connection($this->db)->insert($insertJ, [
-                        $id,
-                        $kode_lokasi,
-                        $nik,
-                        $periode,
-                        '-',
-                        $x,
-                        $gt[$x]->kode_akun,
-                        'D',
-                        $gt[$x]->total,
-                        $gt[$x]->total,
-                        $r->keterangan,
-                        'BRGBELI',
-                        'BRGBELI',
-                        'IDR',
-                        1,
-                        $r->kode_pp,
-                        '-',
-                        '-',
-                        '-',
-                        '-',
-                        '-',
-                        '-',
-                        '-',
-                        '-'   
-                    ]);  
-                    $diskItem += floatval($gt[$x]->total_diskon);
+            $total=0;
+            for($b=0; $b<count($request->kode_barang);$b++){
+                $nilai = $request->sub_barang[$b];
+                $isAda = false;
+                $idx = 0;
+                
+                $akun = $request->kode_akun[$b];						
+                for ($c=0;$c <= $b;$c++){
+                    if(isset($request->kode_akun[$c-1])){
+
+                        if ($akun == $request->kode_akun[$c-1]) {
+                            $isAda = true;
+                            $idx = $c;
+                            break;
+                        }
+                    }
                 }
+                if (!$isAda) {							
+                    array_push($series,$request->kode_akun[$b]);
+                    
+                    $series2[$request->kode_akun[$b]]=$nilai;
+                } 
+                else { 
+                    $total = $series2[$request->kode_akun[$b]];
+                    $total = $total + $nilai;
+                    $series2[$request->kode_akun[$b]]=$total;
+                }		
+                    
+                $diskItem+=$request->disc_barang[$b];
             }
             
-            $totDiskon = $r->total_diskon +$diskItem;
-            if ($r->total_ppn > 0) {
+            for($x=0; $x<count($series);$x++){
+                $insertJ = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                // $sqlj=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$request->kode_akun[$x]."','D',".$series2[$series[$x]].",".$series2[$series[$x]].",'Persediaan Barang','BRGBELI','BRGBELI','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
+                DB::connection($this->sql)->insert($insertJ, [
+                    $id,
+                    $kode_lokasi,
+                    date('Y-m-d H:i:s'),
+                    $nik,
+                    $periode,
+                    '-',
+                    date('Y-m-d H:i:s'),
+                    $x,
+                    $request->kode_akun[$x],
+                    'D',
+                    $series2[$series[$x]],
+                    $series2[$series[$x]],
+                    $request->keterangan,
+                    'BRGBELI',
+                    'BRGBELI',
+                    'IDR',
+                    1,
+                    $request->kode_pp,
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-',
+                    '-'   
+                ]);       
+            }
+            
+            $totDiskon = $request->total_diskon +$diskItem;
+            if ($request->total_ppn > 0) {
                 $x=$x+1;
                 $insert6 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert6, [
+                // $sql6=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunPPN."','D',".$request->total_ppn.",".$request->total_ppn.",'PPN Masukan','BRGBELI','PPNM','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
+                DB::connection($this->sql)->insert($insert6, [
                     $id,
                     $kode_lokasi,
                     date('Y-m-d H:i:s'),
@@ -456,14 +458,14 @@ class PembelianController extends Controller
                     $x,
                     $akunPPN,
                     'D',
-                    $r->total_ppn,
-                    $r->total_ppn,
+                    $request->total_ppn,
+                    $request->total_ppn,
                     'PPN Masukan',
                     'BRGBELI',
                     'PPNM',
                     'IDR',
                     1,
-                    $r->kode_pp,
+                    $request->kode_pp,
                     '-',
                     '-',
                     '-',
@@ -476,7 +478,8 @@ class PembelianController extends Controller
 
                 $insert6d = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert6, [
+                // $sql6=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunPPN."','D',".$request->total_ppn.",".$request->total_ppn.",'PPN Masukan','BRGBELI','PPNM','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
+                DB::connection($this->sql)->insert($insert6, [
                     $id,
                     $kode_lokasi,
                     date('Y-m-d H:i:s'),
@@ -487,14 +490,14 @@ class PembelianController extends Controller
                     $x,
                     $akunPPN,
                     'C',
-                    $r->total_ppn,
-                    $r->total_ppn,
+                    $request->total_ppn,
+                    $request->total_ppn,
                     'PPN Masukan',
                     'BRGBELI',
                     'PPNM',
                     'IDR',
                     1,
-                    $r->kode_pp,
+                    $request->kode_pp,
                     '-',
                     '-',
                     '-',
@@ -507,12 +510,13 @@ class PembelianController extends Controller
                     
             }
 
-            if ($r->total_trans > 0) {
+            if ($request->total_trans > 0) {
                 $x=$x+1;
-                $hut = floatval($r->total_trans)-floatval($totDiskon);
+                $hut = floatval($request->total_trans)-floatval($totDiskon);
                 $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert7, [
+                // $sql7= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunHutang."','C',".$request->total_trans.",".$request->total_trans.",'Hutang Vendor Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
+                DB::connection($this->sql)->insert($insert7, [
                     $id,
                     $kode_lokasi,
                     date('Y-m-d H:i:s'),
@@ -530,7 +534,7 @@ class PembelianController extends Controller
                     'HUTBELI',
                     'IDR',
                     1,
-                    $r->kode_pp,
+                    $request->kode_pp,
                     '-',
                     '-',
                     '-',
@@ -542,11 +546,12 @@ class PembelianController extends Controller
                 ]);
             }
             
-            if ($r->total_diskon > 0) {
+            if ($request->total_diskon > 0) {
                 $x=$x+1;
                 $insert8 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert8, [
+                // $sql8=  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunDiskon."','C',".$totDiskon.",".$totDiskon.",'Diskon Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
+                DB::connection($this->sql)->insert($insert8, [
                     $id,
                     $kode_lokasi,
                     date('Y-m-d H:i:s'),
@@ -564,7 +569,7 @@ class PembelianController extends Controller
                     'BELIDISC',
                     'IDR',
                     1,
-                    $r->kode_pp,
+                    $request->kode_pp,
                     '-',
                     '-',
                     '-',
@@ -575,26 +580,44 @@ class PembelianController extends Controller
                     '-'
                 ]);
             }
+            
+            for($a=0; $a<count($request->kode_barang);$a++){
 
-            $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
-            select ?,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,?,tot_diskon,total 
-            from brg_trans_d_tmp 
-            where nik_user=? and form='BRGBELI' ";
-            DB::connection($this->db)->insert($insert9, [
-                $id,
-                $diskItem,
-                $r->nik_user
-            ]);
+                $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
+                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                // $sql9 = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
+                // ('".$id."','".$kode_lokasi."','".$periode."','BRGBELI','BRGBELI',".$a.",'$kodeGudang','".$request->kode_barang[$a]."','-',getdate(),'".$request->satuan_barang[$a]."','D',0,".$request->qty_barang[$a].",0,".$request->harga_barang[$a].",0,0,".$diskItem.",".$request->disc_barang[$a].",".$request->sub_barang[$a].")");
+                DB::connection($this->sql)->insert($insert9, [
+                    $id,
+                    $kode_lokasi,
+                    $periode,
+                    'BRGBELI',
+                    'BRGBELI',
+                    $a,
+                    $kodeGudang,
+                    $request->kode_barang[$a],
+                    '-',
+                    date('Y-m-d H:i:s'),
+                    $request->satuan_barang[$a],
+                    'D',
+                    0,
+                    $request->qty_barang[$a],
+                    0,
+                    $request->harga_barang[$a],
+                    0,
+                    0,
+                    $diskItem,
+                    $request->disc_barang[$a],
+                    $request->sub_barang[$a]
+                ]);
 
-            $update = DB::connection($this->db)->update("update brg_barang
-            set nilai_beli= b.harga, hna=b.harga_jual 
-            from brg_barang a
-            inner join brg_trans_d_tmp b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.pabrik=b.kode_gudang 
-            where b.nik_user=? and a.kode_lokasi=? and b.form='BRGBELI'
-            ",[$r->nik_user,$kode_lokasi]);
+                $update = DB::connection($this->sql)->table('brg_barang')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
+            }	
 
             
-            $get = DB::connection($this->db)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
+            $get = DB::connection($this->sql)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
             from trans_j where no_bukti ='".$id."' and kode_lokasi='$kode_lokasi'
             ");
             
@@ -609,19 +632,18 @@ class PembelianController extends Controller
             }else{
                 $dc = "C";
             }
+
+            if($sls != 0){
+
+                $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
+            }
             
-            $insls = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$r->kode_pp,'-','-','-','-','-','-','-','-',NULL));
 
-            $exec = DB::connection($this->db)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
-            // $exec2 = DB::connection($this->db)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
-            $del = DB::connection($this->db)->table('brg_trans_d_tmp')
-            ->where('nik_user', $r->nik_user)
-            ->where('form', 'BRGBELI')
-            ->delete();
-
+            $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
+            // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
-            DB::connection($this->db)->commit();
+            DB::connection($this->sql)->commit();
 
             $success['status'] = $sts;
             $success['message'] = $tmp;
@@ -629,7 +651,7 @@ class PembelianController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pembelian gagal disimpan ".$e;
             return response()->json($success, $this->successStatus); 
@@ -637,23 +659,21 @@ class PembelianController extends Controller
         
     }
 
-    public function storeDetail(Request $r)
+    public function storeDetail(Request $request)
     {
-        $this->validate($r, [
+        $this->validate($request, [
             'nik_user' => 'required',
             'kode_akun' => 'required',
             'kode_barang' => 'required',
-            'harga_jual' => 'required',
-            'harga_seb' => 'required',
-            'stok_barang' => 'required',
             'qty_barang' => 'required',
             'harga_barang' => 'required',
             'satuan_barang' => 'required',
             'disc_barang' => 'required',
-            'sub_barang' => 'required'
+            'sub_barang' => 'required',
+            'harga_jual' => 'required'
         ]);
 
-        DB::connection($this->db)->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -662,8 +682,8 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
             $str_format="0000";
@@ -672,7 +692,7 @@ class PembelianController extends Controller
             $prefix="PO/".substr($periode,2,4)."/".$kode_lokasi."/";
             $sql="select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
 
-            $get = DB::connection($this->db)->select($sql);
+            $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
                 $id = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
@@ -681,61 +701,39 @@ class PembelianController extends Controller
             }
 
             $kodeGudang=$pabrik;
-            $diskItem=$r->input('disc_barang');
-
-            $sql="select isnull(max(nu),0)+1 as no_urut from brg_trans_d_tmp where nik_user='$r->nik_user' ";
-            $get = DB::connection($this->db)->select($sql);
-            $no_urut = 0;
-            if(count($get) > 0){
-                $no_urut = $get[0]->no_urut;
-            }
-
-            $sql="select nu as no_urut, jumlah as qty, harga from brg_trans_d_tmp where nik_user='$r->nik_user' and kode_barang='$r->kode_barang' ";
-            $get = DB::connection($this->db)->select($sql);
-            if(count($get) > 0){
-                $no_urut = $get[0]->no_urut;
-                $qty = intval($get[0]->qty) + $r->input('qty_barang');
-                $sub = floatval($get[0]->harga)*$qty;
-                DB::connection($this->db)->update("update brg_trans_d_tmp
-                set jumlah=?, total=? 
-                where nik_user=? and nu=? and kode_barang=?",[$qty,$sub,$r->input('nik_user'),$no_urut,$r->input('kode_barang')]);
-            }else{
-
-                $insert9 = "insert into brg_trans_d_tmp (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,harga_jual,harga_seb,kode_akun,nik_user,tgl_input) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
-                DB::connection($this->db)->insert($insert9, [
-                    $id,
-                    $kode_lokasi,
-                    $periode,
-                    'BRGBELI',
-                    'BRGBELI',
-                    $no_urut,
-                    $kodeGudang,
-                    $r->input('kode_barang'),
-                    '-',
-                    date('Y-m-d H:i:s'),
-                    $r->input('satuan_barang'),
-                    'D',
-                    $r->input('stok_barang'),
-                    $r->input('qty_barang'),
-                    0,
-                    $r->input('harga_barang'),
-                    0,
-                    0,
-                    $diskItem,
-                    $r->input('disc_barang'),
-                    $r->input('sub_barang'),
-                    $r->input('harga_jual'),
-                    $r->input('harga_seb'),
-                    $r->input('kode_akun'),
-                    $r->input('nik_user')
-                ]);
-            }
+            $diskItem=$request->input('disc_barang');
             
+            
+            $insert9 = "insert into brg_trans_d_tmp (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,nik_user,tgl_input) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,getdate())";
+            DB::connection($this->sql)->insert($insert9, [
+                $id,
+                $kode_lokasi,
+                $periode,
+                'BRGBELI',
+                'BRGBELI',
+                $no_urut,
+                $kodeGudang,
+                $request->input('kode_barang'),
+                '-',
+                date('Y-m-d H:i:s'),
+                $request->input('satuan_barang'),
+                'D',
+                $request->input('stok_barang'),
+                $request->input('qty_barang'),
+                0,
+                $request->input('harga_barang'),
+                0,
+                0,
+                $diskItem,
+                $request->input('disc_barang'),
+                $request->input('sub_barang'),
+                $request->input('nik_user')
+            ]);
 
             $tmp="Data Detail Pembelian berhasil disimpan";
             $sts=true;
-            DB::connection($this->db)->commit();
+            DB::connection($this->sql)->commit();
 
             $success['status'] = $sts;
             $success['message'] = $tmp;
@@ -743,7 +741,7 @@ class PembelianController extends Controller
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['no_bukti'] = "-";
             $success['message'] = "Data Detail Pembelian gagal disimpan ".$e;
@@ -752,53 +750,9 @@ class PembelianController extends Controller
         
     }
 
-    public function updateDetail(Request $r)
-    {
-        $this->validate($r, [
-            'nik_user' => 'required',
-            'no_urut' => 'required',
-            'kode_barang' => 'required',
-            'harga_jual' => 'required',
-            'harga_seb' => 'required',
-            'qty_barang' => 'required',
-            'harga_barang' => 'required',
-            'disc_barang' => 'required',
-            'sub_barang' => 'required'
-        ]);
-
-        DB::connection($this->db)->beginTransaction();
-        
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-                $pabrik= $data->pabrik;
-            }
-            
-            DB::connection($this->db)->update("update brg_trans_d_tmp
-            set harga_jual=?, harga_seb=?, jumlah=?, harga=?, diskon=?, total=? 
-            where nik_user=? and nu=? and kode_barang=?",[$r->input('harga_jual'),$r->input('harga_seb'),$r->input('qty_barang'),$r->input('harga_barang'),$r->input('disc_barang'),$r->input('sub_barang'),$r->input('nik_user'),$r->input('no_urut'),$r->input('kode_barang')]);
-
-            $tmp="Data Detail Pembelian berhasil diubah";
-            $sts=true;
-            DB::connection($this->db)->commit();
-
-            $success['status'] = $sts;
-            $success['message'] = $tmp;
-            
-            return response()->json($success, $this->successStatus);     
-        } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
-            $success['status'] = false;
-            $success['message'] = "Data Detail Pembelian gagal diubah ".$e;
-            return response()->json($success, $this->successStatus); 
-        }				
-        
-    }
-
-    // public function update(Request $r)
+    // public function update(Request $request)
     // {
-    //     $this->validate($r, [
+    //     $this->validate($request, [
     //         'no_bukti'=>'required',
     //         'kode_vendor' => 'required',
     //         'no_faktur' => 'required',
@@ -817,7 +771,7 @@ class PembelianController extends Controller
     //         'harga_jual' => 'required|array'
     //     ]);
 
-    //     DB::connection($this->db)->beginTransaction();
+    //     DB::connection($this->sql)->beginTransaction();
         
     //     try {
     //         if($data =  Auth::guard($this->guard)->user()){
@@ -825,48 +779,48 @@ class PembelianController extends Controller
     //             $kode_lokasi= $data->kode_lokasi;
     //         }
 
-    //         if(isset($r->nik) && $r->nik != ""){
-    //             $nik= $r->nik;
+    //         if(isset($request->nik) && $request->nik != ""){
+    //             $nik= $request->nik;
     //         }
     //         $periode=date('Y').date('m');
 
-    //         $id = $r->no_bukti;
+    //         $id = $request->no_bukti;
     //         $sql="select * from trans_m where isnull(id_sync,'-') ='-' and no_bukti='$id' and kode_lokasi='$kode_lokasi'";
 
-    //         $get = DB::connection($this->db)->select($sql);
+    //         $get = DB::connection($this->sql)->select($sql);
     //         $get = json_decode(json_encode($get),true);
     //         if(count($get) > 0){
 
-    //             $del = DB::connection($this->db)->table('trans_m')
+    //             $del = DB::connection($this->sql)->table('trans_m')
     //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_bukti', $r->no_bukti)
+    //             ->where('no_bukti', $request->no_bukti)
     //             ->where('nik_user', $nik)
     //             ->where('form', 'BRGBELI')
     //             ->delete();
 
-    //             $del2 = DB::connection($this->db)->table('trans_j')
+    //             $del2 = DB::connection($this->sql)->table('trans_j')
     //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_bukti', $r->no_bukti)
+    //             ->where('no_bukti', $request->no_bukti)
     //             ->where('nik_user', $nik)
     //             ->where('modul', 'BRGBELI')
     //             ->delete();
 
-    //             $del3 = DB::connection($this->db)->table('brg_belihut_d')
+    //             $del3 = DB::connection($this->sql)->table('brg_belihut_d')
     //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_beli', $r->no_bukti)
+    //             ->where('no_beli', $request->no_bukti)
     //             ->where('nik_user', $nik)
     //             ->where('modul', 'BELI')
     //             ->delete();
 
-    //             $del4 = DB::connection($this->db)->table('brg_trans_d')
+    //             $del4 = DB::connection($this->sql)->table('brg_trans_d')
     //             ->where('kode_lokasi', $kode_lokasi)
-    //             ->where('no_bukti', $r->no_bukti)
+    //             ->where('no_bukti', $request->no_bukti)
     //             ->where('form', 'BRGBELI')
     //             ->delete();
 
                
     //             $sql="select kode_spro,flag from spro where kode_spro in ('PPNM','BELIDIS') and kode_lokasi = '".$kode_lokasi."'";
-    //             $spro = DB::connection($this->db)->select($sql);
+    //             $spro = DB::connection($this->sql)->select($sql);
     //             if(count($spro) > 0){
     //                 foreach ($spro as $row){
     //                     if ($row->kode_spro == "PPNM") $akunPPN=$row->flag;
@@ -874,14 +828,14 @@ class PembelianController extends Controller
     //                 }
     //             }
     
-    //             $sql3 = "select akun_hutang from vendor where kode_vendor ='".$r->kode_vendor."' and kode_lokasi = '".$kode_lokasi."'";
-    //             $res = DB::connection($this->db)->select($sql3);
+    //             $sql3 = "select akun_hutang from vendor where kode_vendor ='".$request->kode_vendor."' and kode_lokasi = '".$kode_lokasi."'";
+    //             $res = DB::connection($this->sql)->select($sql3);
     //             if (count($res) > 0){
     //                 $akunHutang = $res[0]->akun_hutang;									
     //             }	
     
     //             $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
-    //             $rsg = DB::connection($this->db)->select($sqlg);
+    //             $rsg = DB::connection($this->sql)->select($sqlg);
     //             if(count($rsg) > 0){
     //                 $kodeGudang=$rsg[0]->kode_gudang;
     //             }else{
@@ -892,7 +846,7 @@ class PembelianController extends Controller
 
     //             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
     //             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //             DB::connection($this->db)->insert($insertM, [
+    //             DB::connection($this->sql)->insert($insertM, [
     //                 $id,
     //                 $kode_lokasi,
     //                 date('Y-m-d H:i:s'),
@@ -903,15 +857,15 @@ class PembelianController extends Controller
     //                 'F',
     //                 '-',
     //                 '-',
-    //                 $r->kode_pp,
+    //                 $request->kode_pp,
     //                 date('Y-m-d H:i:s'),
-    //                 $r->no_faktur,
-    //                 $r->keterangan,
+    //                 $request->no_faktur,
+    //                 $request->keterangan,
     //                 'IDR',
     //                 1,
-    //                 $r->total_trans,
-    //                 $r->total_ppn,
-    //                 $r->total_diskon,
+    //                 $request->total_trans,
+    //                 $request->total_ppn,
+    //                 $request->total_diskon,
     //                 '-',
     //                 '-',
     //                 '-',
@@ -919,37 +873,37 @@ class PembelianController extends Controller
     //                 '-',
     //                 '-',
     //                 '-',
-    //                 $r->kode_vendor,
+    //                 $request->kode_vendor,
     //                 $akunHutang
     //             ]);
     
-    //             // $sqlm = DB::connection($this->db)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGBELI','F','-','-','".$r->kode_pp."',getdate(),'".$r->no_faktur."','Pembelian Persediaan','IDR',1,$r->total_trans,$r->total_ppn,$r->total_diskon,'-','-','-','-','-','-','-','".$r->kode_vendor."','".$akunHutang."')");
+    //             // $sqlm = DB::connection($this->sql)->insert("insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','IV','BRGBELI','F','-','-','".$request->kode_pp."',getdate(),'".$request->no_faktur."','Pembelian Persediaan','IDR',1,$request->total_trans,$request->total_ppn,$request->total_diskon,'-','-','-','-','-','-','-','".$request->kode_vendor."','".$akunHutang."')");
                 
     //             $insertB = "insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) 
     //             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //             DB::connection($this->db)->insert($insertB, [
+    //             DB::connection($this->sql)->insert($insertB, [
     //                 $id,
     //                 $kode_lokasi,
     //                 date('Y-m-d H:i:s'), 
     //                 'Pembelian Persediaan',
-    //                 $r->kode_vendor,
+    //                 $request->kode_vendor,
     //                 'IDR',
     //                 1,
-    //                 $r->kode_pp,
-    //                 $r->total_trans,
+    //                 $request->kode_pp,
+    //                 $request->total_trans,
     //                 $periode,
     //                 $nik,
     //                 date('Y-m-d H:i:s'),
     //                 $akunHutang,
-    //                 $r->total_ppn,
+    //                 $request->total_ppn,
     //                 '-',
     //                 date('Y-m-d H:i:s'),
     //                 0,
-    //                 $r->total_diskon, 
+    //                 $request->total_diskon, 
     //                 'BELI',
     //                 $kodeGudang 
     //             ]);
-    //             // $sqlb = DB::connection($this->db)->insert("insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) values ('".$id."','".$kode_lokasi."',getdate(), 'Pembelian Persediaan','".$r->kode_vendor."','IDR',1,'".$r->kode_pp."',$r->total_trans,'".$periode."','".$nik."',getdate(),'".$akunHutang."',$r->total_ppn,'-',getdate(),0,$r->total_diskon, 'BELI','$kodeGudang')");
+    //             // $sqlb = DB::connection($this->sql)->insert("insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) values ('".$id."','".$kode_lokasi."',getdate(), 'Pembelian Persediaan','".$request->kode_vendor."','IDR',1,'".$request->kode_pp."',$request->total_trans,'".$periode."','".$nik."',getdate(),'".$akunHutang."',$request->total_ppn,'-',getdate(),0,$request->total_diskon, 'BELI','$kodeGudang')");
                             
     //             $series = array();
     //             $series2 = array();
@@ -957,15 +911,15 @@ class PembelianController extends Controller
     //             $nilai = 0;
     //             $diskItem = 0;
     //             $total=0;
-    //             for($b=0; $b<count($r->kode_barang);$b++){
-    //                 $nilai = $r->sub_barang[$b];
+    //             for($b=0; $b<count($request->kode_barang);$b++){
+    //                 $nilai = $request->sub_barang[$b];
     //                 $isAda = false;
     //                 $idx = 0;
                     
-    //                 $akun = $r->kode_akun[$b];						
+    //                 $akun = $request->kode_akun[$b];						
     //                 for ($c=0;$c <= $b;$c++){
-    //                     if(isset($r->kode_akun[$c-1])){
-    //                         if ($akun == $r->kode_akun[$c-1]) {
+    //                     if(isset($request->kode_akun[$c-1])){
+    //                         if ($akun == $request->kode_akun[$c-1]) {
     //                             $isAda = true;
     //                             $idx = $c;
     //                             break;
@@ -973,25 +927,25 @@ class PembelianController extends Controller
     //                     }
     //                 }
     //                 if (!$isAda) {							
-    //                     array_push($series,$r->kode_akun[$b]);
+    //                     array_push($series,$request->kode_akun[$b]);
                         
-    //                     $series2[$r->kode_akun[$b]]=$nilai;
+    //                     $series2[$request->kode_akun[$b]]=$nilai;
     //                 } 
     //                 else { 
-    //                     $total = $series2[$r->kode_akun[$b]];
+    //                     $total = $series2[$request->kode_akun[$b]];
     //                     $total = $total + $nilai;
-    //                     $series2[$r->kode_akun[$b]]=$total;
+    //                     $series2[$request->kode_akun[$b]]=$total;
     //                 }		
                         
-    //                 $diskItem+=$r->disc_barang[$b];
+    //                 $diskItem+=$request->disc_barang[$b];
     //             }
                 
     //             for($x=0; $x<count($series);$x++){
                     
-    //                 // $sqlj=DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$r->kode_akun[$x]."','D',".$series2[$series[$x]].",".$series2[$series[$x]].",'Persediaan Barang','BRGBELI','BRGBELI','IDR',1,'$r->kode_pp','-','-','-','-','-','-','-','-')");
+    //                 // $sqlj=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$request->kode_akun[$x]."','D',".$series2[$series[$x]].",".$series2[$series[$x]].",'Persediaan Barang','BRGBELI','BRGBELI','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
     //                 $insertJ = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
     //                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //                 DB::connection($this->db)->insert($insertJ, [
+    //                 DB::connection($this->sql)->insert($insertJ, [
     //                     $id,
     //                     $kode_lokasi,
     //                     date('Y-m-d H:i:s'),
@@ -1000,16 +954,16 @@ class PembelianController extends Controller
     //                     '-',
     //                     date('Y-m-d H:i:s'),
     //                     $x,
-    //                     $r->kode_akun[$x],
+    //                     $request->kode_akun[$x],
     //                     'D',
     //                     $series2[$series[$x]],
     //                     $series2[$series[$x]],
-    //                     $r->keterangan,
+    //                     $request->keterangan,
     //                     'BRGBELI',
     //                     'BRGBELI',
     //                     'IDR',
     //                     1,
-    //                     $r->kode_pp,
+    //                     $request->kode_pp,
     //                     '-',
     //                     '-',
     //                     '-',
@@ -1022,12 +976,12 @@ class PembelianController extends Controller
                         
     //             }
                 
-    //             $totDiskon = $r->total_diskon +$diskItem;
-    //             if ($r->total_ppn > 0) {
+    //             $totDiskon = $request->total_diskon +$diskItem;
+    //             if ($request->total_ppn > 0) {
     //                 $x=$x+1;
     //                 $insert6 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
     //                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //                 DB::connection($this->db)->insert($insert6, [
+    //                 DB::connection($this->sql)->insert($insert6, [
     //                     $id,
     //                     $kode_lokasi,
     //                     date('Y-m-d H:i:s'),
@@ -1038,14 +992,14 @@ class PembelianController extends Controller
     //                     $x,
     //                     $akunPPN,
     //                     'D',
-    //                     $r->total_ppn,
-    //                     $r->total_ppn,
+    //                     $request->total_ppn,
+    //                     $request->total_ppn,
     //                     'PPN Masukan',
     //                     'BRGBELI',
     //                     'PPNM',
     //                     'IDR',
     //                     1,
-    //                     $r->kode_pp,
+    //                     $request->kode_pp,
     //                     '-',
     //                     '-',
     //                     '-',
@@ -1055,16 +1009,16 @@ class PembelianController extends Controller
     //                     '-',
     //                     '-'
     //                 ]);
-    //                 // $sql6=DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunPPN."','D',".$r->total_ppn.",".$r->total_ppn.",'PPN Masukan','BRGBELI','PPNM','IDR',1,'$r->kode_pp','-','-','-','-','-','-','-','-')");
+    //                 // $sql6=DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunPPN."','D',".$request->total_ppn.",".$request->total_ppn.",'PPN Masukan','BRGBELI','PPNM','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
                         
     //             }
     
-    //             if ($r->total_trans > 0) {
+    //             if ($request->total_trans > 0) {
     //                 $x=$x+1;
-    //                 $hut = floatval($r->total_trans)+floatval($r->total_ppn)-floatval($totDiskon);
+    //                 $hut = floatval($request->total_trans)+floatval($request->total_ppn)-floatval($totDiskon);
     //                 $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
     //                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //                 DB::connection($this->db)->insert($insert7, [
+    //                 DB::connection($this->sql)->insert($insert7, [
     //                     $id,
     //                     $kode_lokasi,
     //                     date('Y-m-d H:i:s'),
@@ -1082,7 +1036,7 @@ class PembelianController extends Controller
     //                     'BELIDISC',
     //                     'IDR',
     //                     1,
-    //                     $r->kode_pp,
+    //                     $request->kode_pp,
     //                     '-',
     //                     '-',
     //                     '-',
@@ -1092,14 +1046,14 @@ class PembelianController extends Controller
     //                     '-',
     //                     '-'
     //                 ]);
-    //                 // $sql7= DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunHutang."','C',".$r->total_trans.",".$r->total_trans.",'Hutang Vendor Pembelian','BRGBELI','BELIDISC','IDR',1,'$r->kode_pp','-','-','-','-','-','-','-','-')");
+    //                 // $sql7= DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunHutang."','C',".$request->total_trans.",".$request->total_trans.",'Hutang Vendor Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
     //             }
                 
-    //             if ($r->total_diskon > 0) {
+    //             if ($request->total_diskon > 0) {
     //                 $x=$x+1;
     //                 $insert8 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
     //                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //                 DB::connection($this->db)->insert($insert8, [
+    //                 DB::connection($this->sql)->insert($insert8, [
     //                     $id,
     //                     $kode_lokasi,
     //                     date('Y-m-d H:i:s'),
@@ -1117,7 +1071,7 @@ class PembelianController extends Controller
     //                     'BELIDISC',
     //                     'IDR',
     //                     1,
-    //                     $r->kode_pp,
+    //                     $request->kode_pp,
     //                     '-',
     //                     '-',
     //                     '-',
@@ -1127,14 +1081,14 @@ class PembelianController extends Controller
     //                     '-',
     //                     '-'
     //                 ]);
-    //                 // $sql8=  DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunDiskon."','C',".$totDiskon.",".$totDiskon.",'Diskon Pembelian','BRGBELI','BELIDISC','IDR',1,'$r->kode_pp','-','-','-','-','-','-','-','-')");
+    //                 // $sql8=  DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) values ('".$id."','".$kode_lokasi."',getdate(),'".$nik."','".$periode."','-',getdate(),".$x.",'".$akunDiskon."','C',".$totDiskon.",".$totDiskon.",'Diskon Pembelian','BRGBELI','BELIDISC','IDR',1,'$request->kode_pp','-','-','-','-','-','-','-','-')");
     //             }
                 
-    //             for($a=0; $a<count($r->kode_barang);$a++){
+    //             for($a=0; $a<count($request->kode_barang);$a++){
                     
     //                 $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
     //                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-    //                 DB::connection($this->db)->insert($insert9, [
+    //                 DB::connection($this->sql)->insert($insert9, [
     //                     $id,
     //                     $kode_lokasi,
     //                     $periode,
@@ -1142,33 +1096,33 @@ class PembelianController extends Controller
     //                     'BRGBELI',
     //                     $a,
     //                     $kodeGudang,
-    //                     $r->kode_barang[$a],
+    //                     $request->kode_barang[$a],
     //                     '-',
     //                     date('Y-m-d H:i:s'),
-    //                     $r->satuan_barang[$a],
+    //                     $request->satuan_barang[$a],
     //                     'D',
     //                     0,
-    //                     $r->qty_barang[$a],
+    //                     $request->qty_barang[$a],
     //                     0,
-    //                     $r->harga_barang[$a],
+    //                     $request->harga_barang[$a],
     //                     0,
     //                     0,
     //                     $diskItem,
-    //                     $r->disc_barang[$a],
-    //                     $r->sub_barang[$a]
+    //                     $request->disc_barang[$a],
+    //                     $request->sub_barang[$a]
     //                 ]);
-    //                 // $sql9 = DB::connection($this->db)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
-    //                 // ('".$id."','".$kode_lokasi."','".$periode."','BRGBELI','BRGBELI',".$a.",'$kodeGudang','".$r->kode_barang[$a]."','-',getdate(),'".$r->satuan_barang[$a]."','D',0,".$r->qty_barang[$a].",0,".$r->harga_barang[$a].",0,0,".$diskItem.",".$r->disc_barang[$a].",".$r->sub_barang[$a].")");
+    //                 // $sql9 = DB::connection($this->sql)->insert("insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) values 
+    //                 // ('".$id."','".$kode_lokasi."','".$periode."','BRGBELI','BRGBELI',".$a.",'$kodeGudang','".$request->kode_barang[$a]."','-',getdate(),'".$request->satuan_barang[$a]."','D',0,".$request->qty_barang[$a].",0,".$request->harga_barang[$a].",0,0,".$diskItem.",".$request->disc_barang[$a].",".$request->sub_barang[$a].")");
     
-    //                 $update = DB::connection($this->db)->table('brg_barang')
+    //                 $update = DB::connection($this->sql)->table('brg_barang')
     //                 ->where('kode_lokasi', $kode_lokasi)
-    //                 ->where('kode_barang', $r->kode_barang[$a])->update(['nilai_beli'=>$r->harga_barang[$a],'hna'=>$r->harga_jual[$a]]);
+    //                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
     //             }
                 
-    //             $exec = DB::connection($this->db)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
-    //             // $exec2 = DB::connection($this->db)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
+    //             $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
+    //             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
     
-    //             DB::connection($this->db)->commit();
+    //             DB::connection($this->sql)->commit();
     //             $tmp = "Data Pembelian berhasil diubah";
     //             $sts = true;
     //         }else{
@@ -1182,7 +1136,7 @@ class PembelianController extends Controller
             
     //         return response()->json($success, $this->successStatus);     
     //     } catch (\Throwable $e) {
-    //         DB::connection($this->db)->rollback();
+    //         DB::connection($this->sql)->rollback();
     //         $success['status'] = false;
     //         $success['message'] = "Data Pembelian gagal diubah ".$e;
     //         return response()->json($success, $this->successStatus); 
@@ -1191,12 +1145,12 @@ class PembelianController extends Controller
         
     // }
 
-    public function destroy(Request $r)
+    public function destroy(Request $request)
     {
-        $this->validate($r, [
+        $this->validate($request, [
             'no_bukti' => 'required'
         ]);
-        DB::connection($this->db)->beginTransaction();
+        DB::connection($this->sql)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -1204,123 +1158,47 @@ class PembelianController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
+            if(isset($request->nik) && $request->nik != ""){
+                $nik= $request->nik;
             }
 
-            $del = DB::connection($this->db)->table('trans_m')
+            $del = DB::connection($this->sql)->table('trans_m')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $r->no_bukti)
+            ->where('no_bukti', $request->no_bukti)
             ->where('nik_user', $nik)
             ->where('form', 'BRGBELI')
             ->delete();
 
-            $del2 = DB::connection($this->db)->table('trans_j')
+            $del2 = DB::connection($this->sql)->table('trans_j')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $r->no_bukti)
+            ->where('no_bukti', $request->no_bukti)
             ->where('nik_user', $nik)
             ->where('modul', 'BRGBELI')
             ->delete();
 
-            $del3 = DB::connection($this->db)->table('brg_belihut_d')
+            $del3 = DB::connection($this->sql)->table('brg_belihut_d')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_beli', $r->no_bukti)
+            ->where('no_beli', $request->no_bukti)
             ->where('nik_user', $nik)
             ->where('modul', 'BELI')
             ->delete();
 
-            $del4 = DB::connection($this->db)->table('brg_trans_d')
+            $del4 = DB::connection($this->sql)->table('brg_trans_d')
             ->where('kode_lokasi', $kode_lokasi)
-            ->where('no_bukti', $r->no_bukti)
+            ->where('no_bukti', $request->no_bukti)
             ->where('form', 'BRGBELI')
             ->delete();
 
 
-            DB::connection($this->db)->commit();
+            DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['message'] = "Data Pembelian berhasil dihapus";
             
             return response()->json($success, $this->successStatus); 
         } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
+            DB::connection($this->sql)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Pembelian gagal dihapus ".$e;
-            
-            return response()->json($success, $this->successStatus); 
-        }	
-    }
-
-    public function clearTmp(Request $r)
-    {
-        $this->validate($r, [
-            'nik_user' => 'required'
-        ]);
-        DB::connection($this->db)->beginTransaction();
-        
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
-            }
-
-            $del = DB::connection($this->db)->table('brg_trans_d_tmp')
-            ->where('nik_user', $r->nik_user)
-            ->where('form', 'BRGBELI')
-            ->delete();
-
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Detail Pembelian berhasil dihapus";
-            
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
-            $success['status'] = false;
-            $success['message'] = "Data Detail Pembelian gagal dihapus ".$e;
-            
-            return response()->json($success, $this->successStatus); 
-        }	
-    }
-
-    public function destroyDetail(Request $r)
-    {
-        $this->validate($r, [
-            'nik_user' => 'required',
-            'no_urut' => 'required',
-            'kode_barang' => 'required'
-        ]);
-        DB::connection($this->db)->beginTransaction();
-        
-        try {
-            if($data =  Auth::guard($this->guard)->user()){
-                $nik= $data->nik;
-                $kode_lokasi= $data->kode_lokasi;
-            }
-
-            if(isset($r->nik) && $r->nik != ""){
-                $nik= $r->nik;
-            }
-
-            $del = DB::connection($this->db)->table('brg_trans_d_tmp')
-            ->where('nik_user', $r->nik_user)
-            ->where('nu', $r->no_urut)
-            ->where('kode_barang', $r->kode_barang)
-            ->where('form', 'BRGBELI')
-            ->delete();
-
-            DB::connection($this->db)->commit();
-            $success['status'] = true;
-            $success['message'] = "Data Detail Pembelian berhasil dihapus";
-            
-            return response()->json($success, $this->successStatus); 
-        } catch (\Throwable $e) {
-            DB::connection($this->db)->rollback();
-            $success['status'] = false;
-            $success['message'] = "Data Detail Pembelian gagal dihapus ".$e;
             
             return response()->json($success, $this->successStatus); 
         }	

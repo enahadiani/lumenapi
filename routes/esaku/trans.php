@@ -54,11 +54,16 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Pembelian
     $router->get('pembelian', 'Esaku\Inventori\PembelianController@index');
     $router->get('pembelian-detail', 'Esaku\Inventori\PembelianController@show');
+    $router->get('pembelian-detail-tmp', 'Esaku\Inventori\PembelianController@showTmp');
     $router->post('pembelian', 'Esaku\Inventori\PembelianController@store');
+    $router->post('pembelian-detail', 'Esaku\Inventori\PembelianController@storeDetail');
+    $router->post('pembelian-detail-ubah', 'Esaku\Inventori\PembelianController@updateDetail');
     $router->put('pembelian', 'Esaku\Inventori\PembelianController@update');
     $router->delete('pembelian', 'Esaku\Inventori\PembelianController@destroy');
     $router->get('pembelian-nota', 'Esaku\Inventori\PembelianController@getNota');
     $router->get('pembelian-barang', 'Esaku\Inventori\PembelianController@getBarang');
+    $router->delete('pembelian-detail-tmp', 'Esaku\Inventori\PembelianController@clearTmp');
+    $router->delete('pembelian-detail', 'Esaku\Inventori\PembelianController@destroyDetail');
 
 
     //Pembelian3
