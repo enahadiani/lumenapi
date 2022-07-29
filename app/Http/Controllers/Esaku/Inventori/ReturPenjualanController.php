@@ -149,6 +149,7 @@ class ReturPenjualanController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -157,13 +158,7 @@ class ReturPenjualanController extends Controller
 
             if($request->total_return <= $request->saldo){
 
-                $sqlg="select top 1 a.kode_gudang from brg_gudang a where a.kode_lokasi='$kode_lokasi' ";
-                $rsg=DB::connection($this->sql)->select($sqlg);
-                if(count($rsg) > 0){
-                    $kodeGudang=$rsg[0]->kode_gudang;
-                }else{
-                    $kodeGudang="-";
-                }
+                $kodeGudang=$pabrik;
     
                 $str_format="0001";
                 $periode = $request->periode;
