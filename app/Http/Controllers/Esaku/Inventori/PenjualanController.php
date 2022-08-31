@@ -353,7 +353,8 @@ class PenjualanController extends Controller
             $success["total_byr"]=$total_byr;
             $success["kembalian"]=$kembalian;
 
-            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik' ";
+            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' and b.pabrik='$pabrik' ";
+            
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
