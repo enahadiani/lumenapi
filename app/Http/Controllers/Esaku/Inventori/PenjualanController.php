@@ -322,10 +322,14 @@ class PenjualanController extends Controller
             $success["nik"]=$nik;
             $success["no_jual"] = $request->no_jual;
 
-            $sql="select * from brg_jualpiu_dloc where no_jual='$request->no_jual' ";
+            $sql="select a.*,b.nama,b.alamat from brg_jualpiu_dloc a 
+            left join brg_gudang b on a.kode_gudang=b.kode_gudang and a.kode_lokasi=b.kode_lokasi
+            where a.no_jual='$request->no_jual' ";
             $get = DB::connection($this->sql)->select($sql);
             $get = json_decode(json_encode($get),true);
             if(count($get) > 0){
+                $success["nama"] = $get[0]['nama'];
+                $success["alamat"] = $get[0]['alamat'];
                 $total_trans=$get[0]['nilai'];
                 $total_disk=$get[0]['diskon'];
                 $total_stlh=$get[0]['nilai']-$get[0]['diskon'];
@@ -335,6 +339,8 @@ class PenjualanController extends Controller
                 $kembalian=$get[0]['tobyr']-($total_stlh);
                 $success["tgl"] = $get[0]['tanggal'];
             }else{
+                $success["nama"] = "-";
+                $success["alamat"] = "-";
                 $total_trans=0;
                 $total_disk=0;
                 $total_stlh=0;
