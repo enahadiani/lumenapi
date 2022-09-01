@@ -107,6 +107,7 @@ class CloseKasirController extends Controller
             if($data =  Auth::guard($this->guard)->user()){
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
+                $pabrik= $data->pabrik;
             }
 
             if(isset($request->nik) && $request->nik != ""){
@@ -118,7 +119,7 @@ class CloseKasirController extends Controller
             left join 
             ( select a.no_open,sum(a.nilai) as total,sum(a.diskon) as diskon
               from brg_jualpiu_dloc a
-              where isnull(a.no_close,'-')='-' 
+              where isnull(a.no_close,'-')='-' and a.kode_gudang='$pabrik'
               group by a.no_open
               ) b on a.no_open=b.no_open 
             where a.kode_lokasi='".$kode_lokasi."' and a.no_open='".$request->no_open."' and a.nik='".$nik."' 
@@ -127,18 +128,19 @@ class CloseKasirController extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and no_jual not like '%RJ%'" ;
+            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
+            from brg_jualpiu_dloc
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%'" ;
             $res2 = DB::connection($this->sql)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
             $sql3 = "select no_beli,tanggal,keterangan,periode,nilai,diskon from brg_belihut_d
-            where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' " ;
+            where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' and kode_gudang='$pabrik'" ;
             $res3 = DB::connection($this->sql)->select($sql3);
             $res3 = json_decode(json_encode($res3),true);
 
             $sql4 = "select no_jual as no_retur,tanggal,keterangan,periode,nilai,diskon from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' and no_jual like '%RJ%' " ;
+            where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' and no_jual like '%RJ%' and kode_gudang='$pabrik' " ;
             $res4 = DB::connection($this->sql)->select($sql4);
             $res4 = json_decode(json_encode($res4),true);
             
@@ -235,8 +237,8 @@ class CloseKasirController extends Controller
     
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
-                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
-                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
+                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi and b.pabrik=c.kode_gudang
+                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%' and c.kode_gudang=d.kode_gudang
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' and b.pabrik='$pabrik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
@@ -284,7 +286,7 @@ class CloseKasirController extends Controller
     
                 if(count($request->no_jual) > 0){
 
-                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%'";
+                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' and no_jual not like '%RJ%'";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -360,7 +362,7 @@ class CloseKasirController extends Controller
                 
                 if(isset($request->no_retur) && count($request->no_retur) > 0){
 
-                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' ";
+                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -384,7 +386,7 @@ class CloseKasirController extends Controller
                 
                 if(isset($request->no_beli) && count($request->no_beli) > 0){
 
-                    $sql = "select no_beli,id_sync,akun_hutang from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' ";
+                    $sql = "select no_beli,id_sync,akun_hutang from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' ";
                     $return2 = DB::connection($this->sql)->select($sql);
                     $return2 = json_decode(json_encode($return2),true);
     
@@ -499,8 +501,8 @@ class CloseKasirController extends Controller
     
                 $spro = DB::connection($this->sql)->select("select a.akun_pdpt, sum (case when c.dc='C' then c.total else -c.total end) as nilai_jual from brg_barangklp a
                 inner join brg_barang b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi
-                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi
-                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%'
+                inner join brg_trans_d c on b.kode_barang=c.kode_barang and c.kode_lokasi=b.kode_lokasi and b.pabrik=c.kode_gudang
+                inner join brg_jualpiu_dloc d on c.no_bukti=d.no_jual and c.kode_lokasi=d.kode_lokasi and d.no_jual not like '%RJ%' and c.kode_gudang=d.kode_gudang
                 where  a.kode_lokasi='$kode_lokasi' and d.no_close='-' and d.no_open='".$request->no_open."' and d.nik_user='$nik' and b.pabrik='$pabrik' group by a.akun_pdpt
                 ");
                 $spro = json_decode(json_encode($spro),true);
@@ -585,7 +587,7 @@ class CloseKasirController extends Controller
     
                 if(count($request->no_jual) > 0){
                     
-                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%' ";
+                    $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -663,7 +665,7 @@ class CloseKasirController extends Controller
 
                 if(count($request->no_retur) > 0){
 
-                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' ";
+                    $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
                     $return = json_decode(json_encode($return),true);
     
@@ -687,7 +689,7 @@ class CloseKasirController extends Controller
 
                 if(isset($request->no_beli) && count($request->no_beli) > 0){
 
-                    $sql = "select no_beli from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' ";
+                    $sql = "select no_beli from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' ";
                     $return2 = DB::connection($this->sql)->select($sql);
                     $return2 = json_decode(json_encode($return2),true);
     
