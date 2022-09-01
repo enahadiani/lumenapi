@@ -2149,7 +2149,9 @@ class LaporanController extends Controller
                 }
             }
             $nik_user=$request->nik_user;
-            $sql="select * from brg_jualpiu_dloc a $where ";
+            $sql="select a.*,b.nama,b.alamat from brg_jualpiu_dloc a 
+            left join brg_gudang b on a.kode_gudang=b.kode_gudang and a.kode_lokasi=b.kode_lokasi
+            $where ";
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
 
