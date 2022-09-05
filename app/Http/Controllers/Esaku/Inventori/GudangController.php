@@ -49,7 +49,7 @@ class GudangController extends Controller
                 from brg_gudang a 
                 left join pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi 
                 left join karyawan c on a.pic=c.nik and a.kode_lokasi=c.kode_lokasi 
-                where a.kode_lokasi='".$kode_lokasi."'  "; //and a.kode_gudang='$pabrik' $filter 
+                where a.kode_lokasi='".$kode_lokasi."' and a.kode_gudang='$pabrik' $filter "; 
             }else{
                 $sql = "select kode_gudang,nama,pic,telp,alamat,kode_pp,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_gudang where kode_lokasi= '".$kode_lokasi."' and kode_gudang='$pabrik' ";
             }
