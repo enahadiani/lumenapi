@@ -319,7 +319,7 @@ class Pembelian3Controller extends Controller
             $total=0;
             for($b=0; $b<count($request->kode_barang);$b++) {
                 if($request->flag_ppn[$b] == "1") {
-                    $harga = floatval($request->harga_barang[$b])*(100/110);
+                    $harga = floatval($request->harga_barang[$b])*(100/111);
                 } else {
                     $harga = floatval($request->harga_barang[$b]);
                 }
@@ -359,7 +359,7 @@ class Pembelian3Controller extends Controller
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 
                 if($request->flag_ppn[$a] == "1") {
-                    $harga = floatval($request->harga_barang[$a])*(100/110);
+                    $harga = floatval($request->harga_barang[$a])*(100/111);
                 } else {
                     $harga = floatval($request->harga_barang[$a]);
                 }
@@ -436,7 +436,7 @@ class Pembelian3Controller extends Controller
                 ]);       
             }
 
-            $totDiskon = (floatval($request->total_diskon)*(100/110)) +$diskItem;
+            $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
             $totPPN = ($total - $totDiskon)*0.1;
 
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
