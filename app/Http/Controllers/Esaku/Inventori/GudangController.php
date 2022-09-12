@@ -124,10 +124,12 @@ class GudangController extends Controller
                     $request->kode_pp
                 ]);
                 
+                /*
                 $ins2 = DB::connection($this->sql)->insert("
                 insert into brg_barang_gudang (kode_barang, kode_gudang, kode_lokasi, hpp, no_belicurr, kode_klp)
                 select kode_barang, '$request->kode_gudang', kode_lokasi, 0, '-', kode_klp
                 from brg_barang where kode_lokasi=? ",array($kode_lokasi));
+                */
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;

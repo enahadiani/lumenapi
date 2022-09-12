@@ -176,16 +176,19 @@ class BarangController extends Controller
                     $request->hrg_satuan,
                 ]);
 
+                /*
                 $ins2 = DB::connection($this->sql)->insert("
                 insert into brg_barang_gudang (kode_barang, kode_gudang, kode_lokasi, hpp, no_belicurr, kode_klp)
                 select a.kode_barang, b.kode_gudang, a.kode_lokasi, 0, '-', a.kode_klp
                 from brg_barang a cross join brg_gudang b
                 where a.kode_barang=? and a.kode_lokasi=? and b.kode_lokasi=? ",array($request->kode_barang,$kode_lokasi,$kode_lokasi));
+                */
                 
                 DB::connection($this->sql)->commit();
                 $success['status'] = true;
                 $success['message'] = "Data Barang berhasil disimpan";
                 $success['kode'] = $request->kode_barang;
+                
             }else{
                 $success['status'] = false;
                 $success['message'] = "Error : Duplicate entry. No Barang sudah ada di database! $request->kode_barang,$kode_lokasi,$request->barcode,$request->kode_gudang";

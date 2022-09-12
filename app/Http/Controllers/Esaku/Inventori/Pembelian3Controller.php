@@ -137,9 +137,8 @@ class Pembelian3Controller extends Controller
 
             $sql="select a.kode_barang,a.nama,a.hna as harga,a.barcode,a.sat_kecil as satuan,x.akun_pers as kode_akun,isnull(a.nilai_beli,0) as harga_seb,isnull(d.sakhir,0) as saldo,a.flag_ppn
             from (            
-                select a.kode_barang,z.nama,a.hjual as hna,z.barcode,z.sat_kecil,a.hbeli as nilai_beli,a.kode_gudang,a.kode_klp,a.kode_lokasi,isnull(z.flag_ppn, 0) as flag_ppn
-                from brg_barang_gudang a 
-                inner join brg_barang z on a.kode_barang=z.kode_barang and a.kode_lokasi=z.kode_lokasi
+                select a.kode_barang,a.nama,a.hna as hna,a.barcode,a.sat_kecil,a.nilai_beli as nilai_beli,a.pabrik as kode_gudang,a.kode_klp,a.kode_lokasi,isnull(a.flag_ppn, 0) as flag_ppn
+                from brg_barang a                 
                 inner join brg_gudang b on a.kode_gudang=b.kode_gudang and a.kode_lokasi=b.kode_lokasi			
                 where a.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
             ) a
@@ -210,10 +209,9 @@ class Pembelian3Controller extends Controller
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
             
-            $sql2="select a.nu, a.kode_barang,isnull(b.hbeli,0) as hrg_seb,z.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,z.nama,a.stok, isnull(b.hjual,0) as harga_jual 
+            $sql2="select a.nu, a.kode_barang,isnull(b.nilai_beli,0) as hrg_seb,b.satuan,a.jumlah,a.harga,a.diskon,a.total as subtotal,b.nama,a.stok, isnull(b.hna,0) as harga_jual 
             from brg_trans_d  a 
-            inner join brg_barang_gudang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang
-            inner join brg_barang z on b.kode_barang=z.kode_barang and b.kode_lokasi=z.kode_lokasi 
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
             where  a.form='BRGBELI' and a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_bukti' and b.kode_gudang='$pabrik' ";
 
             $res2 = DB::connection($this->sql)->select($sql2);
@@ -401,19 +399,19 @@ class Pembelian3Controller extends Controller
                     round($ppn,0)
                 ]);
                    
-                /*
-                070922- ubah ke brg_barang_gudang
+                
                 $update = DB::connection($this->sql)->table('brg_barang')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('pabrik', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
-                */
-                
+                                
+                /*
                 //070922- ubah ke brg_barang_gudang
                 $update = DB::connection($this->sql)->table('brg_barang_gudang')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('kode_gudang', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['hbeli'=>$request->harga_barang[$a],'hjual'=>$request->harga_jual[$a]]);
+                */
             }
             
             for($x=0; $x<count($series);$x++){

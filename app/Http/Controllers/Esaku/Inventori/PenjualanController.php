@@ -138,7 +138,7 @@ class PenjualanController extends Controller
                 }
             }
 
-            $sqlp="select distinct b.akun_pdpt as kode_akun from brg_barang_gudang a inner join brg_barangklp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='$kode_lokasi' and a.kode_gudang='$pabrik' ";
+            $sqlp="select distinct b.akun_pdpt as kode_akun from brg_barang a inner join brg_barangklp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik' ";
 
             $get3 = DB::connection($this->sql)->select($sqlp);
             $get3 = json_decode(json_encode($get3),true);
@@ -173,7 +173,7 @@ class PenjualanController extends Controller
             $ins3 = DB::connection($this->sql)->insert("
             update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
             from brg_trans_d a 
-            inner join brg_barang_gudang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang='$pabrik'
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.pabrik='$pabrik'
             where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
 
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
@@ -251,7 +251,7 @@ class PenjualanController extends Controller
                 }
             }
 
-            $sqlp="select distinct b.akun_pdpt as kode_akun from brg_barang_gudang a inner join brg_barangklp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik' ";
+            $sqlp="select distinct b.akun_pdpt as kode_akun from brg_barang a inner join brg_barangklp b on a.kode_klp=b.kode_klp and a.kode_lokasi=b.kode_lokasi where a.kode_lokasi='$kode_lokasi' and a.pabrik='$pabrik' ";
 
             $get3 = DB::connection($this->sql)->select($sqlp);
             $get3 = json_decode(json_encode($get3),true);
@@ -277,7 +277,7 @@ class PenjualanController extends Controller
             $ins3 = DB::connection($this->sql)->insert("
             update a set a.hpp=b.hpp, a.no_belicurr=b.no_belicurr 
             from brg_trans_d a 
-            inner join brg_barang_gudang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang='$pabrik'
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.pabrik='$pabrik'
             where a.no_bukti=? and a.kode_lokasi=? ",array($id,$kode_lokasi));
 
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
@@ -368,7 +368,7 @@ class PenjualanController extends Controller
             $success["total_byr"]=$total_byr;
             $success["kembalian"]=$kembalian;
 
-            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang_gudang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' and b.kode_gudang='$pabrik' ";
+            $sql="select a.kode_barang,a.harga,a.jumlah,a.diskon*-1 as diskon,b.nama,b.sat_kecil,a.total from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi where a.no_bukti='$request->no_jual' and a.kode_lokasi='$kode_lokasi' and b.pabrik='$pabrik' ";
             
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
