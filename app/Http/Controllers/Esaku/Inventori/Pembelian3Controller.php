@@ -238,6 +238,170 @@ class Pembelian3Controller extends Controller
         
     }
    
+    // public function store(Request $request)
+    // {
+    //     $this->validate($request, [
+    //         'kode_vendor' => 'required',
+    //         'no_faktur' => 'required',
+    //         'keterangan' => 'required',
+    //         'kode_pp' => 'required',
+    //         'total_trans' => 'required',
+    //         'total_diskon' => 'required',
+    //         // 'total_ppn' => 'required',
+    //         'kode_akun' => 'required|array',
+    //         'kode_barang' => 'required|array',
+    //         'qty_barang' => 'required|array',
+    //         'harga_barang' => 'required|array',
+    //         'satuan_barang' => 'required|array',
+    //         'disc_barang' => 'required|array',
+    //         'sub_barang' => 'required|array',
+    //         'harga_jual' => 'required|array'
+    //     ]);
+
+    //     DB::connection($this->sql)->beginTransaction();
+        
+    //     try {
+    //         if($data =  Auth::guard($this->guard)->user()){
+    //             $nik= $data->nik;
+    //             $kode_lokasi= $data->kode_lokasi;
+    //             $pabrik= $data->pabrik;
+    //         }
+
+    //         if(isset($request->nik) && $request->nik != ""){
+    //             $nik= $request->nik;
+    //         }
+
+    //         $str_format="0000";
+    //         $periode=date('Y').date('m');
+    //         $per=date('y').date('m');
+    //         $prefix="PO/".substr($periode,2,4)."/".$kode_lokasi."/";
+    //         $sql="select right(isnull(max(no_bukti),'0000'),".strlen($str_format).")+1 as id from trans_m where no_bukti like '$prefix%' and kode_lokasi='".$kode_lokasi."' ";
+
+    //         $get = DB::connection($this->sql)->select($sql);
+    //         $get = json_decode(json_encode($get),true);
+    //         if(count($get) > 0){
+    //             $id = $prefix.str_pad($get[0]['id'], strlen($str_format), $str_format, STR_PAD_LEFT);
+    //         }else{
+    //             $id = "-";
+    //         }
+            
+    //         $kodeGudang=$pabrik;
+    //         $exec = array();
+
+    //         $series = array();
+    //         $series2 = array();
+    //         $group = array();
+    //         $nilai = 0;
+    //         $diskItem = 0;
+    //         $total=0;
+    //         for($b=0; $b<count($request->kode_barang);$b++) {
+    //             if($request->flag_ppn[$b] == "1") {
+    //                 $harga = floatval($request->harga_barang[$b])*(100/111);
+    //             } else {
+    //                 $harga = floatval($request->harga_barang[$b]);
+    //             }
+
+    //             $nilai = $request->qty_barang[$b] * $harga;
+    //             $isAda = false;
+    //             $idx = 0;
+                
+    //             $akun = $request->kode_akun[$b];						
+    //             for ($c=0;$c <= $b;$c++){
+    //                 if(isset($request->kode_akun[$c-1])){
+
+    //                     if ($akun == $request->kode_akun[$c-1]) {
+    //                         $isAda = true;
+    //                         $idx = $c;
+    //                         break;
+    //                     }
+    //                 }
+    //             }
+    //             if (!$isAda) {							
+    //                 array_push($series,$request->kode_akun[$b]);
+                    
+    //                 $series2[$request->kode_akun[$b]]=$nilai;
+    //             } 
+    //             else { 
+    //                 $total = $series2[$request->kode_akun[$b]];
+    //                 $total = $total + $nilai;
+    //                 $series2[$request->kode_akun[$b]]=$total;
+    //             }		
+                    
+    //             $diskItem+=$request->disc_barang[$b];
+    //         }
+
+    //         for($a=0; $a<count($request->kode_barang);$a++){
+
+    //             $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total,ppn) 
+    //             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                
+    //             if($request->flag_ppn[$a] == "1") {
+    //                 $harga = floatval($request->harga_barang[$a])*(100/111);
+    //             } else {
+    //                 $harga = floatval($request->harga_barang[$a]);
+    //             }
+
+    //             $sub = $request->qty_barang[$a] * $harga;
+
+    //             if($request->flag_ppn[$a] == "1") {
+    //                 $ppn = floatval($sub * 0.11); // 11%
+    //             } else {
+    //                 $ppn = 0;
+    //             }
+
+    //             DB::connection($this->sql)->insert($insert9, [
+    //                 $id,
+    //                 $kode_lokasi,
+    //                 $periode,
+    //                 'BRGBELI',
+    //                 'BRGBELI',
+    //                 $a,
+    //                 $kodeGudang,
+    //                 $request->kode_barang[$a],
+    //                 '-',
+    //                 date('Y-m-d H:i:s'),
+    //                 $request->satuan_barang[$a],
+    //                 'D',
+    //                 0,
+    //                 $request->qty_barang[$a],
+    //                 0,
+    //                 $harga,                    
+    //                 $request->harga_jual[$a],
+    //                 $request->harga_barang[$a],
+    //                 $diskItem,
+    //                 $request->disc_barang[$a],
+    //                 round($sub,0),
+    //                 round($ppn,0)
+    //             ]);
+               
+    //         }
+            
+    //         //@nobeli,@lokasi,@nikuser,@kodevendor, @diskon,@ppn ,@faktur ,@keterangan                  
+    //         $vendor = $request->kode_vendor;
+    //         $faktur = $request->faktur;
+    //         $keterangan = $request->keterangan;            
+    //         $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
+    //         $totPPN = ($total - $totDiskon)*0.11;            
+    //         $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
+
+    //         $tmp="Data Pembelian berhasil disimpan";
+    //         $sts=true;
+    //         DB::connection($this->sql)->commit();
+
+    //         $success['status'] = $sts;
+    //         $success['message'] = $tmp;
+    //         $success['no_bukti'] = $id;
+            
+    //         return response()->json($success, $this->successStatus);     
+    //     } catch (\Throwable $e) {
+    //         DB::connection($this->sql)->rollback();
+    //         $success['status'] = false;
+    //         $success['message'] = "Data Pembelian gagal disimpan ".$e;
+    //         return response()->json($success, $this->successStatus); 
+    //     }				
+        
+    // }
+
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -284,10 +448,7 @@ class Pembelian3Controller extends Controller
             }else{
                 $id = "-";
             }
-            
-            /*
-            15-09-2022-mr
-
+                       
             $sql="select kode_spro,flag from spro where kode_spro in ('PPNM','BELIDIS') and kode_lokasi = '".$kode_lokasi."'";
             $spro = DB::connection($this->sql)->select($sql);
             if(count($spro) > 0){
@@ -311,8 +472,7 @@ class Pembelian3Controller extends Controller
             }else{
                 $akunpiu = "-";
             }
-            */
-
+            
             $kodeGudang=$pabrik;
 
             $exec = array();
@@ -373,7 +533,7 @@ class Pembelian3Controller extends Controller
                 $sub = $request->qty_barang[$a] * $harga;
 
                 if($request->flag_ppn[$a] == "1") {
-                    $ppn = floatval($sub * 0.11); // 11%
+                    $ppn = floatval($sub); // 11%
                 } else {
                     $ppn = 0;
                 }
@@ -395,27 +555,22 @@ class Pembelian3Controller extends Controller
                     $request->qty_barang[$a],
                     0,
                     $harga,                    
-                    $request->harga_jual[$a],
-                    $request->harga_barang[$a],
+                    0,
+                    0,
                     $diskItem,
                     $request->disc_barang[$a],
                     round($sub,0),
                     round($ppn,0)
                 ]);
                    
-                /*
-                15-09-2022
                 $update = DB::connection($this->sql)->table('brg_barang')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('pabrik', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
-                */
-
+                
             }
             
 
-            /*
-            15-09-2022
             for($x=0; $x<count($series);$x++){
                 $insertJ = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -631,18 +786,9 @@ class Pembelian3Controller extends Controller
             }
             
             $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
-            */
-
-            // 15-09-2022 --> update harga avg di saat closing kasir $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
+           
+            $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
-
-            //@nobeli,@lokasi,@nikuser,@kodevendor, @diskon,@ppn ,@faktur ,@keterangan                  
-            $vendor = $request->kode_vendor;
-            $faktur = $request->faktur;
-            $keterangan = $request->keterangan;            
-            $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
-            $totPPN = ($total - $totDiskon)*0.11;            
-            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
 
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
