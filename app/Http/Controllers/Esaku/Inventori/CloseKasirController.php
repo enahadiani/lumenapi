@@ -71,8 +71,7 @@ class CloseKasirController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select no_open,nik,tgl_input,saldo_awal from kasir_open where kode_lokasi='".$kode_lokasi."' and no_close='-' 
-            ";
+            $sql = "select no_open,nik,tgl_input,saldo_awal from kasir_open where kode_lokasi='".$kode_lokasi."' and no_close='-'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
