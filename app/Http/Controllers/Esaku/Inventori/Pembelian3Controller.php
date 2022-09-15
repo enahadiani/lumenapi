@@ -373,7 +373,7 @@ class Pembelian3Controller extends Controller
                 $sub = $request->qty_barang[$a] * $harga;
 
                 if($request->flag_ppn[$a] == "1") {
-                    $ppn = floatval($sub); // 11%
+                    $ppn = floatval($sub * 0.11); // 11%
                 } else {
                     $ppn = 0;
                 }
