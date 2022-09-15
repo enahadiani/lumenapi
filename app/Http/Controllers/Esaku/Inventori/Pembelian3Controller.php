@@ -284,6 +284,9 @@ class Pembelian3Controller extends Controller
             }else{
                 $id = "-";
             }
+            
+            /*
+            15-09-2022-mr
 
             $sql="select kode_spro,flag from spro where kode_spro in ('PPNM','BELIDIS') and kode_lokasi = '".$kode_lokasi."'";
             $spro = DB::connection($this->sql)->select($sql);
@@ -308,6 +311,7 @@ class Pembelian3Controller extends Controller
             }else{
                 $akunpiu = "-";
             }
+            */
 
             $kodeGudang=$pabrik;
 
@@ -369,7 +373,7 @@ class Pembelian3Controller extends Controller
                 $sub = $request->qty_barang[$a] * $harga;
 
                 if($request->flag_ppn[$a] == "1") {
-                    $ppn = floatval($sub); // 10%
+                    $ppn = floatval($sub); // 11%
                 } else {
                     $ppn = 0;
                 }
@@ -390,23 +394,28 @@ class Pembelian3Controller extends Controller
                     0,
                     $request->qty_barang[$a],
                     0,
-                    $harga,
-                    0,
-                    0,
+                    $harga,                    
+                    $request->harga_jual[$a],
+                    $request->harga_barang[$a],
                     $diskItem,
                     $request->disc_barang[$a],
                     round($sub,0),
                     round($ppn,0)
                 ]);
                    
-                
+                /*
+                15-09-2022
                 $update = DB::connection($this->sql)->table('brg_barang')
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('pabrik', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
-              
+                */
+
             }
             
+
+            /*
+            15-09-2022
             for($x=0; $x<count($series);$x++){
                 $insertJ = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -441,7 +450,7 @@ class Pembelian3Controller extends Controller
             }
 
             $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
-            $totPPN = ($total - $totDiskon)*0.1;
+            $totPPN = ($total - $totDiskon)*0.11;
 
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -622,9 +631,19 @@ class Pembelian3Controller extends Controller
             }
             
             $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
+            */
 
             // 15-09-2022 --> update harga avg di saat closing kasir $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
+
+            //@nobeli,@lokasi,@nikuser,@kodevendor, @diskon,@ppn ,@faktur ,@keterangan                  
+            $vendor = $request->kode_vendor;
+            $faktur = $request->faktur;
+            $keterangan = $request->keterangan;            
+            $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
+            $totPPN = ($total - $totDiskon)*0.11;            
+            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
+
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
             DB::connection($this->sql)->commit();
