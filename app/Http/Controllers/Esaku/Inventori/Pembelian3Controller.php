@@ -642,7 +642,7 @@ class Pembelian3Controller extends Controller
             $keterangan = $request->keterangan;            
             $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
             $totPPN = ($total - $totDiskon)*0.11;            
-            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
+            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
 
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
