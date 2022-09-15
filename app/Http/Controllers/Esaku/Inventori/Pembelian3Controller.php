@@ -301,7 +301,7 @@ class Pembelian3Controller extends Controller
                 $akunHutang = $res[0]->akun_hutang;									
             }	
 
-            $spro3 = DB::connection($this->sql)->select(" select kode_spro,flag  from spro where kode_lokasi='$kode_lokasi' and kode_spro='CUSTINV'");
+            $spro3 = DB::connection($this->sql)->select("select kode_spro,flag  from spro where kode_lokasi='$kode_lokasi' and kode_spro='CUSTINV'");
             $spro3 = json_decode(json_encode($spro3),true);
             if(count($spro3)>0){
                 $akunpiu=$spro3[0]["flag"];
@@ -404,14 +404,7 @@ class Pembelian3Controller extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('pabrik', $pabrik)
                 ->where('kode_barang', $request->kode_barang[$a])->update(['nilai_beli'=>$request->harga_barang[$a],'hna'=>$request->harga_jual[$a]]);
-                                
-                /*
-                //070922- ubah ke brg_barang_gudang
-                $update = DB::connection($this->sql)->table('brg_barang_gudang')
-                ->where('kode_lokasi', $kode_lokasi)
-                ->where('kode_gudang', $pabrik)
-                ->where('kode_barang', $request->kode_barang[$a])->update(['hbeli'=>$request->harga_barang[$a],'hjual'=>$request->harga_jual[$a]]);
-                */
+              
             }
             
             for($x=0; $x<count($series);$x++){
@@ -630,7 +623,7 @@ class Pembelian3Controller extends Controller
             
             $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
 
-            $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
+            // 15-09-2022 --> update harga avg di saat closing kasir $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
