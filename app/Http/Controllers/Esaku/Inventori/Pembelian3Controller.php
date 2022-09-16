@@ -298,6 +298,7 @@ class Pembelian3Controller extends Controller
                     $harga = floatval($request->harga_barang[$a]);
                 }
                 $sub = $request->qty_barang[$a] * $harga; //harga dpp
+                $diskItem = $request->disc_barang[$a] / $request->qty_barang[$a]; 
 
                 if($request->flag_ppn[$a] == "1") {
                     $ppn = floatval($sub * 0.11); 
@@ -333,16 +334,14 @@ class Pembelian3Controller extends Controller
                 ]);
                
             }
-            
-            //@nobeli,@lokasi,@nikuser,@kodevendor, @diskon,@ppn ,@faktur ,@keterangan                  
+                                        
             $vendor = $request->kode_vendor;
             $faktur = $request->faktur;
-            $keterangan = $request->keterangan;            
+            $keterangan = $request->keterangan;        
+            $totDiskon =  $request->total_diskon;    
             
-            $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
-            $totPPN = ($total - $totDiskon)*0.11;            
-            
-            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$totDiskon,$totPPN,$faktur,$keterangan));
+            //@nobeli,@lokasi,@nikuser,@kodevendor,@faktur,@keterangan  
+            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$faktur,$keterangan,$totDiskon));
 
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
