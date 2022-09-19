@@ -361,7 +361,7 @@ class Pembelian3Controller extends Controller
         
     // }
 
-    // --versi ena 
+    // --versi ena 1-9-2022
     public function store(Request $request)
     {
         $this->validate($request, [
@@ -563,7 +563,7 @@ class Pembelian3Controller extends Controller
             }
 
             $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
-            $totPPN = ($total - $totDiskon)*0.1;
+            $totPPN = ($total - $totDiskon)*0.11;
 
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
