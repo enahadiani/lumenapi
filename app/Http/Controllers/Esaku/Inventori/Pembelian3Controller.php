@@ -335,13 +335,14 @@ class Pembelian3Controller extends Controller
                
             }
                                         
+            $kodepp = $request->kode_pp;
             $vendor = $request->kode_vendor;
             $faktur = $request->faktur;
             $keterangan = $request->keterangan;        
             $totDiskon =  $request->total_diskon;    
             
             //@nobeli,@lokasi,@nikuser,@kodevendor,@faktur,@keterangan  
-            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$faktur,$keterangan,$totDiskon));
+            $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$faktur,$keterangan,$totDiskon,$kodepp));
 
             $tmp="Data Pembelian berhasil disimpan";
             $sts=true;
