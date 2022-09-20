@@ -341,7 +341,7 @@ class Pembelian3Controller extends Controller
             $keterangan = $request->keterangan;        
             $totDiskon =  $request->total_diskon;    
             
-            //@nobeli,@lokasi,@nikuser,@kodevendor,@faktur,@keterangan  
+            //@nobeli,@lokasi,@nikuser,@kodevendor,@faktur,@keterangan,@biaya,@kodepp 
             $exec = DB::connection($this->sql)->update("exec sp_brg_beli ?,?,?,?,?,?,?,? ", array($id,$kode_lokasi,$nik,$vendor,$faktur,$keterangan,$totDiskon,$kodepp));
 
             $tmp="Data Pembelian berhasil disimpan";
