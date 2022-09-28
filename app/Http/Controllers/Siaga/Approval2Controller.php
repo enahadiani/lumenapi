@@ -64,12 +64,13 @@ class Approval2Controller extends Controller
             if(isset($request->jenis) && $request->jenis != ""){
                 if($request->jenis == "Beban"){
 
-                    $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
+                    $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen,b.tanggal as tgl_aju
                     from apv_pesan a
                     inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
                     left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                     inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
+                    order by b.tanggal desc
                     ");
                     $res = json_decode(json_encode($res),true);
                 
@@ -77,12 +78,13 @@ class Approval2Controller extends Controller
                     $res = array();
                 }
             }else{
-                $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen
+                $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen,b.tanggal as tgl_aju
                 from apv_pesan a
                 inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                 inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
+                order by b.tanggal desc
                 ");
                 $res = json_decode(json_encode($res),true);
             }
@@ -139,21 +141,23 @@ class Approval2Controller extends Controller
             if(isset($request->jenis) && $request->jenis != ""){
                 if($request->jenis == "Beban"){
 
-                    $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
+                    $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,b.tanggal as tgl
                     from apv_flow a
                     inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
                     inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
+                    order by b.tanggal desc
                     ");
                 }else{
                     $res = DB::connection($this->db)->select("select * from gr_pb_m where modul='Panjar' ");
                 }
             }else{
-                $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
+                $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,b.tanggal as tgl
                     from apv_flow a
                     inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
                     inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
+                    order by b.tanggal desc
                     ");
             }
 
