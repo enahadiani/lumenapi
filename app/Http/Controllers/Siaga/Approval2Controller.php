@@ -70,7 +70,7 @@ class Approval2Controller extends Controller
                     left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                     inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
                     where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
-                    order by b.tanggal desc
+                    order by c.tanggal desc
                     ");
                     $res = json_decode(json_encode($res),true);
                 
@@ -84,7 +84,7 @@ class Approval2Controller extends Controller
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                 inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
                 where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
-                order by b.tanggal desc
+                order by c.tanggal desc
                 ");
                 $res = json_decode(json_encode($res),true);
             }
