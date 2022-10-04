@@ -439,7 +439,7 @@ class Approval2Controller extends Controller
 
                 $sqlbuat="
                 select isnull(c.no_telp,'-') as no_telp,b.$col_nik as nik_buat,isnull(c.email,'-') as email
-                from $table b
+                from $tabel b
                 inner join karyawan c on b.$col_nik=c.nik 
                 where b.$col_nobukti='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
