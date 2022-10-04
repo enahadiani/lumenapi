@@ -41,20 +41,9 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_jab
-            // from karyawan a
-            // where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            // ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_jab = $get[0]['kode_jab'];
-            // }else{
-            //     $kode_jab = "";
-            // }
-
             $filter = "";
             if(isset($request->no_pb) && $request->no_pb != ""){
-                $filter .= " and c.no_pb='$request->no_pb' ";
+                $filter .= " and a.no_bukti='$request->no_pb' ";
             }
 
             if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
@@ -62,32 +51,33 @@ class Approval2Controller extends Controller
             }
 
             if(isset($request->jenis) && $request->jenis != ""){
-                if($request->jenis == "Beban"){
+                $filter .= " and a.modul='$request->jenis' ";
+            }
 
-                    $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen,c.tanggal as tgl_aju
-                    from apv_pesan a
-                    inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
-                    left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-                    inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
-                    order by c.tanggal desc
-                    ");
-                    $res = json_decode(json_encode($res),true);
-                
-                }else{
-                    $res = array();
-                }
-            }else{
-                $res = DB::connection($this->db)->select("select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,'Beban' as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen,c.tanggal as tgl_aju
+            $filter = $filter != "" ? "where ".substr($filter,4) : "";
+
+            $res = DB::connection($this->db)->select("select a.* from (
+                select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.due_date,case 
+                when c.modul = 'AJU2' OR c.modul = 'AJU' then 'Beban'
+                when c.modul = 'PJAJU2' OR c.modul = 'PJAJU' then 'Panjar' else '-'
+                end as modul,c.kode_pp,d.nama as nama_pp,c.no_dokumen,c.tanggal as tgl_aju
                 from apv_pesan a
                 inner join gr_pb_m c on a.no_bukti=c.no_pb and a.kode_lokasi=c.kode_lokasi 
                 left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
                 inner join pp d on c.kode_pp=d.kode_pp and c.kode_lokasi=d.kode_lokasi
-                where a.kode_lokasi='$kode_lokasi'  and b.nik= '$nik_user' $filter
-                order by c.tanggal desc
-                ");
-                $res = json_decode(json_encode($res),true);
-            }
+                where a.kode_lokasi='$kode_lokasi' and b.nik= '$nik_user'
+                union all
+                select a.no_bukti,a.no_urut,a.id,a.keterangan,c.keterangan as deskripsi,a.tanggal,case when a.status = '2' then 'Approved' else 'Returned' end as status,c.nilai,c.tanggal as due_date,'SPB' as modul,'-' as kode_pp,'-' as nama_pp,'-' as no_dokumen,c.tanggal as tgl_aju
+                from apv_pesan a
+                inner join gr_spb2_m c on a.no_bukti=c.no_spb and a.kode_lokasi=c.kode_lokasi 
+                left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
+                where a.kode_lokasi='$kode_lokasi' and b.nik= '$nik_user'
+            ) a
+            $filter
+            order by a.tanggal desc    
+            ");
+            $res = json_decode(json_encode($res),true);
+
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
@@ -118,48 +108,39 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            // $get = DB::connection($this->db)->select("select a.kode_jab
-            // from karyawan a
-            // where a.kode_lokasi='$kode_lokasi' and a.nik='".$nik_user."' 
-            // ");
-            // $get = json_decode(json_encode($get),true);
-            // if(count($get) > 0){
-            //     $kode_jab = $get[0]['kode_jab'];
-            // }else{
-            //     $kode_jab = "";
-            // }
-
             $filter = "";
             if(isset($request->no_pb) && $request->no_pb != ""){
-                $filter .= " and b.no_pb='$request->no_pb' ";
+                $filter .= " and a.no_bukti='$request->no_pb' ";
             }
 
             if(isset($request->start_date) && $request->start_date != "" && isset($request->end_date) && $request->end_date != ""){
-                $filter .= " and b.tanggal between '$request->start_date' and '$request->end_date' ";
+                $filter .= " and a.tanggal between '$request->start_date' and '$request->end_date' ";
             }
-            
-            if(isset($request->jenis) && $request->jenis != ""){
-                if($request->jenis == "Beban"){
 
-                    $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,b.tanggal as tgl
-                    from apv_flow a
-                    inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-                    inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
-                    order by b.tanggal desc
-                    ");
-                }else{
-                    $res = DB::connection($this->db)->select("select * from gr_pb_m where modul='Panjar' ");
-                }
-            }else{
-                $res = DB::connection($this->db)->select("select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,b.tanggal as tgl
-                    from apv_flow a
-                    inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
-                    inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                    where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user' $filter
-                    order by b.tanggal desc
-                    ");
+            if(isset($request->jenis) && $request->jenis != ""){
+                $filter .= " and a.modul='$request->jenis' ";
             }
+
+            $filter = $filter != "" ? "where ".substr($filter,4) : "";
+            
+            $res = DB::connection($this->db)->select("select a.* from (
+                select b.no_pb as no_bukti,b.no_dokumen,b.kode_pp,convert(varchar,b.tanggal,103) as tanggal,b.keterangan,p.nama as nama_pp,b.nilai,b.due_date,
+                case when b.modul = 'AJU2' OR b.modul = 'AJU' then 'Beban'
+                when b.modul = 'PJAJU2' OR b.modul = 'PJAJU' then 'Panjar' else '-'
+                end as modul,b.tanggal as tgl
+                from apv_flow a
+                inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
+                inner join pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user'
+                union all
+                select b.no_spb as no_bukti,'-' as no_dokumen,'-' as kode_pp,convert(varchar,b.tanggal,103)  as tanggal,b.keterangan,'-' as nama_pp,b.nilai,b.tanggal as due_date,'SPB' as modul,b.tanggal as tgl
+                from apv_flow a
+                inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+                where a.kode_lokasi='$kode_lokasi' and a.status='1' and a.nik= '$nik_user'
+            ) a
+            $filter
+            order by a.tanggal desc
+            ");
 
             $res = json_decode(json_encode($res),true);
             
@@ -227,6 +208,34 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            $modul = isset($request->modul) ? $request->modul : 'Beban';
+
+            if($modul == "Beban"){
+                $form = "AJU";
+                $tabel = "gr_pb_m";
+                $progapp_awal = "S";
+                $progapp_akhir = "1";
+                $col_nik = "nik_buat";
+                $col_nobukti = "no_pb";
+                $email = "email-siaga";
+            }else if($modul == "Panjar"){
+                $form = "PJAJU";
+                $tabel = "gr_pb_m";
+                $progapp_awal = "S";
+                $progapp_akhir = "1";
+                $col_nik = "nik_buat";
+                $col_nobukti = "no_pb";
+                $email = "email-siaga";
+            }else{
+                $form = "AJUSPB";
+                $tabel = "gr_spb2_m";
+                $progapp_awal = "1";
+                $progapp_akhir = "S";
+                $col_nik = "nik_user";
+                $col_nobukti = "no_spb";
+                $email = "email-siaga-pb";
+            }
+
             // $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
             // $get = DB::connection($this->db)->select("select isnull(max(id)+1,1) as no_app from apv_pesan where kode_lokasi='$kode_lokasi' ");
             // $no_app = (isset($get[0]->no_app) ? $get[0]->no_app : 1);
@@ -241,7 +250,7 @@ class Approval2Controller extends Controller
             $nik_app = $nik_user;
             $token_player = array();
             $token_player2 = array();
-            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$keterangan."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','AJU') ");
+            $ins = DB::connection($this->db)->insert("insert into apv_pesan (no_bukti,kode_lokasi,keterangan,tanggal,no_urut,status,modul) values ('".$no_bukti."','".$kode_lokasi."','".$keterangan."','".$tgl."','".$request->input('no_urut')."','".$request->input('status')."','$form') ");
 
             $upd =  DB::connection($this->db)->table('apv_flow')
             ->where('no_bukti', $no_bukti)    
@@ -286,28 +295,28 @@ class Approval2Controller extends Controller
                         $nik_app1 = "-";
                     }
 
-                    $upd3 =  DB::connection($this->db)->table('gr_pb_m')
-                    ->where('no_pb', $no_bukti)    
+                    $upd3 =  DB::connection($this->db)->table($tabel)
+                    ->where($col_nobukti, $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['progress' => 'S']);
+                    ->update(['progress' => $progapp_awal]);
                 }else{
                     $no_telp = "-";
                     $nik_app1 = "-";
 
-                    $upd3 =  DB::connection($this->db)->table('gr_pb_m')
-                    ->where('no_pb', $no_bukti)    
+                    $upd3 =  DB::connection($this->db)->table($tabel)
+                    ->where($col_nobukti, $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
-                    ->update(['progress' => '1']);
+                    ->update(['progress' => $progapp_akhir]);
 
                     $psn = "Approver terakhir";
                 }
 
                 // //send to nik buat
                 $sqlbuat = "
-                select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
-                from gr_pb_m b 
-                inner join karyawan c on b.nik_buat=c.nik 
-                where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
+                select isnull(c.no_telp,'-') as no_telp,b.$col_nik as nik_buat,isnull(c.email,'-') as email
+                from $tabel b 
+                inner join karyawan c on b.$col_nik=c.nik 
+                where b.$col_nobukti='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
@@ -323,7 +332,13 @@ class Approval2Controller extends Controller
                 $success['approval'] = "Approve";
                 
                 $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
-                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                if($modul == "SPB"){
+                    $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
+                
+                }else{
+
+                    $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                }
                 $result = json_decode(json_encode($result),true);
                 if(isset($app_email) && $app_email != "-"){
                     $pesan_header = "Pengajuan $no_bukti berikut telah di approve oleh $nik_user, menunggu approval Anda:";
@@ -331,7 +346,7 @@ class Approval2Controller extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view($email,$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -350,7 +365,7 @@ class Approval2Controller extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view($email,$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -364,8 +379,8 @@ class Approval2Controller extends Controller
                         $msg_email = "";
                 }
 
-                $title = "Beban";
-                $subtitle = "Approval Pengajuan Beban";
+                $title = "$modul";
+                $subtitle = "Approval Pengajuan $modul";
                 $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di approve oleh ".$nik_app." , menunggu approval anda.";
 
                 $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di approve oleh ".$nik_app;
@@ -374,7 +389,7 @@ class Approval2Controller extends Controller
                 $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                 $success['no_pesan'] = $no_pesan;
                 
-                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Beban','-',0,0]);
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,$modul,'-',0,0]);
 
                 // $no_pesan2 = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                 // $success['no_pesan2'] = $no_pesan2;
@@ -408,25 +423,25 @@ class Approval2Controller extends Controller
                         $no_telp = "-";
                         $nik_app1 = "-";
                     }
-                    $upd3 =  DB::connection($this->db)->table('gr_pb_m')
-                    ->where('no_pb', $no_bukti)    
+                    $upd3 =  DB::connection($this->db)->table($tabel)
+                    ->where($col_nobukti, $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'B']);
                 }else{
                     $no_telp = "-";
                     $nik_app1 = "-";
-                    $upd3 =  DB::connection($this->db)->table('gr_pb_m')
-                    ->where('no_pb', $no_bukti)    
+                    $upd3 =  DB::connection($this->db)->table($tabel)
+                    ->where($col_nobukti, $no_bukti)    
                     ->where('kode_lokasi', $kode_lokasi)
                     ->update(['progress' => 'R']);
                 }
                 //send to nik buat
 
                 $sqlbuat="
-                select isnull(c.no_telp,'-') as no_telp,b.nik_buat,isnull(c.email,'-') as email
-                from gr_pb_m b
-                inner join karyawan c on b.nik_buat=c.nik 
-                where b.no_pb='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
+                select isnull(c.no_telp,'-') as no_telp,b.$col_nik as nik_buat,isnull(c.email,'-') as email
+                from $table b
+                inner join karyawan c on b.$col_nik=c.nik 
+                where b.$col_nobukti='".$no_bukti."' and b.kode_lokasi='$kode_lokasi' ";
                 $rs2 = DB::connection($this->db)->select($sqlbuat);
                 $rs2 = json_decode(json_encode($rs2),true);
                 if(count($rs2)>0){
@@ -441,7 +456,11 @@ class Approval2Controller extends Controller
                 }
 
                 $request->request->add(['no_bukti' => ["=",$no_bukti,""]]);
-                $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                if($modul == "SPB"){
+                    $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuFormSPB($request);
+                }else{
+                    $result = app('App\Http\Controllers\Siaga\LaporanController')->getAjuForm($request);
+                }
                 $result = json_decode(json_encode($result),true);
                 if(isset($app_email) && $app_email != "-"){
                     $pesan_header = "Pengajuan $no_bukti berikut telah di return oleh $nik_user, menunggu approval Anda:";
@@ -449,7 +468,7 @@ class Approval2Controller extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view($email,$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -468,7 +487,7 @@ class Approval2Controller extends Controller
                     if(count($result['original']['data']) > 0){
                    
                         $result['original']['judul'] = $pesan_header;
-                        $html = view('email-siaga',$result['original'])->render();
+                        $html = view($email,$result['original'])->render();
                         $periode = substr(date('Ym'),2,4);
                         $no_pool = $this->generateKode("pooling", "no_pool", $kode_lokasi."-PL".$periode.".", "000001");
                         
@@ -484,8 +503,8 @@ class Approval2Controller extends Controller
                 
                 $success['approval'] = "Return";
 
-                $title = "Beban";
-                $subtitle = "Return Pengajuan Beban";
+                $title = "$modul";
+                $subtitle = "Return Pengajuan $modul";
                 $content = "Pengajuan dengan no transaksi ".$no_bukti." telah di return oleh ".$nik_app." , menunggu approval anda.";
 
                 $content2 = "Pengajuan dengan no transaksi ".$no_bukti." Anda telah di return oleh ".$nik_app;
@@ -494,12 +513,12 @@ class Approval2Controller extends Controller
                 $no_pesan = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                 $success['no_pesan'] = $no_pesan;
                 
-                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,'Beban','-',0,0]);
+                $inspesan= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan,$kode_lokasi,$title,$subtitle,$content,$nik_app1,'-',$no_bukti,$modul,'-',0,0]);
 
                 // $no_pesan2 = $this->generateKode("app_notif_m", "no_bukti","PSN".$periode.".", "000001");
                 // $success['no_pesan2'] = $no_pesan2;
                 
-                // $inspesan2= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan2,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,'Beban','-',0,0]);
+                // $inspesan2= DB::connection($this->db)->insert('insert into app_notif_m(no_bukti,kode_lokasi,judul,subjudul,pesan,nik,tgl_input,icon,ref1,ref2,ref3,sts_read,sts_kirim) values (?, ?, ?, ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?)', [$no_pesan2,$kode_lokasi,$title,$subtitle,$content2,$nik_buat,'-',$no_bukti,$modul,'-',0,0]);
 
             }
 
@@ -539,11 +558,19 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul
+            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,case when b.modul = 'AJU2' OR b.modul = 'AJU' then 'Beban'
+            when b.modul = 'PJAJU2' OR b.modul = 'PJAJU' then 'Panjar' else '-'
+            end as modul
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1' ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1'
+            union all
+            select a.no_bukti,'-' as no_dokumen,'-' as kode_pp,b.tanggal,b.keterangan,a.no_urut,'-' as nama_pp,b.nilai,b.tanggal as due_date,'SPB' as modul
+            from apv_flow a
+            inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and a.status='1'
+            ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -562,14 +589,30 @@ class Approval2Controller extends Controller
             $sql4 = "
 			select * from (
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
-                from gr_pb_m a
+                from (
+                    select case when a.modul = 'AJU2' OR a.modul = 'AJU' then 'Beban'
+                    when a.modul = 'PJAJU2' OR a.modul = 'PJAJU' then 'Panjar' else '-'
+                    end as modul,a.no_pb, a.kode_lokasi 
+                    from gr_pb_m a
+                    union all
+                    select 'SPB' as modul,a.no_spb, a.kode_lokasi 
+                    from gr_spb2_m a
+                ) a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
-                from gr_pb_m a
+                from (
+                    select case when a.modul = 'AJU2' OR a.modul = 'AJU' then 'Beban'
+                    when a.modul = 'PJAJU2' OR a.modul = 'PJAJU' then 'Panjar' else '-'
+                    end as modul,a.no_pb, a.kode_lokasi 
+                    from gr_pb_m a
+                    union all
+                    select 'SPB' as modul,a.no_spb, a.kode_lokasi 
+                    from gr_spb2_m a
+                ) a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
                 left join karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
@@ -704,12 +747,21 @@ class Approval2Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,'Beban' as modul,case d.status when '2' then 'Approved' when '3' then 'Returned' else 'In Progress' end as status,convert(varchar,a.tgl_app,103) as tgl_app
+            $sql="select a.no_bukti,b.no_dokumen,b.kode_pp,b.tanggal,b.keterangan,a.no_urut,c.nama as nama_pp,b.nilai,b.due_date,case when b.modul = 'AJU2' OR b.modul = 'AJU' then 'Beban'
+            when b.modul = 'PJAJU2' OR b.modul = 'PJAJU' then 'Panjar' else '-'
+            end as modul,case d.status when '2' then 'Approved' when '3' then 'Returned' else 'In Progress' end as status,convert(varchar,a.tgl_app,103) as tgl_app
             from apv_flow a
             inner join gr_pb_m b on a.no_bukti=b.no_pb and a.kode_lokasi=b.kode_lokasi
             inner join apv_pesan d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
             left join pp c on b.kode_pp=c.kode_pp and b.kode_lokasi=c.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id' ";
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id'
+            union all
+            select a.no_bukti,'-' as no_dokumen,'-' as kode_pp,b.tanggal,b.keterangan,a.no_urut,'-' as nama_pp,b.nilai,b.tanggal as due_date,'SPB' as modul,case d.status when '2' then 'Approved' when '3' then 'Returned' else 'In Progress' end as status,convert(varchar,a.tgl_app,103) as tgl_app
+            from apv_flow a
+            inner join gr_spb2_m b on a.no_bukti=b.no_spb and a.kode_lokasi=b.kode_lokasi
+            inner join apv_pesan d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi and a.no_urut=d.no_urut
+            where a.kode_lokasi='$kode_lokasi' and a.no_bukti='$no_aju' and d.id='$id'
+            ";
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -727,14 +779,30 @@ class Approval2Controller extends Controller
             $sql4 = "
 			select * from (
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik,f.nama,c.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
-                from gr_pb_m a
+                from (
+                    select case when a.modul = 'AJU2' OR a.modul = 'AJU' then 'Beban'
+                    when a.modul = 'PJAJU2' OR a.modul = 'PJAJU' then 'Panjar' else '-'
+                    end as modul,a.no_pb, a.kode_lokasi 
+                    from gr_pb_m a
+                    union all
+                    select 'SPB' as modul,a.no_spb, a.kode_lokasi 
+                    from gr_spb2_m a
+                ) a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join apv_flow c on e.no_bukti=c.no_bukti and e.kode_lokasi=c.kode_lokasi and e.no_urut=c.no_urut
                 left join karyawan f on c.nik=f.nik and c.kode_lokasi=f.kode_lokasi
                 where a.no_pb='$no_aju' and a.kode_lokasi='$kode_lokasi' 
                 union all
                 select convert(varchar,e.id) as id,a.no_pb,case e.status when '2' then 'Approved' when '3' then 'Returned' else '-' end as status,e.keterangan,c.nik_user,f.nama,e.no_urut,e.id as id2,convert(varchar,e.tanggal,103) as tgl,e.tanggal  
-                from gr_pb_m a
+                from (
+                    select case when a.modul = 'AJU2' OR a.modul = 'AJU' then 'Beban'
+                    when a.modul = 'PJAJU2' OR a.modul = 'PJAJU' then 'Panjar' else '-'
+                    end as modul,a.no_pb, a.kode_lokasi 
+                    from gr_pb_m a
+                    union all
+                    select 'SPB' as modul,a.no_spb, a.kode_lokasi 
+                    from gr_spb2_m a
+                ) a
                 inner join apv_pesan e on a.no_pb=e.no_bukti and a.kode_lokasi=e.kode_lokasi
                 inner join gr_app_m c on e.no_ref=c.no_app and e.kode_lokasi=c.kode_lokasi 
                 left join karyawan f on c.nik_user=f.nik and c.kode_lokasi=f.kode_lokasi
