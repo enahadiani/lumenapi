@@ -55,6 +55,10 @@ $router->group(['middleware' => 'auth:siaga'], function () use ($router) {
     $router->post('cek', 'Siaga\Approval2Controller@cek');
     $router->post('send-email-saku3', 'Siaga\Approval2Controller@sendEmailSaku3');
     
+    $router->get('periode','Siaga\GenerateDataController@getPeriode');     
+    $router->get('fs','Siaga\GenerateDataController@getFS');     
+    $router->post('generate-data','Siaga\GenerateDataController@store'); 
+    
 });
 
 $router->get('app-mobile-nik','Siaga\Approval2Controller@cekNIK');
