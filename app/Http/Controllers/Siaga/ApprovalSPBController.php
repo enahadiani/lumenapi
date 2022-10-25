@@ -56,7 +56,7 @@ class ApprovalSPBController extends Controller
             from apv_pesan a
 			inner join gr_spb2_m c on a.no_bukti=c.no_spb and a.kode_lokasi=c.kode_lokasi 
             left join apv_flow b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi and a.kode_lokasi=b.kode_lokasi and a.no_urut=b.no_urut
-            where a.kode_lokasi='$kode_lokasi' and b.kode_jab='".$kode_jab."' and b.nik= '$nik_user' 
+            where a.kode_lokasi='$kode_lokasi' and b.nik= '$nik_user' 
             ");
             $res = json_decode(json_encode($res),true);
             
