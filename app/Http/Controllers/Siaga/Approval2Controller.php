@@ -574,17 +574,10 @@ class Approval2Controller extends Controller
             
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
-
-            if(count($res) > 0 && $res[0]['modul'] == "SPB"){
-                $sql2 = "select a.no_po,a.tgl_po,a.no_dok,a.tgl_dok,a.cat_pajak,a.cat_bdh,a.nama as kepada,a.alamat,a.keterangan as ket_bayar,a.jtran as jenis_trans,a.bank,a.norek,a.alrek as alamat_rek
-                from gr_spb2_m a
-                where a.no_spb = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
-            }else{
-                $sql2="select a.no_pb,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu 
-                from gr_pb_boq a 
-                where a.kode_lokasi='".$kode_lokasi."' and a.no_pb='$no_aju' order by a.nu";					
-            }
-
+            
+            $sql2="select a.no_pb,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu 
+            from gr_pb_boq a 
+            where a.kode_lokasi='".$kode_lokasi."' and a.no_pb='$no_aju' order by a.nu";					
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
 
@@ -636,6 +629,12 @@ class Approval2Controller extends Controller
             group by a.no_pb";
             $res5 = DB::connection($this->db)->select($sql5);
             $res5 = json_decode(json_encode($res5),true);
+
+            $sql6 = "select a.no_po,a.tgl_po,a.no_dok,a.tgl_dok,a.cat_pajak,a.cat_bdh,a.nama as kepada,a.alamat,a.keterangan as ket_bayar,a.jtran as jenis_trans,a.bank,a.norek,a.alrek as alamat_rek
+            from gr_spb2_m a
+            where a.no_spb = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
+            $res6 = DB::connection($this->db)->select($sql6);
+            $res6 = json_decode(json_encode($res6),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
@@ -644,6 +643,7 @@ class Approval2Controller extends Controller
                 $success['data_total'] = $res5;
                 $success['data_dokumen'] = $res3;
                 $success['data_histori'] = $res4;
+                $success['detail_spb'] = $res6;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
@@ -654,11 +654,18 @@ class Approval2Controller extends Controller
                 $success['data_total'] = [];
                 $success['data_dokumen'] = [];
                 $success['data_histori'] = [];
+                $success['detail_spb'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
+            $success['data_total'] = [];
+            $success['data_dokumen'] = [];
+            $success['data_histori'] = [];
+            $success['detail_spb'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
