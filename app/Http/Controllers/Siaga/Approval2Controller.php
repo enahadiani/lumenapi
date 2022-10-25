@@ -575,7 +575,7 @@ class Approval2Controller extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            if($res[0]['modul'] == "SPB"){
+            if(count($res) > 0 && $res[0]['modul'] == "SPB"){
                 $sql2 = "select a.no_po,a.tgl_po,a.no_dok,a.tgl_dok,a.cat_pajak,a.cat_bdh,a.nama as kepada,a.alamat,a.keterangan as ket_bayar,a.jtran as jenis_trans,a.bank,a.norek,a.alrek as alamat_rek
                 from gr_spb2_m a
                 where a.no_spb = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
