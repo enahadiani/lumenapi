@@ -575,11 +575,19 @@ class Approval2Controller extends Controller
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
 
-            $sql2="select a.no_pb,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu 
-            from gr_pb_boq a 
-            where a.kode_lokasi='".$kode_lokasi."' and a.no_pb='$no_aju' order by a.nu";					
+            if($res[0]['modul'] == "SPB"){
+                $sql2 = "select a.no_po,a.tgl_po,a.no_dok,a.tgl_dok,a.cat_pajak,a.cat_bdh,a.nama as kepada,a.alamat,a.keterangan as ket_bayar,a.jtran as jenis_trans,a.bank,a.norek,a.alrek as alamat_rek
+                from gr_spb2_m a
+                where a.no_spb = '$no_aju' and a.kode_lokasi='$kode_lokasi' ";
+            }else{
+                $sql2="select a.no_pb,a.nama_brg,a.satuan,a.jumlah,a.harga,a.nu 
+                from gr_pb_boq a 
+                where a.kode_lokasi='".$kode_lokasi."' and a.no_pb='$no_aju' order by a.nu";					
+            }
+
             $res2 = DB::connection($this->db)->select($sql2);
             $res2 = json_decode(json_encode($res2),true);
+
 
             $url = config('services.api.doc_url_siaga');
             $sql3="select no_pb,no_gambar,nu,kode_jenis,no_ref,'".$url."'+no_gambar as file_dok from gr_pb_dok where kode_lokasi='".$kode_lokasi."' and no_pb='$no_aju' order by nu";
