@@ -511,6 +511,13 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/yakes-api'
+], function ($router) {
+    require __DIR__ . '/../routes/yakes/api.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/admginas-auth'
 ], function ($router) {
     require __DIR__ . '/../routes/admginas/auth.php';
