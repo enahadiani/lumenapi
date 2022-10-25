@@ -643,7 +643,7 @@ class Approval2Controller extends Controller
                 $success['data_total'] = $res5;
                 $success['data_dokumen'] = $res3;
                 $success['data_histori'] = $res4;
-                $success['detail_spb'] = $res6;
+                $success['data_detail_spb'] = $res6;
                 $success['message'] = "Success!";
                 return response()->json($success, $this->successStatus);     
             }
@@ -654,7 +654,7 @@ class Approval2Controller extends Controller
                 $success['data_total'] = [];
                 $success['data_dokumen'] = [];
                 $success['data_histori'] = [];
-                $success['detail_spb'] = [];
+                $success['data_detail_spb'] = [];
                 $success['status'] = false;
                 return response()->json($success, $this->successStatus); 
             }
@@ -665,7 +665,7 @@ class Approval2Controller extends Controller
             $success['data_total'] = [];
             $success['data_dokumen'] = [];
             $success['data_histori'] = [];
-            $success['detail_spb'] = [];
+            $success['data_detail_spb'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
