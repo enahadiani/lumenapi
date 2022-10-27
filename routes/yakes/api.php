@@ -17,6 +17,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:yakes'], function () use ($router) {
     $router->get('laba-rugi/{anper}', 'Yakes\AnperController@getLabaRugi');
+    $router->get('neraca/{anper}', 'Yakes\AnperController@getNeraca');
 });
 
 
