@@ -84,16 +84,15 @@ class SppdController extends Controller
             }else{
                 $filterkode_pp = "";
             }
-			
 
             $res = DB::connection('sqlsrvypt')->select("select a.kode_akun,a.nama
             from masakun a
             inner join (select a.kode_akun,a.kode_lokasi
                         from akun_sppd a
-                        where a.kode_lokasi='$kode_lokasi' $filterkode_pp
+                        where a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1' $filterkode_pp
                         group by a.kode_akun,a.kode_lokasi
                         ) b on a.kode_akun=b.kode_akun and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi'  $filterkode_akun order by a.kode_akun	 
+            where a.kode_lokasi='$kode_lokasi' $filterkode_akun order by a.kode_akun	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -192,10 +191,10 @@ class SppdController extends Controller
             inner join pp_rek c on a.kode_pp=c.kode_pp and a.kode_lokasi=c.kode_lokasi
             inner join (select a.kode_pp,a.kode_lokasi
                         from akun_sppd a
-                        where a.kode_lokasi='$kode_lokasi'
-                        group by a.kode_pp,a.kode_lokasi
+                        where a.kode_lokasi='$kode_lokasi' and a.flag_aktif='1' 
+                        group by a.kode_pp,a.kode_lokasi 
                         ) b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' $filterkode_pp and a.flag_aktif='1' order by a.kode_pp	 
+            where a.kode_lokasi='$kode_lokasi' $filterkode_pp order by a.kode_pp	 
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -260,7 +259,7 @@ class SppdController extends Controller
             from drk a
             inner join (select a.kode_drk,a.kode_lokasi
             from akun_sppd a
-            where a.kode_lokasi='$kode_lokasi' and a.tahun='$tahun' $filter
+            where a.kode_lokasi='$kode_lokasi' and a.tahun='$tahun' and a.flag_aktif='1' $filter
             group by a.kode_drk,a.kode_lokasi
             ) b on a.kode_drk=b.kode_drk and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' and a.tahun='$tahun'  order by a.kode_drk,a.nama  
