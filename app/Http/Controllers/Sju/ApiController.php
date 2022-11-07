@@ -32,8 +32,8 @@ class ApiController extends Controller
                 $filter_periode = " and periode='$r->periode' ";
             }
 
-            $res = DB::connection($this->db)->select("select*from sju_polis_m 
-            kode_lokasi='$kode_lokasi' $filter_periode
+            $res = DB::connection($this->db)->select("select * from sju_polis_m 
+            where kode_lokasi='$kode_lokasi' $filter_periode
             ");
             $res = json_decode(json_encode($res),true);
             
