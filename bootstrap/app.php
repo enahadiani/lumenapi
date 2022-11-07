@@ -264,6 +264,13 @@ $app->router->group([
 
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/sju-api'
+], function ($router) {
+    require __DIR__ . '/../routes/sju/api.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
     'prefix' => 'api/mobile-sekolah'
 ], function ($router) {
     require __DIR__ . '/../routes/mobilesekolah.php';
