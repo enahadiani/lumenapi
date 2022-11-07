@@ -27,13 +27,29 @@ class ApiController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
+            // SAVE LOG TO DB
+            $log = print_r($r->input(), true); 
+            $save_log = DB::connection($this->db)->insert("insert into api_sju_log (kode_lokasi,nik_user,tgl_input,datalog,nama_api,dbname)
+            values (?, ?, getdate(), ?, ?, ?) ",array($kode_lokasi,$nik,$log,'POLIS','dbnewsju'));
+            // END SAVE
+
             $filter_periode = "";
             if(isset($r->periode) && $r->periode != ""){
                 $filter_periode = " and periode='$r->periode' ";
             }
 
+            $filter_no_polis = "";
+            if(isset($r->no_polis) && $r->no_polis != ""){
+                $filter_no_polis = " and no_dok='$r->no_polis' ";
+            }
+
+            $filter_kode_cust = "";
+            if(isset($r->kode_cust) && $r->kode_cust != ""){
+                $filter_kode_cust = " and kode_cust='$r->kode_cust' ";
+            }
+
             $res = DB::connection($this->db)->select("select * from sju_polis_m 
-            where kode_lokasi='$kode_lokasi' $filter_periode
+            where kode_lokasi='$kode_lokasi' $filter_periode $filter_no_polis $filter_kode_cust
             ");
             $res = json_decode(json_encode($res),true);
             
