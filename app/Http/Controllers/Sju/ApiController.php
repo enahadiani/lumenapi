@@ -73,5 +73,128 @@ class ApiController extends Controller
         }
         
     }
+
+    public function getDataCOB(Request $r)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // SAVE LOG TO DB
+            $log = print_r($r->input(), true); 
+            $save_log = DB::connection($this->db)->insert("insert into api_sju_log (kode_lokasi,nik_user,tgl_input,datalog,nama_api,dbname)
+            values (?, ?, getdate(), ?, ?, ?) ",array($kode_lokasi,$nik,$log,'COB','dbnewsju'));
+            // END SAVE
+
+            $res = DB::connection($this->db)->select("select * from sju_tipe 
+            where kode_lokasi='$kode_lokasi'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data']= [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data']= [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getDataTertanggung(Request $r)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // SAVE LOG TO DB
+            $log = print_r($r->input(), true); 
+            $save_log = DB::connection($this->db)->insert("insert into api_sju_log (kode_lokasi,nik_user,tgl_input,datalog,nama_api,dbname)
+            values (?, ?, getdate(), ?, ?, ?) ",array($kode_lokasi,$nik,$log,'Tertanggung/Customer','dbnewsju'));
+            // END SAVE
+
+            $res = DB::connection($this->db)->select("select * from sju_cust 
+            where kode_lokasi='$kode_lokasi'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data']= [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data']= [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    public function getDataPenanggung(Request $r)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            // SAVE LOG TO DB
+            $log = print_r($r->input(), true); 
+            $save_log = DB::connection($this->db)->insert("insert into api_sju_log (kode_lokasi,nik_user,tgl_input,datalog,nama_api,dbname)
+            values (?, ?, getdate(), ?, ?, ?) ",array($kode_lokasi,$nik,$log,'Penanggung/Vendor','dbnewsju'));
+            // END SAVE
+
+            $res = DB::connection($this->db)->select("select * from sju_vendor 
+            where kode_lokasi='$kode_lokasi'
+            ");
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!"; 
+                $success['data']= [];
+                $success['status'] = false;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data']= [];
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
    
 }
