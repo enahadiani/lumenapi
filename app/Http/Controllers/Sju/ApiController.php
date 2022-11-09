@@ -72,7 +72,7 @@ class ApiController extends Controller
             inner join sju_tipe h on d.kode_tipe=h.kode_tipe and d.kode_lokasi=h.kode_lokasi
             left join sju_polisbayar_d g on a.no_polis=g.no_polis and a.no_bill=g.no_bill and a.kode_lokasi=g.kode_lokasi and a.ke=g.ke and a.kode_vendor=g.kode_vendor
             left join trans_m l on g.no_bukti=l.no_bukti and g.kode_lokasi=l.kode_lokasi
-            where kode_lokasi='$kode_lokasi' $filter_periode $filter_no_polis $filter_kode_cob $filter_kode_tertanggung
+            where a.kode_lokasi='$kode_lokasi' $filter_periode $filter_no_polis $filter_kode_cob $filter_kode_tertanggung
             order by d.kode_tipe,a.no_polis
             ");
             $res = json_decode(json_encode($res),true);
