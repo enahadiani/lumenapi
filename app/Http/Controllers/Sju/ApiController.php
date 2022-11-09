@@ -43,13 +43,18 @@ class ApiController extends Controller
                 $filter_no_polis = " and no_dok='$r->no_polis' ";
             }
 
-            $filter_kode_cust = "";
-            if(isset($r->kode_cust) && $r->kode_cust != ""){
-                $filter_kode_cust = " and kode_cust='$r->kode_cust' ";
+            $filter_kode_cob = "";
+            if(isset($r->kode_cob) && $r->kode_cob != ""){
+                $filter_kode_cob = " and kode_tipe='$r->kode_cob' ";
+            }
+
+            $filter_kode_tertanggung = "";
+            if(isset($r->kode_tertanggung) && $r->kode_tertanggung != ""){
+                $filter_kode_tertanggung = " and kode_cust='$r->kode_tertanggung' ";
             }
 
             $res = DB::connection($this->db)->select("select * from sju_polis_m 
-            where kode_lokasi='$kode_lokasi' $filter_periode $filter_no_polis $filter_kode_cust
+            where kode_lokasi='$kode_lokasi' $filter_periode $filter_no_polis $filter_kode_cob $filter_kode_tertanggung
             ");
             $res = json_decode(json_encode($res),true);
             
