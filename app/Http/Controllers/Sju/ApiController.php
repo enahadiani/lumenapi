@@ -78,6 +78,14 @@ class ApiController extends Controller
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $i=0;
+                foreach($res as $row){
+                    $res[$i]['dokumen'] = DB::connection($this->db)->select("select b.no_dok as no_polis,'https://newsju.simkug.com/server/media/'+a.no_gambar as path_file,a.kode_jenis,a.nu as no_urut 
+                    from sju_polis_dok a
+                    inner join sju_polis_m b on a.no_polis=b.no_polis and a.kode_lokasi=b.kode_lokasi
+                    where b.no_dok = '".$row['no_polis']."' ");
+                    $i++;
+                }
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
