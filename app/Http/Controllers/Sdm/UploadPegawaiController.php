@@ -92,31 +92,51 @@ class UploadPegawaiController extends Controller
             DB::connection($this->db)
                 ->table('hr_sdm_pribadi')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->whereIn('nik', $niks)
-                ->delete();
+                ->whereIn('nik', $niks);
             DB::connection($this->db)
                 ->table('hr_sdm_bank')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->whereIn('nik', $niks)
-                ->delete();
+                ->whereIn('nik', $niks);
+                DB::connection($this->db)
+                ->table('hr_sdm_kepegawaian')
+                ->where('kode_lokasi', $kode_lokasi)
+                ->whereIn('nik', $niks);
 
-            $insert = "INSERT INTO hr_sdm_pribadi (nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,tgl_nikah,kode_lokasi)
+            $insmd = DB::connection($this->db)->insert("INSERT INTO hr_sdm_pribadi (nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,tgl_nikah,kode_lokasi)
             SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,
             provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,
-            tgl_nikah,kode_lokasi FROM hr_sdm_tmp
-            WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
-            DB::connection($this->db)->insert($insert);
+            tgl_nikah,kode_lokasi FROM hr_sdm_tmp WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'");
 
-            $insert2 = "INSERT INTO hr_sdm_bank (nik, kode_bank, cabang, no_rek, nama_rek,kode_lokasi)
+            $insmd = DB::connection($this->db)->insert("INSERT INTO hr_sdm_bank (nik, kode_bank, cabang, no_rek, nama_rek,kode_lokasi)
             SELECT nik,kode_bank,cabang,no_rek,nama_rek,kode_lokasi FROM hr_sdm_tmp
-            WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
-            DB::connection($this->db)->insert($insert2);
+            WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'");
+
+            $insmd = DB::connection($this->db)->insert("INSERT INTO hr_sdm_kepegawaian (kode,nik,kode_lokasi,kode_status)
+            SELECT kode,nik, kode_lokasi,kode_status FROM hr_sdm_tmp
+            WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'");
+
+            // $insert = "INSERT INTO hr_sdm_pribadi (nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,tgl_nikah,kode_lokasi)
+            // SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, tgl_lahir, alamat,
+            // provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,
+            // tgl_nikah,kode_lokasi FROM hr_sdm_tmp
+            // WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
+            // DB::connection($this->db)->insert($insert);
+
+            // $insert2 = "INSERT INTO hr_sdm_bank (nik, kode_bank, cabang, no_rek, nama_rek,kode_lokasi)
+            // SELECT nik,kode_bank,cabang,no_rek,nama_rek,kode_lokasi FROM hr_sdm_tmp
+            // WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
+            // DB::connection($this->db)->insert($insert2);
+
+            // $insert3 = "INSERT INTO hr_sdm_kepegawaian (kode,nik,kode_lokasi,kode_status)
+            // SELECT kode,nik, kode_lokasi,kode_status FROM hr_sdm_tmp
+            // WHERE kode_lokasi = '" . $kode_lokasi . "' AND nik_user = '" . $request->input('nik_user') . "'";
+            // DB::connection($this->db)->insert($insert3);
+
 
             DB::connection($this->db)
                 ->table('hr_sdm_tmp')
                 ->where('kode_lokasi', $kode_lokasi)
-                ->where('nik_user', $request->input('nik_user'))
-                ->delete();
+                ->where('nik_user', $request->input('nik_user'));
 
             DB::connection($this->db)->commit();
             $success['status'] = true;
@@ -146,7 +166,7 @@ class UploadPegawaiController extends Controller
 
             $select = "SELECT nik, nama, nomor_ktp, jenis_kelamin, kode_agama, no_telp, no_hp, tempat_lahir, convert(varchar(10), tgl_lahir, 101) as tgl_lahir, alamat,
             provinsi, kota, kecamatan, kelurahan, kode_pos, tinggi_badan, berat_badan, golongan_darah, nomor_kk, status_nikah,
-            convert(varchar(10), tgl_nikah, 101) as tgl_nikah, kode_bank, cabang, no_rek, nama_rek,nu
+            convert(varchar(10), tgl_nikah, 101) as tgl_nikah, kode_bank, cabang, no_rek, nama_rek,nu,kode_status,kode,jabatan
 			FROM hr_sdm_tmp
             WHERE nik_user = '" . $request->query('nik_user') . "' AND kode_lokasi = '" . $kode_lokasi . "'";
 
@@ -179,12 +199,14 @@ class UploadPegawaiController extends Controller
             'file' => 'required|mimes:csv,xls,xlsx',
         ]);
 
-        ini_set('max_execution_time', 600);
+        set_time_limit(300);
+        ini_set('max_execution_time', 300);
         DB::connection($this->db)->beginTransaction();
         try {
-            if ($data =  Auth::guard($this->guard)->user()) {
-                $nik = $data->nik;
-                $kode_lokasi = $data->kode_lokasi;
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
             }
 
             DB::connection($this->db)
@@ -192,51 +214,53 @@ class UploadPegawaiController extends Controller
                 ->where('kode_lokasi', $kode_lokasi)
                 ->where('nik_user', $request->input('nik_user'))
                 ->delete();
-
+            
+            // menangkap file excel
             $file = $request->file('file');
-            $nama_file = rand() . $file->getClientOriginalName();
-
-            Storage::disk('local')->put($nama_file, file_get_contents($file));
-
-            $dt = Excel::toArray(new SDMKaryawanImport(), $nama_file);
+            
+            // membuat nama file unik
+            $nama_file = rand().$file->getClientOriginalName();
+            
+            Storage::disk('local')->put($nama_file,file_get_contents($file));
+            $dt = Excel::toArray(new SDMKaryawanImport(),$nama_file);
             $excel = $dt[0];
-
             $x = array();
             $status_validate = true;
-            $no = 1;
-
+            $no=1;
+            
+            $sql = ""; $sql2 = ""; $sql3 = "";
+            $begin = "SET NOCOUNT on;
+            BEGIN tran;
+            ";
+            $commit = "commit tran;";
+            
+            $i=1;$no=1;
+            set_time_limit(300);
+            ini_set('max_execution_time', 300); 
+            $ins = array(); 
+            $periode = date('Ym');
+			$nilai = 0; $pph = 0;
+			$kode_biaya = "";
             foreach ($excel as $row) {
                 if ($row[0] != "") {
-                    // tanggal lahir
-                    if ($row[8] == "" || $row[8] == "-") {
-                        $row[8] = date('Y-m-d');
-                    } else {
-                        $row[8] = $this->convertDateExcel($row[8]);
-                    }
+                    $sts = 1;
+                    $ket = "-";
+                    // $tgl_masuk = (is_int($row['tgl_masuk']) ? Date::excelToDateTimeObject($row['tgl_masuk'])->format('Y-m-d') : $row['tgl_masuk']);
+                    // // $tgl_keluar = (is_int($row['tgl_keluar']) ? Date::excelToDateTimeObject($row['tgl_keluar'])->format('Y-m-d') : $row['tgl_keluar']);
+                    // $tgl_masuk = $this->transformDate($row['tgl_masuk']);
+                    // $tgl_keluar = $this->transformDate($row['tgl_keluar']);
 
-                    // tanggal nikah
-                    if ($row[20] == "" || $row[20] == "-") {
-                        $row[20] = date('Y-m-d');
-                    } else {
-                        $row[20] = $this->convertDateExcel($row[20]);
-                    }
-
-                    // loker
-                    // $row[24] = $this->getKodeLoker($row[24], $kode_lokasi);
-
-                    // profesi
-                    // $row[29] = $this->getKodeProfesi($row[29], $kode_lokasi);
 
                     $sts = 1;
                     $insert = "INSERT INTO hr_sdm_tmp (
                     nik, nama, nomor_ktp,jenis_kelamin,kode_agama, no_telp, no_hp,tempat_lahir, tgl_lahir,alamat,
                     provinsi, kota, kecamatan,kelurahan,kode_pos,tinggi_badan,berat_badan,golongan_darah,nomor_kk,
                     status_nikah,tgl_nikah,kode_bank,cabang, no_rek,nama_rek,
-                    kode_lokasi, nik_user, nu, sts_upload, ket_upload)
+                    kode_lokasi, nik_user, nu, sts_upload, ket_upload,kode_status,kode,jabatan)
                     VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
-                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
                     DB::connection($this->db)->insert($insert, [
                         $row[0],
                         $row[1],
@@ -267,19 +291,39 @@ class UploadPegawaiController extends Controller
                         $request->input('nik_user'),
                         $no,
                         $sts,
-                        "Upload Data Karyawan" . $nik
+                        "Upload Data Karyawan" . $nik,
+                        $row[24],
+                        $row[25],
+                        $row[26],
                     ]);
-                    $no++;
+
+                    if($i % 100 == 0){
+                        $sql = $begin.$sql.$commit;
+                        $ins[] = DB::connection($this->db)->update($sql);
+                        $sql = "";
+                    }
+                    if($i == count($excel) && ($i % 100 != 0) ){
+                        $sql = $begin.$sql.$commit;
+                        $ins[] = DB::connection($this->db)->update($sql);
+                        $sql = "";
+                    }
+                    $i++;
+                    
+                   
+                    $no++;			
                 }
             }
+            
             DB::connection($this->db)->commit();
             Storage::disk('local')->delete($nama_file);
-            if ($status_validate) {
+            if($status_validate){
                 $msg = "File berhasil diupload!";
-            } else {
+            }else{
                 $msg = "Ada error!";
             }
-
+            
+            $success['excel'] = count($excel);
+            $success['i'] = $i;
             $success['status'] = true;
             $success['validate'] = $status_validate;
             $success['message'] = $msg;
@@ -287,10 +331,12 @@ class UploadPegawaiController extends Controller
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
-            $success['message'] = "Internal Server Error" . $e;
+            // $success['message'] = "Error ".$e;
+            $success['message'] = "Internal Server Error".$e;
             Log::error($e);
             return response()->json($success, $this->successStatus);
         }
+        
     }
 
     public function exportXLS(Request $request)

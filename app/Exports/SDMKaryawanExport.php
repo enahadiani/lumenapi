@@ -88,8 +88,10 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     'Bank',
                     'Cabang',
                     'No. Rekening',
-                    'Nama Rekening',
                     // end data bank
+                    'Kode Status',
+                    'Kode',
+                    'jabatan',
                 ],
 
             ];
@@ -121,8 +123,10 @@ class SDMKaryawanExport implements FromCollection, WithHeadings, WithColumnForma
                     'Bank',
                     'Cabang',
                     'No. Rekening',
-                    'Nama Rekening',
                     // end data bank
+                    'Kode Status',
+                    'Kode',
+                    'jabatan'
                 ]
             ];
         }
