@@ -18,6 +18,10 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 });
 
 $router->group(['middleware' => 'auth:sju'], function () use ($router) {
+    $router->get('cob', 'Sju\ApiController@getDataCOB'); 
+    $router->get('tertanggung', 'Sju\ApiController@getDataTertanggung'); 
+    $router->get('penanggung', 'Sju\ApiController@getDataPenanggung'); 
+
     $router->get('polis', 'Sju\ApiController@getDataPolis'); 
 
 });
