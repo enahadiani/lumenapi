@@ -18,6 +18,13 @@ $router->options('{all:.*}', ['middleware' => 'cors', function() {
 
 $router->group(['middleware' => 'auth:tarbak'], function () use ($router) {
     
+    //fs
+    $router->get('listFSAktif','DashTarbak\FSController@listFSAktif');         
+    $router->get('cariFSAktif','DashTarbak\FSController@cariFSAktif');
+    $router->get('fs','DashTarbak\FSController@index');
+    $router->post('fs','DashTarbak\FSController@store');
+    $router->put('fs','DashTarbak\FSController@update');
+    $router->delete('fs','DashTarbak\FSController@destroy'); 
 });
 
 
