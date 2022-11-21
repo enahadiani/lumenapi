@@ -118,7 +118,7 @@ class CloseKasirController extends Controller
             left join 
             ( select a.no_open,sum(a.nilai) as total,sum(a.diskon) as diskon
               from brg_jualpiu_dloc a
-              where a.no_close='-' 
+              where a.no_close='-' and a.kode_lokasi='".$kode_lokasi."'
               group by a.no_open
               ) b on a.no_open=b.no_open 
             where a.kode_lokasi='".$kode_lokasi."' and a.no_open='".$request->no_open."' and a.nik='".$nik."' 
