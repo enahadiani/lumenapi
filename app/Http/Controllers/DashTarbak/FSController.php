@@ -10,8 +10,8 @@ use Illuminate\Support\Facades\Auth;
 class FSController extends Controller
 {    
     public $successStatus = 200;
-    public $sql = 'sqlsrvtabrak';
-    public $guard = 'tabrak';
+    public $sql = 'sqlsrvtarbak';
+    public $guard = 'tarbak';
 
 
     public function listFSAktif() {
@@ -118,6 +118,7 @@ class FSController extends Controller
             return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = "Error ".$e;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }

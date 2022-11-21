@@ -16,7 +16,7 @@ class TransferDataController extends Controller
      */
     public $successStatus = 200;
     public $guard = 'tarbak';
-    public $sql = 'sqlsrvtarbak';
+    public $db = 'sqlsrvtarbak';
 
     public function getPeriode(Request $request)
     {
@@ -28,7 +28,7 @@ class TransferDataController extends Controller
 
             $sql= "select periode from periode where kode_lokasi='".$kode_lokasi."' order by periode desc";
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -56,7 +56,7 @@ class TransferDataController extends Controller
             'kode_fs' => 'required'
         ]);
 
-        DB::connection($this->sql)->beginTransaction();
+        DB::connection($this->db)->beginTransaction();
         
         try {
             if($data =  Auth::guard($this->guard)->user()){
@@ -64,24 +64,26 @@ class TransferDataController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             set_time_limit(300);
-            $exec1 = DB::connection($this->sql)->getPdo()->exec("exec sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs'");
-            // $exec2 = DB::connection($this->sql)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
-            // $exec3 = DB::connection($this->sql)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
+            $dbh = DB::connection($this->db)->getPdo();
+            $sth = $dbh->prepare("SET NOCOUNT ON; EXEC sp_exs_proses '$kode_lokasi','$request->periode','$request->kode_fs';  ");
+            $sth->execute();
+            // $exec2 = DB::connection($this->db)->update("exec sp_exs_proses_trans '$kode_lokasi','$request->periode'");
+            // $exec3 = DB::connection($this->db)->update("exec sp_exs_proses_lap '$kode_lokasi','$request->periode','$request->kode_fs' ");
 
             // $sql= "select kode_proses,nama,'0' as status from exs_proses_m where kode_lokasi='".$kode_lokasi."' ";
 
             $sql= "select 'P01' as kode_proses, 'Transfer data' as nama,'0' as status ";
 
-            $res = DB::connection($this->sql)->select($sql);
+            $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             $success['data'] = $res;
-            DB::connection($this->sql)->commit();
+            DB::connection($this->db)->commit();
             $success['status'] = true;
             $success['message'] = "Transfer Data berhasil";
             
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
-            DB::connection($this->sql)->rollback();
+            DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Transfer Data gagal ".$e;
             return response()->json($success, $this->successStatus); 
