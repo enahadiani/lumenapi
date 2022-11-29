@@ -85,6 +85,19 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('data-piutang-unit-umur','DashYpt\DashboardPiutangUnitController@getUmurPiutang');  
     $router->get('data-piutang-unit-saldo','DashYpt\DashboardPiutangUnitController@getTrendSaldoPiutang');  
 
+    // DASH FINANCIAL TS
+    $router->get('data-fp-ts-box','DashYpt\DashboardFPTsController@getDataBoxFirst');  
+    $router->get('data-fp-ts-lr','DashYpt\DashboardFPTsController@getDataBoxLabaRugi'); 
+    $router->get('data-fp-ts-pl','DashYpt\DashboardFPTsController@getDataBoxPerformLembaga'); 
+    $router->get('data-fp-ts-pl-pp','DashYpt\DashboardFPTsController@getDataBoxPerformLembagaPP'); 
+
+    $router->get('data-fp-ts-detail-perform','DashYpt\DashboardFPTsController@getDataPerformansiLembaga');  
+    $router->get('data-fp-ts-detail-lembaga','DashYpt\DashboardFPTsController@getDataPerLembaga');  
+    $router->get('data-fp-ts-detail-kelompok','DashYpt\DashboardFPTsController@getDataKelompokYoy');  
+    $router->get('data-fp-ts-detail-akun','DashYpt\DashboardFPTsController@getDataKelompokAkun');  
+    $router->get('data-fp-ts-detail-or-5tahun','DashYpt\DashboardFPTsController@getDataOR5Tahun');  
+
+
 
 });
 
