@@ -970,4 +970,13 @@ $app->router->group([
     require __DIR__ . '/../routes/sukka/dash.php';
 });
 
+
+// UI3
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/ui3'
+], function ($router) {
+    require __DIR__ . '/../routes/ui3/api.php';
+});
+
 return $app;

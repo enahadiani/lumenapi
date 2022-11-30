@@ -94,6 +94,10 @@ return [
         'bangtel' => [
             'driver' => 'jwt',
             'provider' => 'bangtel',
+        ],
+        'ui3' => [
+            'driver' => 'jwt',
+            'provider' => 'ui3',
         ]
     ],
 
@@ -181,6 +185,10 @@ return [
         'bangtel' => [
             'driver' => 'eloquent',
             'model' => \App\AdminBangtel::class
+        ],
+        'ui3' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminUi3::class
         ]
     ]
 ];

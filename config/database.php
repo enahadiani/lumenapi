@@ -208,6 +208,16 @@ return [
             'password' => env('DB_PASSWORD18', ''),
             'charset' => 'utf8',
             'prefix' => '',
+        ],
+        'dbui3' => [
+            'driver' => env('DB_CONNECTIONui3', 'sqlsrv'),
+            'host' => env('DB_HOSTui3', 'localhost'),
+            'port' => env('DB_PORTui3', '1433'),
+            'database' => env('DB_DATABASEui3', 'forge'),
+            'username' => env('DB_USERNAMEui3', 'forge'),
+            'password' => env('DB_PASSWORDui3', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
         ]
 
     ],

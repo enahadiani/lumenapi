@@ -418,6 +418,29 @@ class AuthController extends Controller
         }
     }
 
+    public function loginUi3(Request $request)
+    {
+        
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (!$token = Auth::guard('ui3')->setTTL(1440)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        } else {
+            if (isset($request->id_device)) {
+                DB::connection('dbui3')->table('karyawan')
+                    ->where('nik', $request->nik)
+                    ->update(['id_device' => $request->id_device]);
+            }
+        }
+
+        return $this->respondWithToken($token, 'ui3');
+    }
+
     public function loginDago(Request $request)
     {
         //validate incoming request
