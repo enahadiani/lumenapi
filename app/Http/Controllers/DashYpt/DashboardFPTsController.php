@@ -87,6 +87,10 @@ class DashboardFPTsController extends Controller
 
             if (isset($r->kode_bidang) && $r->kode_bidang != "") {
                 $filter_bidang = " and p.kode_bidang='$r->kode_bidang' ";
+                $filter_pp = "";
+                if(isset($r->kode_pp) && $r->kode_pp != ""){
+                    $filter_pp = " and p.kode_pp='$r->kode_pp' ";
+                }
                 $sql = "SELECT a.kode_grafik, c.nama,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n2 ELSE b.$n2 END) AS n2,
                 SUM(CASE WHEN b.jenis_akun='Pendapatan' THEN -b.$n4 ELSE b.$n4 END) AS n4,
@@ -95,7 +99,7 @@ class DashboardFPTsController extends Controller
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 INNER JOIN pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
-                $where $filter_bidang
+                $where $filter_bidang $filter_pp
                 group by a.kode_grafik, c.nama
                 order by a.kode_grafik ";
             } else {
@@ -199,6 +203,12 @@ class DashboardFPTsController extends Controller
             } else {
                 $filter_bidang = "";
             }
+
+            if (isset($r->kode_pp) && $r->kode_pp != "") {
+                $filter_pp = " and b.kode_pp = '$r->kode_pp' ";
+            } else {
+                $filter_pp = "";
+            }
             $col_array = array('periode');
             $db_col_name = array('b.periode');
             $where = "WHERE a.kode_lokasi = '$kode_lokasi' AND a.kode_fs='FS1' ";
@@ -225,7 +235,7 @@ class DashboardFPTsController extends Controller
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN pp p on b.kode_pp=p.kode_pp and b.kode_lokasi=p.kode_lokasi
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
-                $where
+                $where $filter_pp
                 GROUP BY a.kode_lokasi,p.kode_bidang
             ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
             WHERE a.kode_lokasi ='$kode_lokasi' $filter_bidang";
@@ -291,6 +301,13 @@ class DashboardFPTsController extends Controller
             } else {
                 $filter_bidang = "";
             }
+
+            if (isset($r->kode_pp) && $r->kode_pp != "") {
+                $filter_pp = " and b.kode_pp = '$r->kode_pp' ";
+            } else {
+                $filter_pp = "";
+            }
+
             $col_array = array('periode');
             $db_col_name = array('b.periode');
             $where = "WHERE a.kode_lokasi ='$kode_lokasi' AND a.kode_fs='FS1' $filter_bidang";
@@ -335,7 +352,7 @@ class DashboardFPTsController extends Controller
                 INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                 INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                 INNER JOIN pp p ON b.kode_pp=p.kode_pp AND b.kode_lokasi=p.kode_lokasi
-                $where
+                $where $filter_pp
                 GROUP BY a.kode_lokasi,p.kode_bidang
             ) b on a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
             WHERE a.kode_lokasi='$kode_lokasi' $filter_bidang";
@@ -566,6 +583,11 @@ class DashboardFPTsController extends Controller
             } else {
                 $filter_bidang = "";
             }
+            if (isset($r->kode_pp) && $r->kode_pp != "") {
+                $filter_pp = " and b.kode_pp = '$r->kode_pp' ";
+            } else {
+                $filter_pp = "";
+            }
 
             $col_array = array('periode', 'kode_grafik');
             $db_col_name = array('b.periode', 'a.kode_grafik');
@@ -603,7 +625,7 @@ class DashboardFPTsController extends Controller
                     INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     INNER JOIN pp p ON b.kode_pp=p.kode_pp AND b.kode_lokasi=p.kode_lokasi
-                    $where
+                    $where $filter_pp
                     GROUP BY a.kode_lokasi,p.kode_bidang
                 ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
                 WHERE a.kode_lokasi ='$kode_lokasi' $filter_bidang ";
@@ -621,7 +643,7 @@ class DashboardFPTsController extends Controller
                     INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     INNER JOIN pp p ON b.kode_pp=p.kode_pp AND b.kode_lokasi=p.kode_lokasi
-                    $where
+                    $where $filter_pp
                     GROUP BY a.kode_lokasi,p.kode_bidang
                 ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
                 WHERE a.kode_lokasi ='$kode_lokasi' $filter_bidang ";
@@ -679,6 +701,11 @@ class DashboardFPTsController extends Controller
             } else {
                 $filter_bidang = "";
             }
+            if (isset($r->kode_pp) && $r->kode_pp != "") {
+                $filter_pp = " and b.kode_pp = '$r->kode_pp' ";
+            } else {
+                $filter_pp = "";
+            }
             $col_array = array('periode', 'kode_grafik');
             $db_col_name = array('b.periode', 'a.kode_grafik');
             $where = "WHERE a.kode_lokasi ='$kode_lokasi' AND a.kode_fs='FS1' ";
@@ -714,7 +741,7 @@ class DashboardFPTsController extends Controller
                     INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     INNER JOIN pp p ON b.kode_pp=p.kode_pp AND b.kode_lokasi=p.kode_lokasi
-                    $where
+                    $where $filter_pp
                     GROUP BY a.kode_lokasi,p.kode_bidang
                 ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
                 WHERE a.kode_lokasi ='$kode_lokasi' $filter_bidang";
@@ -732,7 +759,7 @@ class DashboardFPTsController extends Controller
                     INNER JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND a.kode_lokasi=b.kode_lokasi AND a.kode_fs=b.kode_fs
                     INNER JOIN dash_ypt_grafik_m c ON a.kode_grafik=c.kode_grafik AND a.kode_lokasi=c.kode_lokasi
                     INNER JOIN pp p ON b.kode_pp=p.kode_pp AND b.kode_lokasi=p.kode_lokasi
-                    $where
+                    $where $filter_pp
                     GROUP BY a.kode_lokasi,p.kode_bidang
                 ) b ON a.kode_lokasi=b.kode_lokasi and a.kode_bidang=b.kode_bidang
                 WHERE a.kode_lokasi ='$kode_lokasi' $filter_bidang";
@@ -888,29 +915,58 @@ class DashboardFPTsController extends Controller
 
             if (isset($r->kode_bidang) && $r->kode_bidang != "") {
                 $kode_bidang = $r->kode_bidang;
-                $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
-                ISNULL(b.n6,0) AS n6
-                FROM neraca a
-                INNER JOIN (
-                    SELECT a.kode_neraca,
-                        SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
-                        SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
-                        SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
-                        SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
-                        SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5,
-                        SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.$n4,0) ELSE -ISNULL(g.$n4,0) END) AS n6
-                        FROM dash_ypt_grafik_d a
-                        INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
-                        LEFT JOIN exs_neraca_bidang b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$kode_lokasi' and b.kode_bidang='$kode_bidang' AND a.kode_fs=b.kode_fs AND b.periode='" . $periode[5] . "'
-                        LEFT JOIN exs_neraca_bidang c ON a.kode_neraca=c.kode_neraca AND c.kode_lokasi='$kode_lokasi' and c.kode_bidang='$kode_bidang' AND a.kode_fs=c.kode_fs AND c.periode='" . $periode[4] . "'
-                        LEFT JOIN exs_neraca_bidang d ON a.kode_neraca=d.kode_neraca AND d.kode_lokasi='$kode_lokasi' and d.kode_bidang='$kode_bidang' AND a.kode_fs=d.kode_fs AND d.periode='" . $periode[3] . "'
-                        LEFT JOIN exs_neraca_bidang e ON a.kode_neraca=e.kode_neraca AND e.kode_lokasi='$kode_lokasi' and e.kode_bidang='$kode_bidang' AND a.kode_fs=e.kode_fs AND e.periode='" . $periode[2] . "'
-                        LEFT JOIN exs_neraca_bidang f ON a.kode_neraca=f.kode_neraca AND f.kode_lokasi='$kode_lokasi' and f.kode_bidang='$kode_bidang' AND a.kode_fs=f.kode_fs AND f.periode='" . $periode[1] . "'
-                        LEFT JOIN exs_neraca_bidang g ON a.kode_neraca=g.kode_neraca AND g.kode_lokasi='$kode_lokasi' and g.kode_bidang='$kode_bidang' AND a.kode_fs=g.kode_fs AND g.periode='" . $periode[0] . "'
-                        $where 
-                    GROUP BY a.kode_neraca
-                )b ON a.kode_neraca=b.kode_neraca 
-                where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS1' ";
+                if(isset($r->kode_pp) && $r->kode_pp != ""){
+                    $kode_pp = $r->kode_pp;
+                    $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                    ISNULL(b.n6,0) AS n6
+                    FROM neraca a
+                    INNER JOIN (
+                        SELECT a.kode_neraca,
+                            SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
+                            SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
+                            SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
+                            SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
+                            SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5,
+                            SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.$n4,0) ELSE -ISNULL(g.$n4,0) END) AS n6
+                            FROM dash_ypt_grafik_d a
+                            INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
+                            LEFT JOIN exs_neraca_pp b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$kode_lokasi' and b.kode_pp='$kode_pp' AND a.kode_fs=b.kode_fs AND b.periode='" . $periode[5] . "'
+                            LEFT JOIN exs_neraca_pp c ON a.kode_neraca=c.kode_neraca AND c.kode_lokasi='$kode_lokasi' and c.kode_pp='$kode_pp' AND a.kode_fs=c.kode_fs AND c.periode='" . $periode[4] . "'
+                            LEFT JOIN exs_neraca_pp d ON a.kode_neraca=d.kode_neraca AND d.kode_lokasi='$kode_lokasi' and d.kode_pp='$kode_pp' AND a.kode_fs=d.kode_fs AND d.periode='" . $periode[3] . "'
+                            LEFT JOIN exs_neraca_pp e ON a.kode_neraca=e.kode_neraca AND e.kode_lokasi='$kode_lokasi' and e.kode_pp='$kode_pp' AND a.kode_fs=e.kode_fs AND e.periode='" . $periode[2] . "'
+                            LEFT JOIN exs_neraca_pp f ON a.kode_neraca=f.kode_neraca AND f.kode_lokasi='$kode_lokasi' and f.kode_pp='$kode_pp' AND a.kode_fs=f.kode_fs AND f.periode='" . $periode[1] . "'
+                            LEFT JOIN exs_neraca_pp g ON a.kode_neraca=g.kode_neraca AND g.kode_lokasi='$kode_lokasi' and g.kode_pp='$kode_pp' AND a.kode_fs=g.kode_fs AND g.periode='" . $periode[0] . "'
+                            $where 
+                        GROUP BY a.kode_neraca
+                    )b ON a.kode_neraca=b.kode_neraca 
+                    where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS1' ";
+                }else{
+
+                    $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
+                    ISNULL(b.n6,0) AS n6
+                    FROM neraca a
+                    INNER JOIN (
+                        SELECT a.kode_neraca,
+                            SUM(CASE WHEN b.jenis_akun <> 'Pendapatan' THEN ISNULL(b.$n4,0) ELSE -ISNULL(b.$n4,0) END) AS n1,
+                            SUM(CASE WHEN c.jenis_akun <> 'Pendapatan' THEN ISNULL(c.$n4,0) ELSE -ISNULL(c.$n4,0) END) AS n2,
+                            SUM(CASE WHEN d.jenis_akun <> 'Pendapatan' THEN ISNULL(d.$n4,0) ELSE -ISNULL(d.$n4,0) END) AS n3,
+                            SUM(CASE WHEN e.jenis_akun <> 'Pendapatan' THEN ISNULL(e.$n4,0) ELSE -ISNULL(e.$n4,0) END) AS n4,
+                            SUM(CASE WHEN f.jenis_akun <> 'Pendapatan' THEN ISNULL(f.$n4,0) ELSE -ISNULL(f.$n4,0) END) AS n5,
+                            SUM(CASE WHEN g.jenis_akun <> 'Pendapatan' THEN ISNULL(g.$n4,0) ELSE -ISNULL(g.$n4,0) END) AS n6
+                            FROM dash_ypt_grafik_d a
+                            INNER JOIN dash_ypt_grafik_m x ON a.kode_grafik=x.kode_grafik AND a.kode_lokasi=x.kode_lokasi
+                            LEFT JOIN exs_neraca_bidang b ON a.kode_neraca=b.kode_neraca AND b.kode_lokasi='$kode_lokasi' and b.kode_bidang='$kode_bidang' AND a.kode_fs=b.kode_fs AND b.periode='" . $periode[5] . "'
+                            LEFT JOIN exs_neraca_bidang c ON a.kode_neraca=c.kode_neraca AND c.kode_lokasi='$kode_lokasi' and c.kode_bidang='$kode_bidang' AND a.kode_fs=c.kode_fs AND c.periode='" . $periode[4] . "'
+                            LEFT JOIN exs_neraca_bidang d ON a.kode_neraca=d.kode_neraca AND d.kode_lokasi='$kode_lokasi' and d.kode_bidang='$kode_bidang' AND a.kode_fs=d.kode_fs AND d.periode='" . $periode[3] . "'
+                            LEFT JOIN exs_neraca_bidang e ON a.kode_neraca=e.kode_neraca AND e.kode_lokasi='$kode_lokasi' and e.kode_bidang='$kode_bidang' AND a.kode_fs=e.kode_fs AND e.periode='" . $periode[2] . "'
+                            LEFT JOIN exs_neraca_bidang f ON a.kode_neraca=f.kode_neraca AND f.kode_lokasi='$kode_lokasi' and f.kode_bidang='$kode_bidang' AND a.kode_fs=f.kode_fs AND f.periode='" . $periode[1] . "'
+                            LEFT JOIN exs_neraca_bidang g ON a.kode_neraca=g.kode_neraca AND g.kode_lokasi='$kode_lokasi' and g.kode_bidang='$kode_bidang' AND a.kode_fs=g.kode_fs AND g.periode='" . $periode[0] . "'
+                            $where 
+                        GROUP BY a.kode_neraca
+                    )b ON a.kode_neraca=b.kode_neraca 
+                    where a.kode_lokasi='$kode_lokasi' and a.kode_fs='FS1' ";
+                }
+
             } else {
 
                 $sql = "SELECT DISTINCT a.kode_neraca,UPPER(a.nama) as nama, ISNULL(b.n3,0) AS n3, ISNULL(b.n4,0) AS n4, ISNULL(b.n5,0) AS n5, 
