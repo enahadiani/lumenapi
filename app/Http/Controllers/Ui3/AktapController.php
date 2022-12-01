@@ -154,7 +154,7 @@ class AktapController extends Controller
     
     }
 
-    public function getKlpAkun(Request $r)
+    public function getAkunAktap(Request $request)
     {
         try {
             
@@ -163,23 +163,10 @@ class AktapController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $filter = "";
-            if(isset($r->kode_klpfa) && $r->kode_klpfa != ""){
-                $filter .= " and a.kode_klpfa = '$r->kode_klpfa'  ";
-            }else{
-                $filter .= "";
-            }
-
-            if(isset($r->kode_klpakun) && $r->kode_klpakun != ""){
-                $filter .= " and a.kode_klpakun = '$r->kode_klpakun'  ";
-            }else{
-                $filter .= "";
-            }
-            $res = DB::connection($this->db)->select("select a.kode_klpakun,b.nama,b.kode_akun,c.nama as nama_akun,b.umur,b.persen 
-            from fa_klp a 
-            	 inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi 
-            	 inner join masakun c on b.kode_akun=c.kode_akun and c.kode_lokasi = '$kode_lokasi'
-            where a.kode_lokasi='$kode_lokasi' $filter ");	
+            $res = DB::connection($this->db)->select("select a.kode_klpfa, a.nama, a.kode_klpakun, b.nama as nama_klpakun, b.kode_akun, b.umur, b.persen, b.akun_bp,b.akun_deprs,b.tahun,b.kode_drk,b.flag_susut
+            from fa_klp a
+            inner join fa_klpakun b on a.kode_klpakun=b.kode_klpakun and a.kode_lokasi=b.kode_lokasi
+            where a.kode_lokasi='$kode_lokasi'");
             $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -196,14 +183,19 @@ class AktapController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
     }
 
-    public function getPP(Request $r)
+    public function show(Request $request)
     {
+        $this->validate($request,[
+            'no_fa' => 'required'
+        ]);
+
         try {
             
             if($data =  Auth::guard($this->guard)->user()){
@@ -211,17 +203,19 @@ class AktapController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $filter = "";
-            if(isset($r->kode_pp) && $r->kode_pp != ""){
-                $filter .= " and a.kode_pp = '$r->kode_pp'  ";
-            }else{
-                $filter .= "";
-            }
-
-            $res = DB::connection($this->db)->select("select a.kode_pp, a.nama 
-            from pp a
-            where a.flag_aktif ='1'
-            and a.kode_lokasi='$kode_lokasi' $filter ");	
+            $res = DB::connection($this->db)->select("select a.no_fa,a.nama,a.periode,a.periode_susut,convert(varchar,a.tgl_perolehan,103) as tgl_perolehan,convert(varchar,a.tgl_susut,103) as tgl_susut,a.no_seri,a.merk,a.tipe,a.nilai_residu,a.kode_pp as pp_aktap,a.kode_pp_susut as pp_susut,
+            ,c.kode_klpfa+'-'+c.nama as klpfa,d.kode_klpakun+'-'+d.nama as klpakun,d.kode_akun+'-'+e.nama as akun, a.umur,a.persen,zz.nilai as nilai_perolehan, isnull(b.susut,0) as nilai_susut 
+            from fa_asset a 
+            inner join (select no_fa,sum(case dc when 'D' then nilai else -nilai end) as nilai 
+                        from fa_nilai where kode_lokasi='".$kode_lokasi."' 
+                    group by kode_lokasi,no_fa) zz on a.no_fa=zz.no_fa  
+            inner join fa_klp c on a.kode_klpfa=c.kode_klpfa and a.kode_lokasi=c.kode_lokasi 
+            inner join fa_klpakun d on a.kode_klpakun=d.kode_klpakun and a.kode_lokasi=d.kode_lokasi 
+            inner join masakun e on d.kode_akun=e.kode_akun and d.kode_lokasi=e.kode_lokasi 
+            left join (select no_fa,sum(case dc when 'D' then nilai else -nilai end) as susut 
+                    from fasusut_d where kode_lokasi ='".$kode_lokasi."' 
+                    group by no_fa) b on a.no_fa=b.no_fa
+            where a.no_fa='".$request->no_fa."' and a.kode_lokasi='".$kode_lokasi."' ");
             $res= json_decode(json_encode($res),true);
             
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
@@ -231,17 +225,68 @@ class AktapController extends Controller
                 return response()->json(['success'=>$success], $this->successStatus);     
             }
             else{
-                $success['message'] = "Data Kosong!"; 
+                $success['message'] = "Data tidak ditemukan!"; 
                 $success['data'] = [];
                 $success['status'] = false;
                 return response()->json(['success'=>$success], $this->successStatus);
             }
         } catch (\Throwable $e) {
-            $success['status'] = false;
+            $success['status'] = false; 
+            $success['data'] = [];
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    public function destroy(Request $request)
+    {
+        $this->validate($request, [
+            'no_fa' => 'required'
+        ]);
+
+        
+        DB::connection($this->db)->beginTransaction();
+        try {
+
+            if($rs =  Auth::guard($this->guard)->user()){
+                $nik= $rs->nik;
+                $kode_lokasi= $rs->kode_lokasi;
+                $status_admin=$rs->status_admin;
+            }
+
+            $get = DB::connection($this->db)->select("select isnull(count(*),0)  as jml from fasusut_d where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+            if (count($get) > 0){
+                if(intval($get[0]->jml) > 0){
+                    $msg = "Transaksi tidak valid. Sudah pernah disusutkan, data tidak bisa dihapus.";
+                    $sts = false;
+                }else{
+                    $del1 = DB::connection($this->db)->update("delete from fa_asset where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                    $del2 = DB::connection($this->db)->update("delete from fa_nilai where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                    $sts = true;
+                    $msg = "Data Aktiva Tetap berhasil dihapus. ";  
+                    DB::connection($this->db)->commit();
+
+                }
+            }else{
+                $del1 = DB::connection($this->db)->update("delete from fa_asset where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                $del2 = DB::connection($this->db)->update("delete from fa_nilai where no_fa='".$request->no_fa."' and kode_lokasi='".$kode_lokasi."'");
+                
+                $sts = true;
+                $msg = "Data Aktiva Tetap berhasil dihapus. ";  
+                DB::connection($this->db)->commit();
+            }	
+
+            $success['status'] = $sts;
+            $success['message'] = $msg;
+            return response()->json(['success'=>$success], $this->successStatus);
+        } catch (\Throwable $e) {
+            DB::connection($this->db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Aktiva Tetap gagal dihapus ".$e;
+            return response()->json(['success'=>$success], $this->successStatus); 
+        }	
+    
     }
 
 }

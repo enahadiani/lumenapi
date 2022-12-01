@@ -23,7 +23,9 @@ $router->group(['middleware' => 'cors'], function () use ($router) {
 
 $router->group(['middleware' => 'auth:ui3'], function () use ($router) {
     $router->post('aktiva-tetap', 'Ui3\AktapController@store');
-
+    $router->get('aktiva-tetap', 'Ui3\AktapController@show');
+    $router->delete('aktiva-tetap', 'Ui3\AktapController@destroy');
+    $router->get('akun-aktiva-tetap', 'Ui3\AktapController@getAkunAktap');
 });
 
 
