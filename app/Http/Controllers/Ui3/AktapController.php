@@ -144,12 +144,12 @@ class AktapController extends Controller
                 $success['jumlah_data'] = count($r->input('data_aktap'));
                 $success['jumlah_detail'] = $jum_det;
             }
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aktiva Tetap gagal disimpan ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     
     }
@@ -173,13 +173,13 @@ class AktapController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data Kosong!"; 
                 $success['data'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
@@ -204,7 +204,7 @@ class AktapController extends Controller
             }
 
             $res = DB::connection($this->db)->select("select a.no_fa,a.nama,a.periode,a.periode_susut,convert(varchar,a.tgl_perolehan,103) as tgl_perolehan,convert(varchar,a.tgl_susut,103) as tgl_susut,a.no_seri,a.merk,a.tipe,a.nilai_residu,a.kode_pp as pp_aktap,a.kode_pp_susut as pp_susut,
-            ,c.kode_klpfa+'-'+c.nama as klpfa,d.kode_klpakun+'-'+d.nama as klpakun,d.kode_akun+'-'+e.nama as akun, a.umur,a.persen,zz.nilai as nilai_perolehan, isnull(b.susut,0) as nilai_susut 
+            c.kode_klpfa+'-'+c.nama as klpfa,d.kode_klpakun+'-'+d.nama as klpakun,d.kode_akun+'-'+e.nama as akun, a.umur,a.persen,zz.nilai as nilai_perolehan, isnull(b.susut,0) as nilai_susut 
             from fa_asset a 
             inner join (select no_fa,sum(case dc when 'D' then nilai else -nilai end) as nilai 
                         from fa_nilai where kode_lokasi='".$kode_lokasi."' 
@@ -222,13 +222,13 @@ class AktapController extends Controller
                 $success['status'] = true;
                 $success['data'] = $res;
                 $success['message'] = "Success!";
-                return response()->json(['success'=>$success], $this->successStatus);     
+                return response()->json($success, $this->successStatus);     
             }
             else{
                 $success['message'] = "Data tidak ditemukan!"; 
                 $success['data'] = [];
                 $success['status'] = false;
-                return response()->json(['success'=>$success], $this->successStatus);
+                return response()->json($success, $this->successStatus);
             }
         } catch (\Throwable $e) {
             $success['status'] = false; 
@@ -279,12 +279,12 @@ class AktapController extends Controller
 
             $success['status'] = $sts;
             $success['message'] = $msg;
-            return response()->json(['success'=>$success], $this->successStatus);
+            return response()->json($success, $this->successStatus);
         } catch (\Throwable $e) {
             DB::connection($this->db)->rollback();
             $success['status'] = false;
             $success['message'] = "Data Aktiva Tetap gagal dihapus ".$e;
-            return response()->json(['success'=>$success], $this->successStatus); 
+            return response()->json($success, $this->successStatus); 
         }	
     
     }
