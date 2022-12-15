@@ -405,7 +405,9 @@ class CloseKasirController extends Controller
                 }
 
                 set_time_limit(300);
-                $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));
+
+                // req mas erik dimatikan dulu insert jurnalnya
+                // $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));
 
                 $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
     
