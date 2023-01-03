@@ -129,9 +129,21 @@ class CloseKasirController extends Controller
 
             $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
             from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%'" ;
-            $res2 = DB::connection($this->sql)->select($sql2);
-            $res2 = json_decode(json_encode($res2),true);
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB01' " ;
+            $respjc = DB::connection($this->sql)->select($sql2);
+            $respjc = json_decode(json_encode($respjc),true);
+
+            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
+            from brg_jualpiu_dloc
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB02'" ;
+            $respjq = DB::connection($this->sql)->select($sql2);
+            $respjq = json_decode(json_encode($respjq),true);
+
+            $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
+            from brg_jualpiu_dloc
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB03'" ;
+            $respjl = DB::connection($this->sql)->select($sql2);
+            $respjl = json_decode(json_encode($respjl),true);
 
             $sql3 = "select no_beli,tanggal,keterangan,periode,nilai,diskon from brg_belihut_d
             where kode_lokasi = '".$kode_lokasi."' and isnull(no_close,'-') = '-' and kode_gudang='$pabrik'" ;
@@ -146,7 +158,9 @@ class CloseKasirController extends Controller
             if(count($res) > 0){ //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
                 $success['data'] = $res;
-                $success['data_detail'] = $res2;
+                $success['data_jual_cash'] = $respjc;
+                $success['data_jual_qris'] = $respjq;
+                $success['data_jual_linkaja'] = $respjl;
                 $success['data_beli'] = $res3;
                 $success['data_retur_jual'] = $res4;
                 $success['message'] = "Success!";     
@@ -154,7 +168,9 @@ class CloseKasirController extends Controller
             else{
                 $success['message'] = "Data Kosong!";
                 $success['data'] = [];
-                $success['data_detail'] = [];
+                $success['data_jual_cash'] = [];
+                $success['data_jual_qris'] = [];
+                $success['data_jual_linkaja'] = [];
                 $success['data_beli'] = [];
                 $success['data_retur_jual'] = [];
                 $success['status'] = false;
@@ -163,7 +179,9 @@ class CloseKasirController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['data_detail'] = [];
+            $success['data_jual_cash'] = [];
+            $success['data_jual_qris'] = [];
+            $success['data_jual_linkaja'] = [];
             $success['data_beli'] = [];
             $success['data_retur_jual'] = [];
             $success['message'] = "Error ".$e;
