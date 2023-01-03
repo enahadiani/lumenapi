@@ -654,9 +654,9 @@ class FilterController extends Controller
                 $filter .= "";
             }
             
-            $sql="select a.no_close as no_bukti, b.keterangan 
+            $sql="select a.no_close as no_bukti, 'Penjualan Persediaan '+b.no_open as keterangan
             from kasir_close a 
-            inner join trans_m b on a.no_close=b.no_bukti and a.kode_lokasi=b.kode_lokasi
+            inner join kasir_open b on a.no_close=b.no_close and a.kode_lokasi=b.kode_lokasi
             where a.kode_lokasi='$kode_lokasi' $filter";
 
             $res = DB::connection($this->db)->select($sql);
