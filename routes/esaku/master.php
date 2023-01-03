@@ -388,4 +388,10 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     /*-------------------------------------------------------------------------
        END MODUL SDM
     --------------------------------------------------------------------------*/
+
+    //Jenis Bayar
+    $router->get('jenis-bayar', 'Esaku\Inventori\JenisBayarController@index');
+    $router->post('jenis-bayar', 'Esaku\Inventori\JenisBayarController@store');
+    $router->put('jenis-bayar', 'Esaku\Inventori\JenisBayarController@update');
+    $router->delete('jenis-bayar', 'Esaku\Inventori\JenisBayarController@destroy');
 });

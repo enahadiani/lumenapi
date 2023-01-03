@@ -97,6 +97,7 @@ class PenjualanController extends Controller
             'diskon_barang' => 'required|array',
             'sub_barang' => 'required|array',
             'ppn_barang' => 'required|array',
+            // 'kode_jenis' => 'required',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -150,8 +151,8 @@ class PenjualanController extends Controller
             }
 
             $kodeGudang=$pabrik;
-
-            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-'));		
+            $kode_jenis = isset($request->kode_jenis) ? $request->kode_jenis : '-';
+            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close, kode_jenis) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-',$kode_jenis));		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
@@ -210,6 +211,7 @@ class PenjualanController extends Controller
             'diskon_barang' => 'required|array',
             'sub_barang' => 'required|array',
             'ppn_barang' => 'required|array',
+            // 'kode_jenis' => 'required',
         ]);
 
         DB::connection($this->sql)->beginTransaction();
@@ -263,8 +265,9 @@ class PenjualanController extends Controller
             }
 
             $kodeGudang=$pabrik;
+            $kode_jenis = isset($request->kode_jenis) ? $request->kode_jenis : '-';
 
-            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-'));		
+            $ins =DB::connection($this->sql)->insert("insert into brg_jualpiu_dloc(no_jual,kode_lokasi,tanggal,keterangan,kode_cust,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_piutang,nilai_ppn,nilai_pph,no_fp,diskon,kode_gudang,no_ba,tobyr,no_open,no_close,kode_jenis) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ", array($id,$kode_lokasi,date('Y-m-d H:i:s'),"Penjualan No: $id",'CASH','IDR',1,$request->kode_pp,$request->total_trans,$periode,$nik,date('Y-m-d H:i:s'),$akunPiutang,0,0,'-',$request->diskon,$kodeGudang,'-',$request->total_bayar,$request->no_open,'-',$kode_jenis));		
 
             if(isset($request->kode_barang) && count($request->kode_barang) > 0){
 
