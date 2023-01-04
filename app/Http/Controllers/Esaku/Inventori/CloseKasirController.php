@@ -129,19 +129,19 @@ class CloseKasirController extends Controller
 
             $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
             from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB01' " ;
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'-') in ('JB01','-') " ;
             $respjc = DB::connection($this->sql)->select($sql2);
             $respjc = json_decode(json_encode($respjc),true);
 
             $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
             from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB02'" ;
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'-') = 'JB02'" ;
             $respjq = DB::connection($this->sql)->select($sql2);
             $respjq = json_decode(json_encode($respjq),true);
 
             $sql2 = "select no_jual,tanggal,keterangan,periode,nilai,diskon 
             from brg_jualpiu_dloc
-            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'JB01') = 'JB03'" ;
+            where kode_lokasi = '".$kode_lokasi."' and no_open='$request->no_open' and kode_gudang='$pabrik' and no_jual not like '%RJ%' and isnull(kode_jenis,'-') = 'JB03'" ;
             $respjl = DB::connection($this->sql)->select($sql2);
             $respjl = json_decode(json_encode($respjl),true);
 
@@ -209,7 +209,7 @@ class CloseKasirController extends Controller
     {
         $this->validate($request, [
             'no_open' => 'required',
-            'no_jual' => 'required|array',
+            // 'no_jual' => 'required|array',
             'kode_pp' => 'required',
             'tanggal' => 'required',
             'total_pnj' => 'required',
@@ -301,7 +301,7 @@ class CloseKasirController extends Controller
                 ->update(['no_close'=>$id]);
     
     
-                if(count($request->no_jual) > 0){
+                if(isset($request->no_jual) && count($request->no_jual) > 0){
 
                     $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' and no_jual not like '%RJ%'";
                     $return = DB::connection($this->sql)->select($sql);
@@ -477,7 +477,7 @@ class CloseKasirController extends Controller
         $this->validate($request, [
             'no_open' => 'required',
             'no_close' => 'required',
-            'no_jual' => 'required|array',
+            // 'no_jual' => 'required|array',
             'kode_pp' => 'required',
             'tanggal' => 'required',
             'total_pnj' => 'required',
@@ -584,7 +584,7 @@ class CloseKasirController extends Controller
                 ->where('no_open', $request->no_open)
                 ->update(['no_close'=>'-']);
                 
-                if(count($request->no_jual) > 0){
+                if(isset($request->no_jual) && count($request->no_jual) > 0){
                     
                     for($i=0;$i<count($request->no_jual);$i++){
                         $upd[$i] = DB::connection($this->sql)->table('brg_jualpiu_dloc')
@@ -604,7 +604,7 @@ class CloseKasirController extends Controller
                 ->update(['no_close'=>$id]);
     
     
-                if(count($request->no_jual) > 0){
+                if(isset($request->no_jual) && count($request->no_jual) > 0){
                     
                     $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
