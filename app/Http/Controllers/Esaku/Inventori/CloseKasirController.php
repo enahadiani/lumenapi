@@ -301,7 +301,7 @@ class CloseKasirController extends Controller
                 ->update(['no_close'=>$id]);
     
     
-                if(isset($request->no_jual) && count($request->no_jual) > 0){
+                // if(isset($request->no_jual) && count($request->no_jual) > 0){
 
                     $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' and no_jual not like '%RJ%'";
                     $return = DB::connection($this->sql)->select($sql);
@@ -375,9 +375,9 @@ class CloseKasirController extends Controller
     
                     // ///------------------------------------END JURNAL--------------------------------//                    
     
-                } 
+                // } 
                 
-                if(isset($request->no_retur) && count($request->no_retur) > 0){
+                // if(isset($request->no_retur) && count($request->no_retur) > 0){
 
                     $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
@@ -399,9 +399,9 @@ class CloseKasirController extends Controller
                     
                     // $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));                 
     
-                } 
+                // } 
                 
-                if(isset($request->no_beli) && count($request->no_beli) > 0){
+                // if(isset($request->no_beli) && count($request->no_beli) > 0){
 
                     $sql = "select no_beli,id_sync,akun_hutang from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' ";
                     $return2 = DB::connection($this->sql)->select($sql);
@@ -420,7 +420,7 @@ class CloseKasirController extends Controller
                         ->update(['no_close'=>$id]);   
 
                     } 
-                }
+                // }
 
                 set_time_limit(300);
 
@@ -604,7 +604,7 @@ class CloseKasirController extends Controller
                 ->update(['no_close'=>$id]);
     
     
-                if(isset($request->no_jual) && count($request->no_jual) > 0){
+                // if(isset($request->no_jual) && count($request->no_jual) > 0){
                     
                     $sql = "select no_jual from brg_jualpiu_dloc where no_open='".$request->no_open."' and kode_lokasi='$kode_lokasi' and no_jual not like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
@@ -680,9 +680,9 @@ class CloseKasirController extends Controller
     
                     // ///------------------------------------END JURNAL--------------------------------//                    
     
-                }
+                // }
 
-                if(count($request->no_retur) > 0){
+                // if(count($request->no_retur) > 0){
 
                     $sql = "select no_jual from brg_jualpiu_dloc where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and no_jual like '%RJ%' and kode_gudang='$pabrik' ";
                     $return = DB::connection($this->sql)->select($sql);
@@ -704,9 +704,9 @@ class CloseKasirController extends Controller
                     
                     // $exec = DB::connection($this->sql)->update('exec sp_brg_closing ?, ?, ?, ?, ?, ?, ?, ?, ?',array($id,$kode_lokasi,$nik,$periode,'Penjualan Persediaan '.$request->no_open,$request->kode_pp,'-',$akunpiu,$akunPPN));                 
     
-                }
+                // }
 
-                if(isset($request->no_beli) && count($request->no_beli) > 0){
+                // if(isset($request->no_beli) && count($request->no_beli) > 0){
 
                     $sql = "select no_beli from brg_belihut_d where isnull(no_close,'-')='-' and kode_lokasi='$kode_lokasi' and kode_gudang='$pabrik' ";
                     $return2 = DB::connection($this->sql)->select($sql);
@@ -725,7 +725,7 @@ class CloseKasirController extends Controller
                         ->update(['no_close'=>$id]);   
                         
                     } 
-                }
+                // }
     
                 $tmp="Data Close Kasir berhasil disimpan";
                 $sts=true;
