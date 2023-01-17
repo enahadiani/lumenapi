@@ -630,8 +630,8 @@ class LaporanController extends Controller
             }
 
             $col_array = array('periode');
-            $db_col_name = array('a.periode');
-            $where2 = "where a.kode_lokasi='$kode_lokasi'";
+            $db_col_name = array('periode');
+            $where2 = "where kode_lokasi='$kode_lokasi'";
 
             for ($i = 0; $i < count($col_array); $i++) {
                 if (isset($request->input($col_array[$i])[0])) {
