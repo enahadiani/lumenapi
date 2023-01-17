@@ -605,7 +605,7 @@ class LaporanController extends Controller
             }
 
             $col_array = array('kode_gudang', 'kode_klp', 'kode_barang');
-            $db_col_name = array('c.kode_gudang', 'b.kode_klp', 'a.kode_barang');
+            $db_col_name = array('a.pabrik', 'a.kode_klp', 'a.kode_barang');
             $where = "where a.kode_lokasi='$kode_lokasi'";
 
             for ($i = 0; $i < count($col_array); $i++) {
@@ -629,6 +629,31 @@ class LaporanController extends Controller
                 }
             }
 
+            $col_array = array('periode');
+            $db_col_name = array('a.periode');
+            $where2 = "where a.kode_lokasi='$kode_lokasi'";
+
+            for ($i = 0; $i < count($col_array); $i++) {
+                if (isset($request->input($col_array[$i])[0])) {
+                    if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+                        $where2 .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+                    } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+                        $where2 .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+                    } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+                        $tmp = explode(",", $request->input($col_array[$i])[1]);
+                        for ($x = 0; $x < count($tmp); $x++) {
+                            if ($x == 0) {
+                                $this_in .= "'" . $tmp[$x] . "'";
+                            } else {
+
+                                $this_in .= "," . "'" . $tmp[$x] . "'";
+                            }
+                        }
+                        $where2 .= " and " . $db_col_name[$i] . " in ($this_in) ";
+                    }
+                }
+            }
+
             $nik_user = $nik . "_" . uniqid();
             $periode = $request->input('periode')[1];
             if ($periode == "") {
@@ -636,10 +661,10 @@ class LaporanController extends Controller
             }
 
             //  $sql1 = "exec sp_brg_stok '$periode','$kode_lokasi','$nik_user' ";
-            $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
+            // $sql2 = "exec sp_brg_stok_mutasi '$periode','$kode_lokasi','$nik_user' ";
             //  DB::connection($this->sql)->update($sql1);
-            DB::connection($this->sql)->update($sql2);
-            $success['exec'] = $sql2;
+            // DB::connection($this->sql)->update($sql2);
+            // $success['exec'] = $sql2;
 
             // $sql3 = "select distinct a.kode_barang,a.kode_gudang,a.stok,a.kode_lokasi,a.so_awal,a.debet,a.kredit,d.h_avg,d.h_avg*a.stok as nilai,b.sat_kecil, 
             //     b.nama as nama_barang,c.nama as nama_gudang
@@ -657,15 +682,36 @@ class LaporanController extends Controller
             //     inner join brg_hpp d on a.kode_lokasi=d.kode_lokasi and a.kode_barang=d.kode_barang
             //     $where
             //     order by a.kode_barang,a.kode_gudang";
-            $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,
-             b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total,isnull(a.so_awal,0) as so_awal,
-             isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit, b.hpp, (a.stok * b.hpp) as saldo_persediaan
-             from brg_stok a
-             inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
-             inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
-             left join brg_hpp d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.nik_user=d.nik_user
-             $where and a.nik_user='$nik_user'
-             order by b.kode_klp,a.kode_barang";
+            // $sql3 = "select a.kode_barang,b.nama as nama_barang,a.stok,a.kode_gudang,c.nama as nama_gudang,
+            //  b.kode_klp,isnull(d.h_avg,0) as harga, a.stok*isnull(d.h_avg,0) as total,isnull(a.so_awal,0) as so_awal,
+            //  isnull(a.debet,0) as debet,isnull(a.kredit,0) as kredit, b.hpp, (a.stok * b.hpp) as saldo_persediaan
+            //  from brg_stok a
+            //  inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
+            //  inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+            //  left join brg_hpp d on a.kode_barang=d.kode_barang and a.kode_lokasi=d.kode_lokasi and a.nik_user=d.nik_user
+            //  $where and a.nik_user='$nik_user'
+            //  order by b.kode_klp,a.kode_barang";
+
+            $sql3 = "select a.pabrik,a.kode_barang,a.nama, a.sat_kecil, 
+            isnull(b.jumlah,0) as sawal, 
+            isnull(b.harga,0) as hawal, 
+            isnull(b.jumlah,0) * isnull(b.harga,0) as nilai_sawal,
+            
+            isnull(c.masuk,0) as masuk, 
+            isnull(c.keluar,0) as keluar, 
+            isnull(b.jumlah,0) + isnull(c.masuk,0) - isnull(c.keluar,0) as sakhir 
+            
+            from brg_barang a 
+            left join brg_sawal b on a.kode_barang = b.kode_barang and b.kode_gudang=a.pabrik and a.kode_lokasi=b.kode_lokasi and b.periode ='$periode' 
+            left join ( 
+                        select kode_barang,kode_gudang,kode_lokasi
+                        ,sum(case dc when 'D' then jumlah else 0 end) as masuk 
+                        ,sum(case dc when 'C' then jumlah else 0 end) as keluar 
+                        from brg_trans_d 
+                        $where2
+                        group by kode_barang,kode_gudang,kode_lokasi
+                    ) c on a.kode_barang=c.kode_barang and a.pabrik=c.kode_gudang and a.kode_lokasi=c.kode_lokasi  
+            $where ";
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs), true);
