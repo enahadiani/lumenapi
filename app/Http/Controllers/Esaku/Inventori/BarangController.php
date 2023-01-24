@@ -53,7 +53,7 @@ class BarangController extends Controller
                 left join brg_barangklp c on a.kode_klp=c.kode_klp and a.kode_lokasi=c.kode_lokasi
                 where a.kode_lokasi='".$kode_lokasi."' and a.flag_aktif='1' and a.pabrik='$pabrik' $filter";
             }else{
-                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as kode_gudang,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barang where kode_lokasi= '".$kode_lokasi."' and pabrik='$pabrik'";
+                $sql = "select kode_barang,nama,sat_kecil as satuan,hna,pabrik as kode_gudang,flag_aktif,ss,sm1,sm2,mm1,mm2,fm1,fm2,kode_klp,case when file_gambar != '-' then '".$url."/'+file_gambar else '-' end as file_gambar,barcode,hrg_satuan,ppn,profit,case when datediff(minute,tgl_input,getdate()) <= 10 then 'baru' else 'lama' end as status,tgl_input from brg_barang where kode_lokasi= '".$kode_lokasi."' and pabrik='$pabrik' and flag_aktif='1'";
             }
 
             $res = DB::connection($this->sql)->select($sql);
