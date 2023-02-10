@@ -168,6 +168,7 @@ $router->group(['middleware' => 'auth:yptkug'], function () use ($router) {
     $router->get('buku-rka-list','Ypt\DashboardController@getListBukuRKA');
 
     //DASH PEMBENDAHARAAN
+    $router->get('data-pbh-periode', 'Ypt\DashboardPBHController@getPeriode');
     $router->get('data-pbh-box','Ypt\DashboardPBHController@getDataBox');
     $router->get('data-pbh-jenis-aju','Ypt\DashboardPBHController@getJenisPengajuan');
     $router->get('data-pbh-kas','Ypt\DashboardPBHController@getNilaiKas');

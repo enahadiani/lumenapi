@@ -54,7 +54,10 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
             }else{
@@ -71,8 +74,9 @@ class DashboardPBHController extends Controller
             from it_aju_m a
             inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi";
+            $success['sql'] = $sql;
             $select = DB::connection($this->db)->select($sql);
 
             $sqli = "select a.kode_lokasi,count(a.no_aju) as jml
@@ -88,7 +92,7 @@ class DashboardPBHController extends Controller
             inner join fiat_m b on a.no_fiat=b.no_fiat and a.kode_lokasi=b.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
             inner join ver_m d on a.no_ver=d.no_ver and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select2 = DB::connection($this->db)->select($sql2);
 
@@ -105,7 +109,7 @@ class DashboardPBHController extends Controller
             inner join it_spb_m b on a.no_spb=b.no_spb and a.kode_lokasi=b.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
             inner join fiat_m d on a.no_fiat=d.no_fiat and a.kode_lokasi=d.kode_lokasi
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select3 = DB::connection($this->db)->select($sql3);
 
@@ -122,7 +126,7 @@ class DashboardPBHController extends Controller
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
             inner join it_spb_m d on a.no_spb=d.no_spb and a.kode_lokasi=d.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi";
             $select4 = DB::connection($this->db)->select($sql4);
 
@@ -139,14 +143,14 @@ class DashboardPBHController extends Controller
             from it_aju_m a
             inner join kas_m b on a.no_kas=b.no_kas and a.kode_lokasi=b.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi ";
             $select7 = DB::connection($this->db)->select($sql7);
 
             $sql5 = "select a.kode_lokasi,sum(a.nilai) as nilai,count(a.no_aju) as jml
             from it_aju_m a
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi ";
             $select5 = DB::connection($this->db)->select($sql5);
 
@@ -161,7 +165,7 @@ class DashboardPBHController extends Controller
             $sql6 = "select a.kode_lokasi,count(a.no_aju) as jml
             from it_aju_m a
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' and progress='R' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' and progress='R' $filter_pp $filter_bidang
             group by a.kode_lokasi ";
             $select6 = DB::connection($this->db)->select($sql6);
 
@@ -211,7 +215,7 @@ class DashboardPBHController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = [];
-            $success['message'] = "Error ".$e;
+            $success['message'] = "Error ".$e->getMessage();
             return response()->json($success, $this->successStatus);
         }
     }
@@ -224,7 +228,9 @@ class DashboardPBHController extends Controller
             }
             
             
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
             }else{
@@ -244,7 +250,7 @@ class DashboardPBHController extends Controller
             from it_aju_m a
             inner join it_ajuapp_m b on a.no_aju=b.no_aju and a.kode_lokasi=b.kode_lokasi
             inner join agg_pp p on a.kode_pp=p.kode_pp and a.kode_lokasi=p.kode_lokasi and p.tahun='$tahun' 
-            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,1,4)='$tahun' $filter_pp $filter_bidang
+            where a.kode_lokasi='$kode_lokasi' and a.periode='$periode' $filter_pp $filter_bidang
             group by a.kode_lokasi,b.jenis
                 )a
             group by a.kode_lokasi";
@@ -290,7 +296,9 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun) - 1 ; 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
@@ -385,7 +393,10 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun) - 1 ; 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
@@ -542,7 +553,10 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun) - 1 ; 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
@@ -606,7 +620,10 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
             
-            $tahun = $r->tahun;
+            // $tahun = $r->tahun;
+            
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
             $tahun_seb = intval($tahun) - 1 ; 
             if(isset($r->kode_pp) && $r->kode_pp != ""){
                 $filter_pp = " and a.kode_pp='$r->kode_pp' ";
@@ -698,8 +715,11 @@ class DashboardPBHController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
+            
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
 
-            $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."'
+            $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".$tahun."'
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -738,7 +758,10 @@ class DashboardPBHController extends Controller
                 $filter = "";
             }
 
-            $res = DB::connection($this->db)->select("select kode_pp,nama from agg_pp where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."' $filter
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+
+            $res = DB::connection($this->db)->select("select kode_pp,nama from agg_pp where kode_lokasi='".$kode_lokasi."' and tahun='".$tahun."' $filter
             ");
             $res = json_decode(json_encode($res),true);
             
@@ -777,14 +800,17 @@ class DashboardPBHController extends Controller
                 $filter = "";
             }
 
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+
             if($status_admin == "A"){
-                $res = DB::connection($this->db)->select("select a.kode_pp,a.nama from agg_pp a where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."' $filter
+                $res = DB::connection($this->db)->select("select a.kode_pp,a.nama from agg_pp a where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".$tahun."' $filter
                 ");
             }else{
 
                 $res = DB::connection($this->db)->select("select distinct a.kode_pp,a.nama from agg_pp a
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
-                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."' $filter
+                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".$tahun."' $filter
                 ");
             }
 
@@ -820,9 +846,13 @@ class DashboardPBHController extends Controller
                 $status_admin = $data->status_admin;
             }
 
+            
+            $periode = $r->periode;
+            $tahun = substr($periode,0,4);
+
             if($status_admin == "A"){
 
-                $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".date('Y')."'
+                $res = DB::connection($this->db)->select("select kode_bidang,nama from agg_bidang where kode_lokasi='".$kode_lokasi."' and tahun='".$tahun."'
                 ");
             }else{
 
@@ -830,7 +860,7 @@ class DashboardPBHController extends Controller
                 from agg_pp a
                 inner join karyawan_pp b on a.kode_pp=b.kode_pp and a.kode_lokasi=b.kode_lokasi and b.nik='$nik_user'
                 left join agg_bidang c on a.kode_bidang=c.kode_bidang and a.kode_lokasi=c.kode_lokasi and a.tahun=c.tahun
-                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".date('Y')."'
+                where a.kode_lokasi='".$kode_lokasi."' and a.tahun='".$tahun."'
                 ");
             }
 
@@ -852,6 +882,43 @@ class DashboardPBHController extends Controller
         } catch (\Throwable $e) {
             $success['status'] = false;
             $success['data'] = "Error ".$e;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    public function getPeriode(){
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+			$sql="select  a.periode,dbo.fnNamaBulan(a.periode) as nama
+            from periode a
+            where a.kode_lokasi='$kode_lokasi'
+            order by a.periode desc";
+			$res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+
+            if(count($res) > 0){ 
+                $success['data'] = $res;
+                $success['status'] = true;
+                $success['message'] = "Success!";
+                return response()->json(['success'=>$success], $this->successStatus);     
+            }
+            else{
+                
+                $success['data'] = [];
+                $success['status'] = false;
+                $success['message'] = "Data Kosong!";
+                
+                return response()->json(['success'=>$success], $this->successStatus);
+            }
+
+        } catch (\Throwable $e) {
+            $success['data'] = [];
+            $success['status'] = false;
             $success['message'] = "Error ".$e;
             return response()->json($success, $this->successStatus);
         }
