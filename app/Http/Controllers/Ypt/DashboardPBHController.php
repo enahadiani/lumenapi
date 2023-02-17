@@ -707,7 +707,7 @@ class DashboardPBHController extends Controller
         }
     }
 
-    public function getBidang(Request $request)
+    public function getBidang(Request $r)
     {
         try {
             
@@ -744,7 +744,7 @@ class DashboardPBHController extends Controller
         
     }
 
-    public function getPP(Request $request)
+    public function getPP(Request $r)
     {
         try {
             
@@ -752,8 +752,8 @@ class DashboardPBHController extends Controller
                 $nik_user= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            if(isset($request->kode_bidang) && $request->kode_bidang != ""){
-                $filter = " and kode_bidang = '$request->kode_bidang' ";
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter = " and kode_bidang = '$r->kode_bidang' ";
             }else{
                 $filter = "";
             }
@@ -785,7 +785,7 @@ class DashboardPBHController extends Controller
         
     }
 
-    public function getPPKaryawan(Request $request)
+    public function getPPKaryawan(Request $r)
     {
         try {
             
@@ -794,8 +794,8 @@ class DashboardPBHController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
                 $status_admin = $data->status_admin;
             }
-            if(isset($request->kode_bidang) && $request->kode_bidang != ""){
-                $filter = " and a.kode_bidang = '$request->kode_bidang' ";
+            if(isset($r->kode_bidang) && $r->kode_bidang != ""){
+                $filter = " and a.kode_bidang = '$r->kode_bidang' ";
             }else{
                 $filter = "";
             }
@@ -836,7 +836,7 @@ class DashboardPBHController extends Controller
         
     }
 
-    public function getBidangKaryawan(Request $request)
+    public function getBidangKaryawan(Request $r)
     {
         try {
             
@@ -896,7 +896,7 @@ class DashboardPBHController extends Controller
             
 			$sql="select  a.periode,dbo.fnNamaBulan(a.periode) as nama
             from periode a
-            where a.kode_lokasi='$kode_lokasi'
+            where a.kode_lokasi='$kode_lokasi' and substring(a.periode,5,2) not in ('13','14','15','16')
             order by a.periode desc";
 			$res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
@@ -924,7 +924,7 @@ class DashboardPBHController extends Controller
         }
     }
 
-    public function getFilterDefaultDash(Request $request)
+    public function getFilterDefaultDash(Request $r)
     {
         try {
             
