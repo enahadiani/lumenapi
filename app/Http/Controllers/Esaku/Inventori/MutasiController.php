@@ -658,7 +658,8 @@ class MutasiController extends Controller {
     public function getDetailBarangMutasi(Request $request) {
         $this->validate($request, [            
             'kode_barang' => 'required',                             
-            'kode_gudang' => 'required',                             
+            'kode_gudang' => 'required', 
+            'periode' => 'required'
         ]);
 
         try {
@@ -669,6 +670,10 @@ class MutasiController extends Controller {
 
             $kode_barang = $request->kode_barang;
             $kode_gudang = $request->kode_gudang;
+            $periode = $request->periode;
+
+            $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
+            DB::connection($this->sql)->update($sql1);
 
             $sql = "select distinct a.nama,a.sat_kecil,b.stok
                 from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 

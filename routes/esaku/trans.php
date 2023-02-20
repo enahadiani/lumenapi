@@ -21,9 +21,9 @@ $router->options('{all:.*}', ['middleware' => 'cors', function () {
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Mutasi Barang//
     $router->get('generate-mutasi', 'Esaku\Inventori\MutasiController@handleNoBukti');
-    $router->get('filter-barang-mutasi', 'Esaku\Inventori\FilterController@getFilterBarangMutasi');
-    $router->get('filter-bukti-mutasi-kirim', 'Esaku\Inventori\FilterController@getFilterBuktiMutasiKirim');
-    $router->get('filter-bukti-mutasi-terima', 'Esaku\Inventori\FilterController@getFilterBuktiMutasiTerima');
+    $router->get('filter-barang-mutasi', 'Esaku\Keuangan\FilterController@getFilterBarangMutasi');
+    $router->get('filter-bukti-mutasi-kirim', 'Esaku\Keuangan\FilterController@getFilterBuktiMutasiKirim');
+    $router->get('filter-bukti-mutasi-terima', 'Esaku\Keuangan\FilterController@getFilterBuktiMutasiTerima');
     $router->get('barang-mutasi-detail', 'Esaku\Inventori\MutasiController@getDetailBarangMutasi');
     $router->get('barang-mutasi-kirim', 'Esaku\Inventori\MutasiController@getDataBarangMutasiKirim');
     $router->get('mutasi-terima', 'Esaku\Inventori\MutasiController@getDataMutasiTerima');
