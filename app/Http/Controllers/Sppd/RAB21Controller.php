@@ -183,7 +183,7 @@ class RAB21Controller extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select a.kode_pp,a.tgl_admin,a.nama,b.akun_bdd,a.nilai_or - isnull(c.beban,0) as saldo_or 
+            $sql = "select a.kode_pp,a.tgl_admin,a.nama,b.akun_bdd,a.nilai_or - isnull(c.beban,0) as saldo_or,a.pp_rab 
             from prb_proyek a 			             
                inner join prb_proyek_jenis b on a.kode_jenis=b.kode_jenis and a.kode_lokasi=b.kode_lokasi 			            						 
                left join ( 			             
@@ -324,6 +324,7 @@ class RAB21Controller extends Controller
                     $akunBDD = $line['akun_bdd'];
                     $akun_beban = $akunBDD;
                     $tgladm = $line['tgl_admin'];
+                    $pp_rab = $line['pp_rab'];
     
                     $date1=date_create($tgladm);
                     $date2=date_create($datam['tanggal']);
@@ -399,7 +400,7 @@ class RAB21Controller extends Controller
                                         $sts = false;
                                         DB::connection($this->db)->rollback();
                                     }else{
-                                        $ins = DB::connection($this->db)->insert("insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,no_ref1,dasar) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','UMUM','".$akun_beban."','".$ppKelola."','-','".$datam['kode_proyek']." | ".$datam['keterangan']."',".floatval($total_netto).",getdate(),'".$nik."','-','-','-','A','-','-','".$datam['user_input']."','NTF19','".$datam['status_pajak']."',".floatval($total_pajak).",'-','".$datam['kode_pp']."')");				
+                                        $ins = DB::connection($this->db)->insert("insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,no_ref1,dasar,no_kpa) values ('".$no_bukti."','".$kode_lokasi."','".$periode."','".$datam['tanggal']."','UMUM','".$akun_beban."','".$ppKelola."','-','".$datam['kode_proyek']." | ".$datam['keterangan']."',".floatval($total_netto).",getdate(),'".$nik."','-','-','-','A','-','-','".$datam['user_input']."','NTF19','".$datam['status_pajak']."',".floatval($total_pajak).",'-','".$datam['kode_pp']."','$pp_rab')");				
                                         
                                         $nilaiBeban = floatval($total_bruto);						
                                         $ins2 = DB::connection($this->db)->insert("insert into it_aju_d (no_aju,no_dokumen,tanggal,no_urut,kode_akun,keterangan,dc,kode_curr,kurs,nilai_curr,nilai,kode_pp,kode_drk,kode_lokasi,modul,jenis,periode,nik_user,tgl_input,akun_seb) values ('".$no_bukti."','-','".$datam['tanggal']."',0,'".$akun_beban."','".$datam['kode_proyek']." | ".$datam['keterangan']."','D','IDR',1,".$nilaiBeban.",".$nilaiBeban.",'".$ppKelola."','-','".$kode_lokasi."','NTF19','BEBAN','".$periode."','".$nik."',getdate(),'-')");		
