@@ -28,8 +28,9 @@ class DashboardController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $res = DB::connection($this->db)->select("select periode,dbo.fnNamaBulan(periode) as nama from periode
-            where kode_lokasi=?
+            $res = DB::connection($this->db)->select("select periode,dbo.fnNamaBulan(periode) as nama 
+            from periode
+            where kode_lokasi=? and substring(periode,5,2) not in ('13','14','15','16')
             order by periode desc
             ",[$kode_lokasi]);
             $res = json_decode(json_encode($res),true);
