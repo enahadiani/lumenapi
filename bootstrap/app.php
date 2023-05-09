@@ -979,4 +979,40 @@ $app->router->group([
     require __DIR__ . '/../routes/ui3/api.php';
 });
 
+// DASH ITPLN
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-itpln'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-itpln/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-itpln-master'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-itpln/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-itpln-trans'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-itpln/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-itpln-report'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-itpln/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/dash-itpln-dash'
+], function ($router) {
+    require __DIR__ . '/../routes/dash-itpln/dash.php';
+});
+
 return $app;

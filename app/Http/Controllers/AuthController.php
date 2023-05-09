@@ -227,6 +227,23 @@ class AuthController extends Controller
         return $this->respondWithToken($token, 'tarbak');
     }
 
+    public function loginItpln(Request $request)
+    {
+        //validate incoming request
+        $this->validate($request, [
+            'nik' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        $credentials = $request->only(['nik', 'password']);
+
+        if (!$token = Auth::guard('itpln')->setTTL(1440)->attempt($credentials)) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        return $this->respondWithToken($token, 'itpln');
+    }
+
     public function loginSiswa(Request $request)
     {
         //validate incoming request

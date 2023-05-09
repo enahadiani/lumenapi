@@ -98,6 +98,10 @@ return [
         'ui3' => [
             'driver' => 'jwt',
             'provider' => 'ui3',
+        ],
+        'itpln' => [
+            'driver' => 'jwt',
+            'provider' => 'itpln',
         ]
     ],
 
@@ -189,6 +193,10 @@ return [
         'ui3' => [
             'driver' => 'eloquent',
             'model' => \App\AdminUi3::class
+        ],
+        'itpln' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminItpln::class
         ]
     ]
 ];
