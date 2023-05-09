@@ -73,7 +73,7 @@ class DashboardController extends Controller
                 sum(case when a.kode_grafik = 'DB04' then (case when b.jenis_akun ='Pendapatan' then -b.n4 else b.n4 end) else 0 end) as labarugi
             from db_grafik_d a
             inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_grafik in ('DB02','DB03','DB04') and b.periode=? and a.kode_lokasi=?
+            where a.kode_grafik in ('DB02','DB03','DB04') and b.periode=? and a.kode_lokasi=? and a.kode_fs='FS1'
 
             ",[$r->input('periode'),$kode_lokasi]);
 
@@ -86,7 +86,7 @@ class DashboardController extends Controller
                    sum(case when a.kode_grafik = 'DB04' then (case when b.jenis_akun ='Pendapatan' then -b.n4 else b.n4 end) else 0 end) as labarugi
             from db_grafik_d a
             inner join exs_neraca b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
-            where a.kode_grafik in ('DB02','DB03','DB04') and b.periode=? and a.kode_lokasi=?
+            where a.kode_grafik in ('DB02','DB03','DB04') and b.periode=? and a.kode_lokasi=? and a.kode_fs='FS1'
 
             ",[$periodelalu,$kode_lokasi]);
 
@@ -106,9 +106,12 @@ class DashboardController extends Controller
             $success['data'] = [
                 'pdpt' => $pdpt,
                 'yoy_pdpt' => $pdptyoy,
+                'pdpt_lalu' => $pdptlalu,
                 'beban' => $beban,
+                'beban_lalu' => $bebanlalu,
                 'yoy_beban' => $bebanyoy,
                 'labarugi' => $labarugi,
+                'labarugi_lalu' => $labarugilalu,
                 'yoy_labarugi' => $labarugiyoy
             ];
             $success['message'] = "Success!";
@@ -245,7 +248,7 @@ class DashboardController extends Controller
             from exs_neraca a
             inner join db_grafik_d b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             inner join db_grafik_m c on b.kode_grafik=c.kode_grafik and b.kode_lokasi=c.kode_lokasi 
-            where a.kode_lokasi = ? and substring(a.periode,1,4) = ? and c.kode_grafik in ('DB02','DB03','DB04')
+            where a.kode_lokasi = ? and substring(a.periode,1,4) = ? and c.kode_grafik in ('DB02','DB03','DB04') and a.kode_fs='FS1'
             group by a.kode_neraca,c.nama,case when c.kode_grafik = 'DB04' then 'spline' else 'column' end,case when c.kode_grafik = 'DB04' then 1 else 0 end
             order by a.kode_neraca", [$kode_lokasi, substr($r->input('periode'),0,4)]);
             $res = json_decode(json_encode($res),true);
@@ -309,7 +312,7 @@ class DashboardController extends Controller
             from db_grafik_d a 
             inner join relakun b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             inner join exs_glma c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
-            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=? 
+            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=? and a.kode_fs='FS1'
             union all
             select 'Uang Keluar' as nama,'column' as tipe,0 as yAxis,
                 sum(case when substring(c.periode,5,2)='01' then c.kredit else 0 end) as n1,
@@ -327,7 +330,7 @@ class DashboardController extends Controller
             from db_grafik_d a 
             inner join relakun b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             inner join exs_glma c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
-            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=? 
+            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=?  and a.kode_fs='FS1'
             union all
             select 'Saldo Uang', 'spline' as tipe,1 as yAxis,
                 sum(case when substring(c.periode,5,2)='01' then c.so_akhir else 0 end) as n1,
@@ -345,7 +348,7 @@ class DashboardController extends Controller
             from db_grafik_d a 
             inner join relakun b on a.kode_neraca=b.kode_neraca and a.kode_lokasi=b.kode_lokasi and a.kode_fs=b.kode_fs
             inner join exs_glma c on b.kode_akun=c.kode_akun and b.kode_lokasi=c.kode_lokasi
-            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=? ", 
+            where a.kode_grafik='DB01' and substring(c.periode,1,4)=? and a.kode_lokasi=? and a.kode_fs='FS1' ", 
             [substr($r->input('periode'),0,4), $kode_lokasi, substr($r->input('periode'),0,4), $kode_lokasi,substr($r->input('periode'),0,4), $kode_lokasi]);
             $res = json_decode(json_encode($res),true);
             
