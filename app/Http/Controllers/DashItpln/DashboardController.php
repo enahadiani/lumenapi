@@ -152,7 +152,7 @@ class DashboardController extends Controller
                         group by a.kode_rasio, a.kode_lokasi, a.nama, b.kode_neraca, c.nama, a.rumus, b.no
                 ) a
             left join (
-                    select a.kode_rasio,a.kode_neraca,a.kode_lokasi,sum(case when b.jenis_akun ='Pendapatan' then -b.n4 else b.n4 end) as nilai
+                    select a.kode_rasio,a.kode_neraca,a.kode_lokasi,sum(case when b.jenis_akun ='Pendapatan' then -b.n4 else (case when b.modul='P' then -b.n4 else b.n4 end) end) as nilai
                     from db_rasio_d a
                     inner join db_rasio_m c on a.kode_rasio=c.kode_rasio and a.kode_lokasi=c.kode_lokasi
                     inner join exs_neraca b on a.kode_lokasi=b.kode_lokasi and a.kode_neraca=b.kode_neraca and c.kode_fs=b.kode_fs
