@@ -177,7 +177,7 @@ class ProfilPerusahaanController extends Controller {
 
             if(count($request->misi) > 0) {
                 for($i=0;$i<count($request->misi);$i++) {
-                    DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','$request->misi[$i]',$i)");
+                    DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','".$request->misi[$i]."',$i)");
                 }
             }
 
