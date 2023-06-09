@@ -98,7 +98,7 @@ $router->group(['middleware' => 'auth:admginas'], function () use ($router) {
     $router->get('layanan','AdmGinas\LayananController@index');
     $router->get('layanan-detail','AdmGinas\LayananController@show');
     $router->post('layanan','AdmGinas\LayananController@store');
-    $router->post('layanan','AdmGinas\LayananController@update');
+    $router->put('layanan','AdmGinas\LayananController@update');
     // $router->delete('layanan','Wisata\CamatController@destroy');    
 });
     $router->get('banner-web','AdmGinas\BannerController@show');
