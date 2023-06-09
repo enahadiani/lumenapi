@@ -163,21 +163,21 @@ class ProfilPerusahaanController extends Controller {
                 }
             }
             
-            if(count($request->no_urut) > 0) {
-                for($i=0;$i<count($request->no_urut);$i++) {
-                    $arr_no_urut[] = $request->no_urut[$i]; 
-                    $arr_misi[] = $request->misi[$i]; 
-                }
-            }
+            // if(count($request->no_urut) > 0) {
+            //     for($i=0;$i<count($request->no_urut);$i++) {
+            //         $arr_no_urut[] = $request->no_urut[$i]; 
+            //         $arr_misi[] = $request->misi[$i]; 
+            //     }
+            // }
 
             DB::connection($this->db)->table('lab_profil_perusahaan')->where('kode_lokasi', $kode_lokasi)->delete();
             DB::connection($this->db)->table('lab_profil_perusahaan_detail')->where('kode_lokasi', $kode_lokasi)->delete();
 
             DB::connection($this->db)->insert("insert into lab_profil_perusahaan(id_perusahaan,nama_perusahaan,koordinat,kode_lokasi,file_gambar,visi,alamat,deskripsi,no_telp,email,link_wa,no_fax) values ('$kode','$nama','$koordinat','$kode_lokasi','$foto','$visi','$alamat','$deskripsi','$telp','$email','$wa','$fax')");
 
-            if(count($arr_no_urut) > 0) {
-                for($i=0;$i<count($arr_no_urut);$i++) {
-                    DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','$arr_misi[$i]','$arr_no_urut[$i]')");
+            if(count($request->misi) > 0) {
+                for($i=0;$i<count($request->misi);$i++) {
+                    DB::connection($this->db)->insert("insert into lab_profil_perusahaan_detail(kode_lokasi,id_perusahaan,misi,no_urut) values ('$kode_lokasi','$kode','$request->misi[$i]',$i)");
                 }
             }
 
