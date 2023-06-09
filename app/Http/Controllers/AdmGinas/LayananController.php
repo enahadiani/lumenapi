@@ -187,7 +187,7 @@ class LayananController extends Controller
         
     }
 
-    public function show($id)
+    public function show(Request $r)
     {
         try {
             
@@ -196,7 +196,7 @@ class LayananController extends Controller
                 $kode_lokasi= $data->kode_lokasi;
             }
 
-            $sql = "select id_layanan,nama_layanan from lab_layanan where kode_lokasi= '".$kode_lokasi."' and id_layanan = '".$id."'";
+            $sql = "select id_layanan,nama_layanan from lab_layanan where kode_lokasi= '".$kode_lokasi."' and id_layanan = '".$r->id_layanan."'";
 
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
