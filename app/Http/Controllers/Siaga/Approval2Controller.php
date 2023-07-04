@@ -233,7 +233,7 @@ class Approval2Controller extends Controller
                 $progapp_akhir = "S";
                 $col_nik = "nik_user";
                 $col_nobukti = "no_spb";
-                $email = "email-siaga-pb";
+                $email = "email-siaga-spb";
             }
 
             // $periode = substr($request->tanggal,0,4).substr($request->tanggal,5,2);
