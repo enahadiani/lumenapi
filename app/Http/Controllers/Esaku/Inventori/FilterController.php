@@ -120,7 +120,7 @@ class FilterController extends Controller
             }
 
             $where = $where == "" ? "" : "where ".substr($where,4);
-            $sql="select a.kode_vendor,a.nama
+            $sql="select kode_vendor,nama
             from vendor 
             $where";
             $res = DB::connection($this->db)->select($sql);
