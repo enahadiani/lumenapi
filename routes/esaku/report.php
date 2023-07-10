@@ -52,6 +52,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-kontrol-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiKontrolMutasi');
     $router->get('filter-pp-keu','Esaku\Keuangan\FilterController@getFilterPP');
 
+    
+    $router->get('filter-lokasi','Esaku\Inventori\FilterController@getFilterLokasi');
+    $router->get('filter-default','Esaku\Inventori\FilterController@getFilterDefault');
     //Laporan
     $router->get('lap-barang','Esaku\Inventori\LaporanController@getReportBarang');
     $router->get('lap-closing','Esaku\Inventori\LaporanController@getReportClosing');
@@ -63,6 +66,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-retur-jual','Esaku\Inventori\LaporanController@getReportReturJual');
     $router->get('lap-kartu-stok','Esaku\Inventori\LaporanController@getKartuStok');
     $router->get('lap-stok','Esaku\Inventori\LaporanController@getStok');
+    $router->get('lap-posisi-stok','Esaku\Inventori\LaporanController@getPosisiStok');
     $router->get('lap-saldo-stok','Esaku\Inventori\LaporanController@getLapSaldoStok');
     $router->get('lap-nota-jual','Esaku\Inventori\LaporanController@getNotaPnj');
     $router->get('lap-rekap-jual','Esaku\Inventori\LaporanController@getReportRekapPenjualan');

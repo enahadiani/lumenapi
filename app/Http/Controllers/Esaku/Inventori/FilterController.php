@@ -49,6 +49,75 @@ class FilterController extends Controller
         
     }
 
+    public function getFilterLokasi(){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $sql="select kode_lokasi,nama from lokasi where kode_lokasi='$kode_lokasi' ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+    function getFilterDefault(Request $request)
+    {
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $periode = "-";
+            $kode_gudang = "-";
+
+            $sql="select max(periode) as periode from periode where kode_lokasi='".$kode_lokasi."' ";
+            $res = DB::connection($this->db)->select($sql);
+            if(count($res) > 0){
+                $periode = $res[0]->periode;
+            }
+
+            $sql="select pabrik from hakakses where nik='$nik' and kode_lokasi='".$kode_lokasi."' ";
+            $res = DB::connection($this->db)->select($sql);
+            if(count($res) > 0){
+                $kode_gudang = $res[0]->pabrik;
+            }
+
+            $success['status'] = true;
+            $success['kode_lokasi'] = $kode_lokasi;
+            $success['periode'] = $periode;
+            $success['kode_gudang'] = $kode_gudang;
+            $success['message'] = "Success!";
+            return response()->json($success, $this->successStatus);     
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+        
+    }
+
+
     public function getFilterNIKRetur(Request $request){
         try {
             

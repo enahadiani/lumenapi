@@ -738,6 +738,69 @@ class LaporanController extends Controller
         }
     }
 
+    function getPosisiStok(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $nik_user = $nik . "_" . uniqid();
+            $periode = $request->input('periode')[1];
+            $kode_lokasi = isset($request->kode_lokasi) && $request->kode_lokasi[1] != "" ? $request->input('kode_lokasi')[1] : $kode_lokasi;
+            $kode_gudang = $request->input('kode_gudang')[1];
+            if ($periode == "") {
+                $periode = date('Ym');
+            }
+
+            $sql1 = "exec sp_brg_stok_gudang_bulan '$kode_gudang', '$periode','$kode_lokasi', '$nik_user';";
+            $sql2 = "exec sp_brg_hpp_periodik '$periode','$kode_lokasi','$nik_user','$kode_gudang';";
+
+            $sqlex="SET NOCOUNT ON; ".$sql1;
+            $dbh = DB::connection($this->sql)->getPdo();
+            $sth = $dbh->prepare($sqlex);
+            $sth->execute();
+
+            $sqlex2="SET NOCOUNT ON; ".$sql2;
+            $dbh = DB::connection($this->sql)->getPdo();
+            $sth = $dbh->prepare($sqlex2);
+            $sth->execute();
+
+            $sql3 = "select a.kode_barang,c.nama,a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
+                round(a.stok * b.h_avg,0) as nilai_stok
+            from brg_stok a
+            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik
+            inner join brg_gudang d on a.kode_gudang=d.kode_gudang
+            left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
+            where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang'";
+
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs), true);
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportPenjualan(Request $request)
     {
         try {
