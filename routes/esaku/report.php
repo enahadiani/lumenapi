@@ -51,7 +51,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiMutasi');
     $router->get('filter-bukti-kontrol-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiKontrolMutasi');
     $router->get('filter-pp-keu','Esaku\Keuangan\FilterController@getFilterPP');
-    $router->get('filter-vendor','Esaku\Keuangan\FilterController@getFilterVendor');
+    $router->get('filter-vendor','Esaku\Inventori\FilterController@getFilterVendor');
     
     $router->get('filter-lokasi','Esaku\Inventori\FilterController@getFilterLokasi');
     $router->get('filter-default','Esaku\Inventori\FilterController@getFilterDefault');
