@@ -801,6 +801,84 @@ class LaporanController extends Controller
         }
     }
 
+    function getSaldoHutang(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $col_array = array('kode_gudang', 'kode_lokasi', 'periode', 'a.kode_vendor');
+            $db_col_name = array('a.kode_gudang', 'a.kode_lokasi', 'a.periode', 'a.kode_vendor');
+            $where = "";
+
+            for ($i = 0; $i < count($col_array); $i++) {
+                if (isset($request->input($col_array[$i])[0])) {
+                    if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+                        $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+                    } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+                        $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+                    } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+                        $tmp = explode(",", $request->input($col_array[$i])[1]);
+                        for ($x = 0; $x < count($tmp); $x++) {
+                            if ($x == 0) {
+                                $this_in .= "'" . $tmp[$x] . "'";
+                            } else {
+
+                                $this_in .= "," . "'" . $tmp[$x] . "'";
+                            }
+                        }
+                        $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
+                    }
+                }
+            }
+
+            $where = $where == "" ? $where : "where ".substr($where,4);
+            $kode_lokasi = isset($request->kode_lokasi) && $request->kode_lokasi[1] != "" ? $request->input('kode_lokasi')[1] : $kode_lokasi;
+            $filter_jenis = "";
+            if(isset($request->jenis[1]) && $request->jenis[1] == "Saldo"){
+                $filter_jenis = " and a.nilai+nilai_ppn-isnull(b.bayar_tot,0) >0 ";
+            }
+
+            $sql3 = "select a.kode_gudang,d.nama,a.no_beli,a.tanggal,c.nama as vendor,a.nilai,a.nilai_ppn, a.nilai+a.nilai_ppn as total, isnull(b.bayar_tot,0) as bayar,  
+            a.nilai+nilai_ppn-isnull(b.bayar_tot,0) as saldo_hutang
+            from brg_belihut_d a 
+            inner join vendor c on a.kode_vendor=c.kode_vendor and a.kode_lokasi=c.kode_lokasi
+            inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
+            left join (select no_beli,kode_lokasi,sum(case dc when 'D' then nilai else -nilai end) as bayar_tot
+                      from brg_belibayar_d 
+                      where kode_lokasi ='$kode_lokasi'
+                      group by no_beli,kode_lokasi) b on a.no_beli=b.no_beli and a.kode_lokasi=b.kode_lokasi
+            $where $filter_jenis
+            order by c.nama";
+
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs), true);
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportPenjualan(Request $request)
     {
         try {
