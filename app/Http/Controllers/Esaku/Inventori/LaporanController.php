@@ -54,8 +54,8 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $col_array = array('periode', 'tanggal', 'nik_kasir');
-            $db_col_name = array('a.periode', 'a.tanggal', 'a.nik_user');
+            $col_array = array('periode', 'tanggal', 'nik_kasir','gudang');
+            $db_col_name = array('a.periode', 'a.tanggal', 'a.nik_user','a.kode_gudang');
 
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
@@ -101,6 +101,35 @@ class LaporanController extends Controller
                 $i++;
             }
 
+            $sql4 = "select a.kode_gudang 
+            from brg_jualpiu_dloc a 
+            $where
+            group by a.kode_gudang";
+            $rs4 = DB::connection($this->sql)->select($sql4);
+            $res4 = json_decode(json_encode($rs4), true);
+
+            $gudang = "";
+            $resdata = array();
+            $i = 0;
+            foreach ($rs4 as $row) {
+
+                $resdata[] = (array)$row;
+                if ($i == 0) {
+                    $gudang .= "'$row->kode_gudang'";
+                } else {
+                    $gudang .= "," . "'$row->kode_gudang'";
+                }
+                $i++;
+            }
+
+            $sql5 = "select a.nik_user, a.kode_gudang
+            from brg_jualpiu_dloc a 
+            $where
+            group by a.nik_user, a.kode_gudang
+            order by a.kode_gudang asc, a.nik_user asc";
+            $rs5 = DB::connection($this->sql)->select($sql5);
+            $res5 = json_decode(json_encode($rs5), true);
+
             if (count($res) > 0) {
                 $tgl_filter = null;
                 if ($request->input($col_array[1])[0] == "=" && isset($request->input($col_array[1])[1])) {
@@ -111,10 +140,10 @@ class LaporanController extends Controller
 
                 $sql3 = "select a.tanggal 
                 from brg_jualpiu_dloc a 
-                where a.kode_lokasi = '" . $kode_lokasi . "' and  a.nik_user in ($kasir) and a.periode = '" . $request->input($col_array[0])[1] . "'
+                where a.kode_lokasi = '" . $kode_lokasi . "' and  a.nik_user in ($kasir) and a.kode_gudang in ($gudang) and a.periode = '" . $request->input($col_array[0])[1] . "'
                 $tgl_filter
-                group by a.tanggal";
-                $rs3 = DB::connection($this->sql)->select($sql3);
+                group by a.tanggal";    
+                $rs3 = DB::connection($this->sql)->select($sql3);   
                 $res3 = json_decode(json_encode($rs3), true);
 
                 $tgl = "";
@@ -132,10 +161,10 @@ class LaporanController extends Controller
             }
 
             if (count($res3) > 0) {
-                $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.tanggal as tgl, a.nik_user as kasir,
+                $sql2 = "select CONVERT(varchar,a.tanggal,103) as tanggal, a.tanggal as tgl, a.nik_user as kasir, a.kode_gudang,
                 sum(c.total) as total, sum(c.ppn) as ppn, sum(c.hpp) as hpp, count(a.no_jual) as struk,
                 (sum(c.total) - sum(c.ppn)) as bersih, isnull(sum(d.brg_pajak),0) as brg_pajak, 
-                isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, '0' as margin, '0' as rata, '0' as persen
+            isnull(sum(e.brg_non_pajak),0) as brg_non_pajak, (sum(c.total) - sum(c.ppn))-(sum(c.hpp)) as margin, '0' as rata, ((sum(c.total) - sum(c.ppn))-(sum(c.hpp)))/(sum(c.total) - sum(c.ppn))*100 as persen
                 from brg_jualpiu_dloc a
                 left join (
                 select no_bukti, kode_lokasi, isnull(sum(total),0) as total, 
@@ -156,8 +185,8 @@ class LaporanController extends Controller
                     where kode_lokasi = '" . $kode_lokasi . "' and form='BRGJUAL' and ppn = 0
                     group by no_bukti, kode_lokasi
                 ) e on a.kode_lokasi=e.kode_lokasi and a.no_jual=e.no_bukti
-                where a.kode_lokasi = '" . $kode_lokasi . "' and a.tanggal in ($tgl) and a.nik_user in ($kasir)
-                group by a.tanggal, a.nik_user
+                where a.kode_lokasi = '" . $kode_lokasi . "' and a.tanggal in ($tgl) and a.nik_user in ($kasir) and a.kode_gudang in ($gudang)
+                group by a.tanggal, a.nik_user, a.kode_gudang
                 order by a.tanggal asc";
 
                 $res2 = DB::connection($this->sql)->select($sql2);
@@ -166,8 +195,9 @@ class LaporanController extends Controller
 
             if (count($res) > 0) { //mengecek apakah data kosong atau tidak
                 $success['status'] = true;
-                $success['data'] = $res;
+                $success['data'] = $res5;
                 $success['data_detail'] = $res2;
+                $success['gudang'] = $res3;
                 $success['message'] = "Success!";
                 $success["auth_status"] = 1;
 

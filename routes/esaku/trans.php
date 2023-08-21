@@ -502,11 +502,38 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('inv-hitung-hpp', 'Esaku\Inventori\HppController@store');
     $router->post('inv-hitung-hpp-update', 'Esaku\Inventori\HppController@update');
     $router->delete('inv-hitung-hpp', 'Esaku\Inventori\HppController@destroy');
-
+    
     //Retur Penjualan
     $router->get('retur-jual-bukti', 'Esaku\Inventori\ReturPenjualanController@getPenjualan');
     $router->get('retur-jual-detail', 'Esaku\Inventori\ReturPenjualanController@show');
     $router->post('retur-jual', 'Esaku\Inventori\ReturPenjualanController@store');
+    
+    //Pembayaran Pembelian
+    $router->get('bayar-beli', 'Esaku\Inventori\PembayaranPembelianController@index');
+    $router->get('bayar-beli-nobukti', 'Esaku\Inventori\PembayaranPembelianController@GenerateBukti');
+    $router->get('bayar-beli-vendor', 'Esaku\Inventori\PembayaranPembelianController@getVendor');
+    $router->get('bayar-beli-detail', 'Esaku\Inventori\PembayaranPembelianController@getDetailPembelian');
+    $router->post('bayar-beli', 'Esaku\Inventori\PembayaranPembelianController@store');
+    $router->delete('bayar-beli', 'Esaku\Inventori\PembayaranPembelianController@destroy');
+
+    //Pembelian (PPn)
+    $router->get('pembelian3-ppn', 'Esaku\Inventori\PembelianPPnController@index');
+    $router->get('pembelian3-ppn-detail', 'Esaku\Inventori\PembelianPPnController@show');
+    $router->post('pembelian3-ppn', 'Esaku\Inventori\PembelianPPnController@store');
+    $router->put('pembelian3-ppn', 'Esaku\Inventori\PembelianPPnController@update');
+    $router->delete('pembelian3-ppn', 'Esaku\Inventori\PembelianPPnController@destroy');
+    $router->get('pembelian3-ppn-nota', 'Esaku\Inventori\PembelianPPnController@getNota');
+    $router->get('pembelian3-ppn-barang', 'Esaku\Inventori\PembelianPPnController@getBarang');
+
+    //Pembelian (Non PPn)
+    $router->get('pembelian3-non', 'Esaku\Inventori\PembelianNonPPn2Controller@index');
+    $router->get('pembelian3-non-detail', 'Esaku\Inventori\PembelianNonPPn2Controller@show');
+    $router->post('pembelian3-non', 'Esaku\Inventori\PembelianNonPPn2Controller@store');
+    $router->put('pembelian3-non', 'Esaku\Inventori\PembelianNonPPn2Controller@update');
+    $router->delete('pembelian3-non', 'Esaku\Inventori\PembelianNonPPn2Controller@destroy');
+    $router->get('pembelian3-non-nota', 'Esaku\Inventori\PembelianNonPPn2Controller@getNota');
+    $router->get('pembelian3-non-barang', 'Esaku\Inventori\PembelianNonPPn2Controller@getBarang');
+
 });
 
 $router->post('select-query', 'Esaku\Inventori\Sync2Controller@selectQuery');
