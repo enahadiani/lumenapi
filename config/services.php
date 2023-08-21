@@ -42,6 +42,11 @@ return [
     'api' => [
         'doc_url_siaga' => env('DOC_URL_SIAGA'),
         'redirect_email_url_siaga' => env('REDIRECT_EMAIL_URL_SIAGA')
+    ],
+    'civitax' => [
+        'sso_auth_url' => env('CIVITAX_SSO_AUTH_URL'),
+        'sso_role_url' => env('CIVITAX_SSO_ROLE_URL'),
+        'sso_profile_url' => env('CIVITAX_SSO_PROFILE_URL'),
     ]
 
 ];

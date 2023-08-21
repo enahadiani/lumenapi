@@ -228,6 +228,16 @@ return [
             'password' => env('DB_PASSWORDpln', ''),
             'charset' => 'utf8',
             'prefix' => '',
+        ],
+        'dbsimkug' => [
+            'driver' => env('DB_CONNECTIONsimkug', 'sqlsrv'),
+            'host' => env('DB_HOSTsimkug', 'localhost'),
+            'port' => env('DB_PORTsimkug', '1433'),
+            'database' => env('DB_DATABASEsimkug', 'forge'),
+            'username' => env('DB_USERNAMEsimkug', 'forge'),
+            'password' => env('DB_PASSWORDsimkug', ''),
+            'charset' => 'utf8',
+            'prefix' => '',
         ]
 
     ],

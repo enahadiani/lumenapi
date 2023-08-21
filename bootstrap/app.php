@@ -124,6 +124,7 @@ $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
     'cors' => App\Http\Middleware\CorsMiddleware::class,
     'jwt.portal' => App\Http\Middleware\JwtMiddleware::class,
+    'XSS' => App\Http\Middleware\XSS::class,
 ]);
 
 
@@ -1014,5 +1015,43 @@ $app->router->group([
 ], function ($router) {
     require __DIR__ . '/../routes/dash-itpln/dash.php';
 });
+
+
+//SIMKUG
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simkug-auth'
+], function ($router) {
+    require __DIR__ . '/../routes/simkug/auth.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simkug-master'
+], function ($router) {
+    require __DIR__ . '/../routes/simkug/master.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simkug-trans'
+], function ($router) {
+    require __DIR__ . '/../routes/simkug/trans.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simkug-report'
+], function ($router) {
+    require __DIR__ . '/../routes/simkug/report.php';
+});
+
+$app->router->group([
+    'namespace' => 'App\Http\Controllers',
+    'prefix' => 'api/simkug-dash'
+], function ($router) {
+    require __DIR__ . '/../routes/simkug/dash.php';
+});
+
 
 return $app;

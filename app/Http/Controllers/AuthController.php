@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 
 use  App\User;
 use  App\Admin;
@@ -18,6 +20,7 @@ use  App\AdminSilo;
 use  App\AdminAset;
 use  App\AdminBangtel;
 use App\AdminNewSilo;
+use App\AdminSimkug;
 
 class AuthController extends Controller
 {
@@ -291,6 +294,111 @@ class AuthController extends Controller
 
         return $this->respondWithToken($token, 'siswa');
     }
+
+      // login with sso
+      public function loginSimkug(Request $request)
+      {
+            //validate incoming request 
+          $this->validate($request, [
+              'nik' => 'required|alpha_num',
+              'password' => 'required|regex:/^[^()]+$/',
+          ]);
+  
+          $credentials = $request->only(['nik', 'password']);
+          try{
+              $extra_data = [];
+              $client = new Client();
+              $response = $client->request('POST',  config('services.civitax.sso_auth_url'), [
+                  'form_params' => [
+                      'username' => $request->input('nik'),
+                      'password' => $request->input('password')
+                  ]
+              ]);
+              if ($response->getStatusCode() == 200) { // 200 OK
+                  $response_data = $response->getBody()->getContents();
+                  $data = json_decode($response_data,true);
+                  $extra_data['sso_auth'] = $data;
+              }
+  
+              if(isset($data['token']) && $data['token'] != ''){
+  
+                  $client2 = new Client();
+                  $response2 = $client2->request('GET',  config('services.civitax.sso_profile_url'),[
+                      'headers' => [
+                          'Authorization' => 'Bearer '.$data['token']
+                      ]
+                  ]);
+                  if ($response2->getStatusCode() == 200) {
+                      $response2_data = $response2->getBody()->getContents();
+                      $data2 = json_decode($response2_data,true);
+                      $extra_data['profile'] = $data2;
+                  }
+  
+                  // dd($data2);
+                  $user = AdminSimkug::where('nik','=',$data2['numberid'])->first();
+  
+                  if(is_null($user)){
+                      return response()->json(['message' => 'Unauthorized. Username belum terdaftar','status'=>false], 401);   
+                  }else{
+                      if (! $token = Auth::guard('simkug')->setTTL(1440)->fromUser($user)) {
+                          return response()->json(['message' => 'Unauthorized','status' => false], 401);
+                      }else{
+                          if (isset($request->id_device)) {
+                              $kode_lokasi = $user->kode_lokasi;
+                              $nik = $user->nik;
+                              $cek = DB::connection('dbsimkug')->select("select count(id_device) as jum from users_device where nik=?  ",[$nik]);
+                              if (count($cek) > 0) {
+                                  $nu = intval($cek[0]->jum) + 1;
+                              } else {
+                                  $nu = 1;
+                              }
+              
+                              $get = DB::connection('dbsimkug')->select("select count(id_device) as jum from users_device where id_device=? and nik=?  ",[$request->input('id_device'),$nik]);
+                              if (count($get) > 0) {
+                                  if ($get[0]->jum == 0) {
+                                      $ins = DB::connection('dbsimkug')->insert("insert into users_device (
+                                          id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values(?, ?, ?, ?, ?, getdate()) ",[$request->input('id_device'),$nik,$nu,$kode_lokasi,'-']);
+                                  }
+                              } else {
+                                  $ins = DB::connection('dbsimkug')->insert("insert into users_device (
+                                      id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values(?, ?, ?, ?, ?, getdate()) ",[$request->input('id_device'),$nik,$nu,$kode_lokasi,'-']);
+                              }
+                          }
+                      }
+                  }
+              }
+              return $this->respondWithTokenExtraData($token,'simkug',60,$extra_data);
+          } catch (BadResponseException $ex) {
+              $response = $ex->getResponse();
+              $res = json_decode($response->getBody(), true);
+              if (! $token = Auth::guard('simkug')->setTTL(1440)->attempt($credentials)) {
+                  return response()->json(['message' => $res['message'], 'status'=>false], 401);
+              }else{
+                  if (isset($request->id_device)) {
+                      $kode_lokasi = Auth::guard('simkug')->user()->kode_lokasi;
+                      $nik = Auth::guard('simkug')->user()->nik;
+                      $cek = DB::connection('dbsimkug')->select("select count(id_device) as jum from users_device where nik=?  ",[$nik]);
+                      if (count($cek) > 0) {
+                          $nu = intval($cek[0]->jum) + 1;
+                      } else {
+                          $nu = 1;
+                      }
+      
+                      $get = DB::connection('dbsimkug')->select("select count(id_device) as jum from users_device where id_device=? and nik=?  ",[$request->input('id_device'),$nik]);
+                      if (count($get) > 0) {
+                          if ($get[0]->jum == 0) {
+                              $ins = DB::connection('dbsimkug')->insert("insert into users_device (
+                                  id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values(?, ?, ?, ?, ?, getdate()) ",[$request->input('id_device'),$nik,$nu,$kode_lokasi,'-']);
+                          }
+                      } else {
+                          $ins = DB::connection('dbsimkug')->insert("insert into users_device (
+                              id_device,nik,nu,kode_lokasi,kode_pp,tgl_input) values(?, ?, ?, ?, ?, getdate()) ",[$request->input('id_device'),$nik,$nu,$kode_lokasi,'-']);
+                      }
+                  }
+              }
+              return $this->respondWithToken($token,'simkug');
+          }
+      }
 
     public function loginSiswa2(Request $request)
     {
@@ -1610,4 +1718,81 @@ class AuthController extends Controller
             return response()->json($success, 200);
         }
     }
+
+    public function addLogUser(Request $r)
+    {
+        $db = 'dbtelu';
+        if(isset($r->db) && $r->db != ""){
+            $db = $r->db;
+        }
+
+        DB::connection($db)->beginTransaction();
+        try {
+
+            $ins = DB::connection($db)->insert("insert into userlog_esaku (uid, userloc, timein, session, timeout, host, ip) values (?, ?, getdate(), ?, '1990-01-01', ?, ?) ",[$r->input('uuid'),$r->input('userloc'),$r->input('session'),$r->input('host'),$r->input('ip')]);
+            
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Log berhasil disimpan";
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Log gagal disimpan ".$e;
+            return response()->json($success, 200); 
+        }	
+
+    }
+
+    public function addLogUserOut(Request $r)
+    {
+        $db = 'dbtelu';
+        
+        if(isset($r->db) && $r->db != ""){
+            $db = $r->db;
+        }
+
+        DB::connection($db)->beginTransaction();
+        try {
+
+            $upd = DB::connection($db)->update("update userlog_esaku set timeout=getdate() where session=?",[$r->input('session')]);
+            
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Logout berhasil disimpan";
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Logout gagal disimpan ".$e;
+            return response()->json($success, 200); 
+        }	
+
+    }
+
+    public function addLogFormAkses(Request $r)
+    {
+        $db = 'dbtelu';
+        if(isset($r->db) && $r->db != ""){
+            $db = $r->db;
+        }
+
+        DB::connection($db)->beginTransaction();
+        try {
+            
+            $ins = DB::connection($db)->insert("insert into userformacces_esaku (uid, userloc, timeacc, session, form) values (?, ?, getdate(), ?, ?) ",[$r->input('uuid'),$r->input('userloc'),$r->input('session'),$r->input('form')]);
+            
+            DB::connection($db)->commit();
+            $success['status'] = true;
+            $success['message'] = "Data Log Form berhasil disimpan";
+            return response()->json($success, 200);     
+        } catch (\Throwable $e) {
+            DB::connection($db)->rollback();
+            $success['status'] = false;
+            $success['message'] = "Data Log Form gagal disimpan ".$e;
+            return response()->json($success, 200); 
+        }	
+
+    }
+
 }

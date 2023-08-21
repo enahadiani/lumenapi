@@ -102,9 +102,12 @@ return [
         'itpln' => [
             'driver' => 'jwt',
             'provider' => 'itpln',
+        ],
+        'simkug' => [
+            'driver' => 'jwt',
+            'provider' => 'simkug',
         ]
     ],
-
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
@@ -197,6 +200,10 @@ return [
         'itpln' => [
             'driver' => 'eloquent',
             'model' => \App\AdminItpln::class
+        ],
+        'simkug' => [
+            'driver' => 'eloquent',
+            'model' => \App\AdminSimkug::class
         ]
     ]
 ];

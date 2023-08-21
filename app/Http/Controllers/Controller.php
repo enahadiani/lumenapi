@@ -17,4 +17,19 @@ class Controller extends BaseController
             'expires_in' => Auth::guard($auth)->factory()->getTTL() * $expired
         ], 200);
     }
+
+    
+
+    protected function respondWithTokenExtraData($token,$auth,$expired = 60,$data = [])
+    {
+        $dt_array = [
+            'token' => $token,
+            'token_type' => 'bearer',
+            'message' => 'success',
+            'expires_in' => Auth::guard($auth)->factory()->getTTL() * $expired
+        ];
+        $dt_array = array_merge($dt_array,$data);
+        return response()->json($dt_array, 200);
+    }
+
 }
