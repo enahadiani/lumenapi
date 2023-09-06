@@ -606,7 +606,7 @@ class LaporanController extends Controller
                 inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
                 union all
-                select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , q.no_bukti, a.modul, a.stok,a.harga,
+                select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, a.modul, a.stok,a.harga,
                 case when a.dc='D' then a.jumlah else 0 end as debet,	      
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
