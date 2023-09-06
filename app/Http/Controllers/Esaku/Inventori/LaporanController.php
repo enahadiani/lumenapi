@@ -581,20 +581,36 @@ class LaporanController extends Controller
                 $i++;
             }
 
-            $sql4 = "select distinct * from (select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+            // $sql4 = "select distinct * from (select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+            //     case when a.dc='D' then a.jumlah else 0 end as debet,	      
+            //     case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+            //     from brg_trans_d a
+            //     inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
+            //     inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
+            //     where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
+            //     union all
+            //     select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+            //     case when a.dc='D' then a.jumlah else 0 end as debet,	      
+            //     case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
+            //     from brg_trans_d a
+            //     inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
+            //     inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
+            //     inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
+            //     where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
+            //     )a order by a.tgl_ed";
+
+            $sql4 = "select distinct * from (select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , a.no_bukti, a.modul, a.stok,a.harga,
                 case when a.dc='D' then a.jumlah else 0 end as debet,	      
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
-                inner join trans_m b on a.no_bukti=b.no_bukti and a.kode_lokasi=b.kode_lokasi 
                 inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode'
                 union all
-                select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , b.no_bukti, b.keterangan, a.modul, a.stok,a.harga,b.param2,
+                select a.kode_barang,convert(varchar(20),a.tgl_ed,103) as tgl , q.no_bukti, a.modul, a.stok,a.harga,
                 case when a.dc='D' then a.jumlah else 0 end as debet,	      
                 case when a.dc='C' then a.jumlah else 0 end as kredit, a.tgl_ed
                 from brg_trans_d a
                 inner join brg_jualpiu_d d on a.no_bukti=d.no_jual and a.kode_lokasi=d.kode_lokasi
-                inner join trans_m b on d.no_close=b.no_bukti and d.kode_lokasi=b.kode_lokasi 
                 inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_lokasi=c.kode_lokasi and a.kode_gudang=c.pabrik
                 where a.kode_barang in ($nb) and a.kode_lokasi='$kode_lokasi' and a.kode_gudang in ($nb2) and a.periode = '$periode' 
                 )a order by a.tgl_ed";
