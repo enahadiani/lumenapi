@@ -1032,4 +1032,48 @@ class SppdController extends Controller
         }
     }
 
+    // DATA ASSET
+    public function getAset(Request $r){
+
+        $this->validate($r,[
+            'no_hutang' => 'required|max:20'
+        ]);
+
+        try {
+
+            if($data =  Auth::guard('ypt')->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            
+            $res = DB::connection('sqlsrvypt')->select("
+            select no_fa, tgl_perolehan, kode_klpfa, kode_pp, nama as uraian, nilai  
+            from fa_asset
+            where kode_lokasi=? and no_fa=? 
+            ",[$kode_lokasi, $r->input('no_hutang')]);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['daftar'] = $res;
+                $success['message'] = "Success!";
+                $success['rows']=count($res);
+                
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['daftar'] = [];
+                $success['status'] = true;
+                
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Internal Server Error";
+            Log::error($e);
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
 }
