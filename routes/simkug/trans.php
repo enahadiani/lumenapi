@@ -20,6 +20,10 @@ $router->group(['middleware' => ['auth:simkug','XSS']], function () use ($router
     $router->get('serah-dok-load', 'Simkug\SerahTerimaDokumenController@loadData');
     $router->get('serah-dok-penerima', 'Simkug\SerahTerimaDokumenController@getNIKTerima');
     $router->post('serah-dok', 'Simkug\SerahTerimaDokumenController@store');
+
+    $router->get('serah-dok-revisi-akses-form', 'Simkug\SerahTerimaRevisiVerDokController@cekFormAkses');
+    $router->get('serah-dok-revisi-load', 'Simkug\SerahTerimaRevisiVerDokController@loadData');
+    $router->post('serah-dok-revisi', 'Simkug\SerahTerimaRevisiVerDokController@store');
 });
 
 
