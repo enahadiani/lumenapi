@@ -139,7 +139,7 @@ class PembelianController extends Controller
             from ( select a.kode_barang,a.nama,a.hna,a.barcode,a.sat_kecil,a.nilai_beli,b.kode_gudang,a.kode_klp,a.kode_lokasi,isnull(a.flag_ppn, 0) as flag_ppn
 			from brg_barang a 
             inner join brg_gudang b on a.pabrik=b.kode_gudang and a.kode_lokasi=b.kode_lokasi			
-			where a.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang'
+			where a.kode_lokasi='$kode_lokasi' and b.kode_gudang='$kodeGudang' and a.flag_aktif='1'
 			) a
             inner join brg_barangklp x on a.kode_klp=x.kode_klp and a.kode_lokasi=x.kode_lokasi 
             left join (select kode_barang,kode_gudang,kode_lokasi,sum(jumlah) as sawal 
