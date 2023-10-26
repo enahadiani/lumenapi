@@ -120,7 +120,16 @@ $router->group(['middleware' => 'auth:ts'], function () use ($router) {
     $router->get('hash-pass-pp-batch','Ts\HashPasswordController@getBatch');
     $router->get('hash-pass-pp-lokasi','Ts\HashPasswordController@getLokasi');
     
-    
+    //Master Sis Hakakses
+    $router->get('sis-hakakses-pp','Ts\SisHakaksesController@getPP');
+    $router->get('sis-hakakses-form','Ts\SisHakaksesController@getForm');
+    $router->get('sis-hakakses-menu','Ts\SisHakaksesController@getMenu');
+    $router->get('sis-hakakses-nik','Ts\SisHakaksesController@getNIK');
+    $router->post('sis-hakakses-list','Ts\SisHakaksesController@index');
+    $router->get('sis-hakakses/{nik}','Ts\SisHakaksesController@show');
+    $router->post('sis-hakakses','Ts\SisHakaksesController@store');
+    $router->post('sis-hakakses/{nik}','Ts\SisHakaksesController@update');
+    $router->delete('sis-hakakses/{nik}','Ts\SisHakaksesController@destroy');
 });
 
 $router->put('update-mandiri-bill','Ts\BayarMandiriController@updateStatus');
