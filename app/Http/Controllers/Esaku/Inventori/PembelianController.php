@@ -402,6 +402,7 @@ class PembelianController extends Controller
             ]);
                         
             $diskItem = 0;
+            $x=0;
             $gt = DB::connection($this->db)->select("select kode_akun,sum(total) as total,sum(diskon)as total_diskon  
             from brg_trans_d_tmp 
             where nik_user=? and form='BRGBELI'

@@ -445,6 +445,7 @@ class Pembelian3Controller extends Controller
             $nilai = 0;
             $diskItem = 0;
             $total=0;
+            $total_beli=0;
             for($b=0; $b<count($request->kode_barang);$b++) {
                 if($request->flag_ppn[$b] == "1") {
                     $harga = floatval($request->harga_barang[$b])*(100/111);
@@ -477,7 +478,7 @@ class Pembelian3Controller extends Controller
                     $total = $total + $nilai;
                     $series2[$request->kode_akun[$b]]=$total;
                 }		
-                    
+                $total_beli += $nilai;    
                 $diskItem+=$request->disc_barang[$b];
             }
 
@@ -565,7 +566,7 @@ class Pembelian3Controller extends Controller
             }
 
             $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
-            $totPPN = ($total - $totDiskon)*0.11;
+            $totPPN = ($total_beli - $totDiskon)*0.11;
 
             $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
             values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
@@ -586,7 +587,7 @@ class Pembelian3Controller extends Controller
                 $request->keterangan,
                 'IDR',
                 1,
-                round(floatval($total),0),
+                round(floatval($total_beli),0),
                 round($totPPN,0),
                 round($totDiskon,0),
                 '-',
@@ -611,7 +612,7 @@ class Pembelian3Controller extends Controller
                'IDR',
                1,
                $request->kode_pp,
-               round(floatval($total),0),
+               round(floatval($total_beli),0),
                $periode,
                $nik,
                date('Y-m-d H:i:s'),
@@ -660,9 +661,9 @@ class Pembelian3Controller extends Controller
                 ]);                    
             }
 
-            if ($total > 0) {
+            if ($total_beli > 0) {
                 $x=$x+1;
-                $hut = (floatval($total)+floatval($totPPN))-floatval($totDiskon);
+                $hut = (floatval($total_beli)+floatval($totPPN))-floatval($totDiskon);
                 $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
                 values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
                 DB::connection($this->sql)->insert($insert7, [
@@ -745,7 +746,9 @@ class Pembelian3Controller extends Controller
                 $dc = "C";
             }
             
-            $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
+            if($sls != 0){
+                $insls = DB::connection($this->sql)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$request->kode_pp,'-','-','-','-','-','-','-','-',NULL));
+            }
 
             $exec = DB::connection($this->sql)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
             // $exec2 = DB::connection($this->sql)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
