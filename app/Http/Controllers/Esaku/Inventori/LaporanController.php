@@ -814,7 +814,7 @@ class LaporanController extends Controller
             $sth = $dbh->prepare($sqlex2);
             $sth->execute();
 
-            $sql3 = "select a.kode_barang,c.nama,a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
+            $sql3 = "select a.kode_barang,c.nama, case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
                 round(a.stok * b.h_avg,0) as nilai_stok
             from brg_stok a
             inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik
