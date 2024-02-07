@@ -29,6 +29,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-close','Esaku\Keuangan\FilterController@getFilterNoBuktiClose');
     $router->get('filter-periode-pmb','Esaku\Keuangan\FilterController@getFilterPeriodePmb');
     $router->get('filter-nik-pmb','Esaku\Keuangan\FilterController@getFilterNIKPmb');
+    $router->get('filter-gudang-pmb','Esaku\Keuangan\FilterController@getFilterGudangPmb');
     $router->get('filter-bukti-pmb','Esaku\Keuangan\FilterController@getFilterNoBuktiPmb');
     $router->get('filter-periode-retur','Esaku\Keuangan\FilterController@getFilterPeriodeRetur');
     $router->get('filter-nik-retur','Esaku\Keuangan\FilterController@getFilterNIKRetur');
@@ -52,6 +53,14 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-kontrol-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiKontrolMutasi');
     $router->get('filter-pp-keu','Esaku\Keuangan\FilterController@getFilterPP');
     $router->get('filter-vendor','Esaku\Inventori\FilterController@getFilterVendor');
+
+    $router->get('filter-periode-jualstr','Esaku\Inventori\FilterController@getPeriodeJualSetor');
+    $router->get('filter-tahun-jualstr','Esaku\Inventori\FilterController@getTahunJualSetor');
+    $router->get('filter-nik-jualstr','Esaku\Inventori\FilterController@getNikJualSetor');
+    $router->get('filter-gudang-jualstr','Esaku\Inventori\FilterController@getFilterGudangJualSetor');
+
+    $router->get('filter-tanggal-pmb','Esaku\Keuangan\FilterController@getFilterTanggalPmb');
+
     
     $router->get('filter-lokasi','Esaku\Inventori\FilterController@getFilterLokasi');
     $router->get('filter-default','Esaku\Inventori\FilterController@getFilterDefault');
@@ -71,6 +80,9 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-saldo-stok','Esaku\Inventori\LaporanController@getLapSaldoStok');
     $router->get('lap-nota-jual','Esaku\Inventori\LaporanController@getNotaPnj');
     $router->get('lap-rekap-jual','Esaku\Inventori\LaporanController@getReportRekapPenjualan');
+    $router->get('lap-rekap-jualstr','Esaku\Inventori\LaporanController@getRekapJualSetor');
+    $router->get('lap-rekap-jual-perbrg','Esaku\Inventori\LaporanController@getRekapJualBarang');
+    $router->get('lap-rekap-beli-perbrg','Esaku\Inventori\LaporanController@getRekapBeliBarang');
 
     $router->get('lap_kartu','Esaku\Inventori\LaporanController@getGlReportBukuBesar');
     $router->get('lap_saldo','Esaku\Inventori\LaporanController@getGlReportNeracaLajur');

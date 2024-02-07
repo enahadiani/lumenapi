@@ -216,6 +216,177 @@ class LaporanController extends Controller
         }
     }
 
+    function getRekapJualSetor(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $col_array = array('periode','nik_kasir','gudang');
+            $db_col_name = array('a.periode','b.nik_user','a.kode_gudang');
+
+            $where = "where a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for ($i = 0; $i < count($col_array); $i++) {
+                if (isset($request->input($col_array[$i])[0])) {
+                    if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+                        $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+                    } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+                        $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+                    } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+                        $tmp = explode(",", $request->input($col_array[$i])[1]);
+                        for ($x = 0; $x < count($tmp); $x++) {
+                            if ($x == 0) {
+                                $this_in .= "'" . $tmp[$x] . "'";
+                            } else {
+
+                                $this_in .= "," . "'" . $tmp[$x] . "'";
+                            }
+                        }
+                        $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
+                    }
+                }
+            }
+
+            // if ($request->input('tahun')[0] == "=" && isset($request->input('tahun')[1])) {
+            //     $where .= "and a.periode like '" . $request->input('tahun')[1] . "%'";
+            //     $tahun = $request->input('tahun')[1];
+            // }else{
+            //     $where .= "and a.periode = '-' ";
+            //     $tahun = $request->input('tahun')[1];
+            // }
+
+            $sql = "SELECT b.nik_user
+            from brg_trans_d a 
+            inner join brg_jualpiu_dloc b on a.no_bukti=b.no_jual and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang
+            inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+            $where and a.modul ='BRGJUAL'
+            group by b.nik_user";
+            $rs = DB::connection($this->sql)->select($sql);
+            $res = json_decode(json_encode($rs), true);
+
+            $kasir = "";
+            $resdata = array();
+            $i = 0;
+            foreach ($rs as $row) {
+
+                $resdata[] = (array)$row;
+                if ($i == 0) {
+                    $kasir .= "'$row->nik_user'";
+                } else {
+                    $kasir .= "," . "'$row->nik_user'";
+                }
+                $i++;
+            }
+
+            $sql4 = "SELECT a.kode_gudang
+            from brg_trans_d a 
+            inner join brg_jualpiu_dloc b on a.no_bukti=b.no_jual and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang
+            inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+            $where and a.modul ='BRGJUAL'
+            group by a.kode_gudang";
+            $rs4 = DB::connection($this->sql)->select($sql4);
+            $res4 = json_decode(json_encode($rs4), true);
+
+            $gudang = "";
+            $resdata = array();
+            $i = 0;
+            foreach ($rs4 as $row) {
+
+                $resdata[] = (array)$row;
+                if ($i == 0) {
+                    $gudang .= "'$row->kode_gudang'";
+                } else {
+                    $gudang .= "," . "'$row->kode_gudang'";
+                }
+                $i++;
+            }
+
+            $sql5 = "SELECT a.kode_gudang,b.nik_user
+            from brg_trans_d a 
+            inner join brg_jualpiu_dloc b on a.no_bukti=b.no_jual and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang
+            inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+            $where and a.modul ='BRGJUAL'
+            group by a.kode_gudang,b.nik_user
+            order by a.kode_gudang,b.nik_user";
+            $rs5 = DB::connection($this->sql)->select($sql5);
+            $res5 = json_decode(json_encode($rs5), true);
+
+            // if (count($res) > 0) {
+            //     $tgl_filter = null;
+            //     if ($request->input($col_array[1])[0] == "=" && isset($request->input($col_array[1])[1])) {
+            //         $tgl_filter = "and a.tanggal = '" . $request->input($col_array[1])[1] . "'";
+            //     } elseif ($request->input($col_array[1])[0] == "range" && isset($request->input($col_array[1])[1]) && isset($request->input($col_array[1])[2])) {
+            //         $tgl_filter = "and a.tanggal between '" . $request->input($col_array[1])[1] . "' and '" . $request->input($col_array[1])[2] . "'";
+            //     }
+
+            //     $sql3 = "select a.tanggal 
+            //     from brg_jualpiu_dloc a 
+            //     where a.kode_lokasi = '" . $kode_lokasi . "' and  a.nik_user in ($kasir) and a.kode_gudang in ($gudang) and a.periode = '" . $request->input($col_array[0])[1] . "'
+            //     $tgl_filter
+            //     group by a.tanggal";    
+            //     $rs3 = DB::connection($this->sql)->select($sql3);   
+            //     $res3 = json_decode(json_encode($rs3), true);
+
+            //     $tgl = "";
+            //     $resdata = array();
+            //     $i = 0;
+            //     foreach ($rs3 as $row) {
+            //         $resdata[] = (array)$row;
+            //         if ($i == 0) {
+            //             $tgl .= "'$row->tanggal'";
+            //         } else {
+            //             $tgl .= "," . "'$row->tanggal'";
+            //         }
+            //         $i++;
+            //     }
+            // }
+
+            
+
+            if (count($res5) > 0) {
+                $sql2 = "SELECT a.kode_gudang,b.nik_user as kasir, a.periode, sum(a.total) as total, sum(a.ppn) as ppn,
+                    (sum(a.total) - sum(a.ppn)) as bersih, sum(a.hpp) as hpp,
+                    (sum(a.total) - sum(a.ppn))-(sum(a.hpp)) as margin,
+                    ((sum(a.total) - sum(a.ppn))-(sum(a.hpp)))/(sum(a.total) - sum(a.ppn))*100 as persen
+                from brg_trans_d a 
+                inner join brg_jualpiu_dloc b on a.no_bukti=b.no_jual and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.kode_gudang
+                inner join brg_gudang c on a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi
+                $where and a.modul ='BRGJUAL' 
+                group by a.kode_gudang,b.nik_user,a.periode
+                order by a.kode_gudang,a.periode,b.nik_user";
+
+                $res2 = DB::connection($this->sql)->select($sql2);
+                $res2 = json_decode(json_encode($res2), true);
+            }
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res5;
+                $success['data_detail'] = $res2;
+                // $success['gudang'] = $res3;
+                $success['tahun'] = $where;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['data_detail'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getReportBarang(Request $request)
     {
         try {
@@ -847,6 +1018,160 @@ class LaporanController extends Controller
         }
     }
 
+    function getRekapJualBarang(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'tanggal', 'kode_gudang','kode_barang');
+            $db_col_name = array('a.periode', 'a.tgl_ed', 'a.kode_gudang','a.kode_barang');
+
+            $where = "and a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for ($i = 0; $i < count($col_array); $i++) {
+                if (isset($request->input($col_array[$i])[0])) {
+                    if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+                        $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+                    } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+                        $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+                    } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+                        $tmp = explode(",", $request->input($col_array[$i])[1]);
+                        for ($x = 0; $x < count($tmp); $x++) {
+                            if ($x == 0) {
+                                $this_in .= "'" . $tmp[$x] . "'";
+                            } else {
+
+                                $this_in .= "," . "'" . $tmp[$x] . "'";
+                            }
+                        }
+                        $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
+                    }
+                }
+            }
+
+
+            $sql5 = "SELECT DISTINCT a.kode_gudang
+            FROM brg_trans_d a 
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
+            WHERE modul='BRGJUAL' $where
+            ORDER BY a.kode_gudang";
+            $rs5 = DB::connection($this->sql)->select($sql5);
+            $res5 = json_decode(json_encode($rs5), true);
+
+
+            $sql3 = "SELECT a.no_bukti, CONVERT(varchar,a.tgl_ed,103) as tanggal, a.kode_barang, b.nama, a.kode_gudang, a.harga, a.jumlah, a.total
+            FROM brg_trans_d a 
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
+            WHERE modul='BRGJUAL' $where
+            ORDER BY a.tgl_ed asc";
+
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs), true);
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res5;
+                $success['data_detail'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getRekapBeliBarang(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            $col_array = array('periode', 'tanggal', 'kode_gudang','kode_barang');
+            $db_col_name = array('a.periode', 'a.tgl_ed', 'a.kode_gudang','a.kode_barang');
+
+            $where = "and a.kode_lokasi='$kode_lokasi'";
+            $this_in = "";
+            for ($i = 0; $i < count($col_array); $i++) {
+                if (isset($request->input($col_array[$i])[0])) {
+                    if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+                        $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+                    } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+                        $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+                    } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+                        $tmp = explode(",", $request->input($col_array[$i])[1]);
+                        for ($x = 0; $x < count($tmp); $x++) {
+                            if ($x == 0) {
+                                $this_in .= "'" . $tmp[$x] . "'";
+                            } else {
+
+                                $this_in .= "," . "'" . $tmp[$x] . "'";
+                            }
+                        }
+                        $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
+                    }
+                }
+            }
+
+
+            $sql5 = "SELECT DISTINCT a.kode_gudang
+            FROM brg_trans_d a 
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
+            WHERE modul='BRGBELI' $where
+            ORDER BY a.kode_gudang";
+            $rs5 = DB::connection($this->sql)->select($sql5);
+            $res5 = json_decode(json_encode($rs5), true);
+
+
+            $sql3 = "SELECT a.no_bukti, CONVERT(varchar,a.tgl_ed,103) as tanggal, a.kode_barang, b.nama, a.kode_gudang, a.harga, a.jumlah, a.total
+            FROM brg_trans_d a 
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
+            WHERE modul='BRGBELI' $where
+            ORDER BY a.tgl_ed asc";
+
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs), true);
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res5;
+                $success['data_detail'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getSaldoHutang(Request $request)
     {
         try {
@@ -1030,8 +1355,8 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $col_array = array('periode', 'nik_kasir', 'no_bukti');
-            $db_col_name = array('a.periode', 'a.nik_user', 'a.no_bukti');
+            $col_array = array('periode', 'nik_kasir', 'no_bukti','kode_gudang');
+            $db_col_name = array('a.periode', 'a.nik_user', 'a.no_bukti','d.kode_gudang');
             $where = "where a.kode_lokasi='$kode_lokasi'";
             $this_in = "";
             for ($i = 0; $i < count($col_array); $i++) {

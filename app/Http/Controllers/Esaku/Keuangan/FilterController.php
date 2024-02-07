@@ -753,6 +753,52 @@ class FilterController extends Controller
         }
     }
 
+    function getFilterGudangPmb(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+            $filter = "";
+            if(isset($request->periode) && $request->periode != ""){
+                $filter .= " and a.periode ='".$request->periode."' ";
+            }else{
+                $filter .= "";
+            }
+            
+            $sql="SELECT DISTINCT d.kode_gudang,c.nama
+            from trans_j a
+            left join brg_trans_d d on a.no_bukti=d.no_bukti and a.kode_lokasi=d.kode_lokasi
+            inner join brg_gudang c on d.kode_gudang=c.kode_gudang and d.kode_lokasi=c.kode_lokasi
+            inner join trans_m e on e.no_bukti=a.no_bukti and e.kode_lokasi=a.kode_lokasi
+            where a.kode_lokasi=$kode_lokasi and e.form='BRGBELI' $filter
+            ";
+
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['periode'] = $request->periode;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['periode'] = $request->periode;
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
     function getFilterNoBuktiPmb(Request $request){
         try {
             
@@ -1325,6 +1371,47 @@ class FilterController extends Controller
             return response()->json($success, $this->successStatus);
         }
         
+    }
+
+    function getFilterTanggalPmb(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            if(isset($request->periode) && $request->periode != ""){
+                $filter = " and periode='".$request->periode."' ";
+            }else{
+                $filter = "";
+            }
+          
+            $sql="SELECT DISTINCT tanggal 
+            from trans_m 
+            where form='BRGBELI' and kode_lokasi='$kode_lokasi' $filter
+            order by tanggal desc
+            ";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
     }
 
 
