@@ -302,6 +302,8 @@ class PembelianController extends Controller
                 $pabrik= $data->pabrik;
             }
 
+            $versi = isset($r->versi) ? $r->versi : 'V1';
+
             if(isset($r->nik) && $r->nik != ""){
                 $nik= $r->nik;
             }
@@ -348,8 +350,8 @@ class PembelianController extends Controller
 
             $exec = array();
 
-            $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
-            values (?,?,getdate(),?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,versi) 
+            values (?,?,getdate(),?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             DB::connection($this->db)->insert($insertM, [
                 $id,
                 $kode_lokasi,
@@ -376,7 +378,8 @@ class PembelianController extends Controller
                 '-',
                 '-',
                 $r->kode_vendor,
-                $akunHutang
+                $akunHutang,
+                $versi
             ]);
 			
             $insertB = "insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) 
@@ -403,6 +406,8 @@ class PembelianController extends Controller
                         
             $diskItem = 0;
             $x=0;
+            $sts = true;
+            $msg = "";
             $gt = DB::connection($this->db)->select("select kode_akun,sum(total) as total,sum(diskon)as total_diskon  
             from brg_trans_d_tmp 
             where nik_user=? and form='BRGBELI'
@@ -437,192 +442,208 @@ class PembelianController extends Controller
                         '-',
                         '-'   
                     ]);  
+
+                    if ($r->total_ppn > 0) {
+                        $n=$x+1;
+                        $insert6 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                        values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        DB::connection($this->db)->insert($insert6, [
+                            $id,
+                            $kode_lokasi,
+                            date('Y-m-d H:i:s'),
+                            $nik,
+                            $periode,
+                            '-',
+                            date('Y-m-d H:i:s'),
+                            $n,
+                            $akunPPN,
+                            'D',
+                            $r->total_ppn,
+                            $r->total_ppn,
+                            'PPN Masukan',
+                            'BRGBELI',
+                            'PPNM',
+                            'IDR',
+                            1,
+                            $r->kode_pp,
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-'
+                        ]);
+        
+                        $insert6d = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                        values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        DB::connection($this->db)->insert($insert6, [
+                            $id,
+                            $kode_lokasi,
+                            date('Y-m-d H:i:s'),
+                            $nik,
+                            $periode,
+                            '-',
+                            date('Y-m-d H:i:s'),
+                            $n,
+                            $gt[$x]->kode_akun,
+                            'C',
+                            $r->total_ppn,
+                            $r->total_ppn,
+                            'PPN Masukan',
+                            'BRGBELI',
+                            'KORBRG',
+                            'IDR',
+                            1,
+                            $r->kode_pp,
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-',
+                            '-'
+                        ]);
+                            
+                    }
+
                     $diskItem += floatval($gt[$x]->total_diskon);
                 }
-            }
-            
-            $totDiskon = $r->total_diskon +$diskItem;
-            if ($r->total_ppn > 0) {
-                $x=$x+1;
-                $insert6 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert6, [
-                    $id,
-                    $kode_lokasi,
-                    date('Y-m-d H:i:s'),
-                    $nik,
-                    $periode,
-                    '-',
-                    date('Y-m-d H:i:s'),
-                    $x,
-                    $akunPPN,
-                    'D',
-                    $r->total_ppn,
-                    $r->total_ppn,
-                    'PPN Masukan',
-                    'BRGBELI',
-                    'PPNM',
-                    'IDR',
-                    1,
-                    $r->kode_pp,
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-'
-                ]);
-
-                $insert6d = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert6, [
-                    $id,
-                    $kode_lokasi,
-                    date('Y-m-d H:i:s'),
-                    $nik,
-                    $periode,
-                    '-',
-                    date('Y-m-d H:i:s'),
-                    $x,
-                    $akunPPN,
-                    'C',
-                    $r->total_ppn,
-                    $r->total_ppn,
-                    'PPN Masukan',
-                    'BRGBELI',
-                    'PPNM',
-                    'IDR',
-                    1,
-                    $r->kode_pp,
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-'
-                ]);
-                    
-            }
-
-            if ($r->total_trans > 0) {
-                $x=$x+1;
-                $hut = floatval($r->total_trans)-floatval($totDiskon);
-                $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert7, [
-                    $id,
-                    $kode_lokasi,
-                    date('Y-m-d H:i:s'),
-                    $nik,
-                    $periode,
-                    '-',
-                    date('Y-m-d H:i:s'),
-                    $x,
-                    $akunHutang,
-                    'C',
-                    $hut,
-                    $hut,
-                    'Hutang Vendor Pembelian',
-                    'BRGBELI',
-                    'HUTBELI',
-                    'IDR',
-                    1,
-                    $r->kode_pp,
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-'
-                ]);
-            }
-            
-            if ($r->total_diskon > 0) {
-                $x=$x+1;
-                $insert8 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-                DB::connection($this->db)->insert($insert8, [
-                    $id,
-                    $kode_lokasi,
-                    date('Y-m-d H:i:s'),
-                    $nik,
-                    $periode,
-                    '-',
-                    date('Y-m-d H:i:s'),
-                    $x,
-                    $akunDiskon,
-                    'C',
-                    $totDiskon,
-                    $totDiskon,
-                    'Diskon Pembelian',
-                    'BRGBELI',
-                    'BELIDISC',
-                    'IDR',
-                    1,
-                    $r->kode_pp,
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-',
-                    '-'
-                ]);
-            }
-
-            $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
-            select ?,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,?,tot_diskon,total 
-            from brg_trans_d_tmp 
-            where nik_user=? and form='BRGBELI' ";
-            DB::connection($this->db)->insert($insert9, [
-                $id,
-                $diskItem,
-                $r->nik_user
-            ]);
-
-            $update = DB::connection($this->db)->update("update brg_barang
-            set nilai_beli= b.harga, hna=b.harga_jual 
-            from brg_barang a
-            inner join brg_trans_d_tmp b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.pabrik=b.kode_gudang 
-            where b.nik_user=? and a.kode_lokasi=? and b.form='BRGBELI'
-            ",[$r->nik_user,$kode_lokasi]);
-
-            
-            $get = DB::connection($this->db)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
-            from trans_j where no_bukti ='".$id."' and kode_lokasi='$kode_lokasi'
-            ");
-            
-            if(count($get) > 0){
-                $sls = $get[0]->sls;
             }else{
-                $sls = 0;
+                // Jika Temporary ke clear
+                $sts = false;
+                $msg = " Data Barang tidak valid. ";
             }
+
+            if($sts){
+
+                $totDiskon = $r->total_diskon +$diskItem;
             
-            if($sls < 0){
-                $dc = "D";
+                if ($r->total_trans > 0) {
+                    $x=$x+1;
+                    $hut = floatval($r->total_trans)-floatval($totDiskon);
+                    $insert7 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    DB::connection($this->db)->insert($insert7, [
+                        $id,
+                        $kode_lokasi,
+                        date('Y-m-d H:i:s'),
+                        $nik,
+                        $periode,
+                        '-',
+                        date('Y-m-d H:i:s'),
+                        $x,
+                        $akunHutang,
+                        'C',
+                        $hut,
+                        $hut,
+                        'Hutang Vendor Pembelian',
+                        'BRGBELI',
+                        'HUTBELI',
+                        'IDR',
+                        1,
+                        $r->kode_pp,
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-'
+                    ]);
+                }
+                
+                if ($r->total_diskon > 0) {
+                    $x=$x+1;
+                    $insert8 = "insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3) 
+                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                    DB::connection($this->db)->insert($insert8, [
+                        $id,
+                        $kode_lokasi,
+                        date('Y-m-d H:i:s'),
+                        $nik,
+                        $periode,
+                        '-',
+                        date('Y-m-d H:i:s'),
+                        $x,
+                        $akunDiskon,
+                        'C',
+                        $totDiskon,
+                        $totDiskon,
+                        'Diskon Pembelian',
+                        'BRGBELI',
+                        'BELIDISC',
+                        'IDR',
+                        1,
+                        $r->kode_pp,
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-',
+                        '-'
+                    ]);
+                }
+    
+                $insert9 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,diskon,tot_diskon,total) 
+                select ?,kode_lokasi,periode,modul,form,nu,kode_gudang,kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,?,tot_diskon,total 
+                from brg_trans_d_tmp 
+                where nik_user=? and form='BRGBELI' ";
+                DB::connection($this->db)->insert($insert9, [
+                    $id,
+                    $diskItem,
+                    $r->nik_user
+                ]);
+    
+                $update = DB::connection($this->db)->update("update brg_barang
+                set nilai_beli= b.harga, hna=b.harga_jual 
+                from brg_barang a
+                inner join brg_trans_d_tmp b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.pabrik=b.kode_gudang 
+                where b.nik_user=? and a.kode_lokasi=? and b.form='BRGBELI'
+                ",[$r->nik_user,$kode_lokasi]);
+    
+                
+                $get = DB::connection($this->db)->select("select sum(case dc when 'D' then nilai else -nilai end) as sls  
+                from trans_j where no_bukti ='".$id."' and kode_lokasi='$kode_lokasi'
+                ");
+                
+                if(count($get) > 0){
+                    $sls = $get[0]->sls;
+                }else{
+                    $sls = 0;
+                }
+                
+                if($sls < 0){
+                    $dc = "D";
+                }else{
+                    $dc = "C";
+                }
+
+                if($sls != 0){
+
+                    $insls = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$r->kode_pp,'-','-','-','-','-','-','-','-',NULL));
+                }
+    
+                $exec = DB::connection($this->db)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
+                // $exec2 = DB::connection($this->db)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
+                $del = DB::connection($this->db)->table('brg_trans_d_tmp')
+                ->where('nik_user', $r->nik_user)
+                ->where('form', 'BRGBELI')
+                ->delete();
+    
+                $tmp="Data Pembelian berhasil disimpan";
+                $sts=true;
+                DB::connection($this->db)->commit();
             }else{
-                $dc = "C";
+                $tmp=$msg;
+                $sts=false;
+                DB::connection($this->db)->rollback();
             }
-            
-            $insls = DB::connection($this->db)->insert("insert into trans_j (no_bukti,kode_lokasi,tgl_input,nik_user,periode,no_dokumen,tanggal,nu,kode_akun,dc,nilai,nilai_curr,keterangan,modul,jenis,kode_curr,kurs,kode_pp,kode_drk,kode_cust,kode_vendor,no_fa,no_selesai,no_ref1,no_ref2,no_ref3,id_sync) values (?, ?, getdate(), ?, ?, ?, getdate(), ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",array($id,$kode_lokasi,$nik,$periode,'-',999,$akunpiu,$dc,abs($sls),abs($sls),'Selisih Koma','BRGBELI','SLS','IDR',1,$r->kode_pp,'-','-','-','-','-','-','-','-',NULL));
-
-            $exec = DB::connection($this->db)->update("exec sp_brg_hpp ?,?,?,? ", array($id,$periode,$kode_lokasi,$nik));
-            // $exec2 = DB::connection($this->db)->update("exec sp_brg_saldo_harian ?,? ", array($id,$kode_lokasi));
-            $del = DB::connection($this->db)->table('brg_trans_d_tmp')
-            ->where('nik_user', $r->nik_user)
-            ->where('form', 'BRGBELI')
-            ->delete();
-
-            $tmp="Data Pembelian berhasil disimpan";
-            $sts=true;
-            DB::connection($this->db)->commit();
 
             $success['status'] = $sts;
             $success['message'] = $tmp;

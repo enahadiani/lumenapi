@@ -397,6 +397,8 @@ class Pembelian3Controller extends Controller
                 $nik= $request->nik;
             }
 
+            $versi = isset($r->versi) ? $r->versi : 'V2';
+
             $str_format="0000";
             $periode=date('Y').date('m');
             $per=date('y').date('m');
@@ -568,8 +570,8 @@ class Pembelian3Controller extends Controller
             $totDiskon = (floatval($request->total_diskon)*(100/111)) +$diskItem;
             $totPPN = ($total_beli - $totDiskon)*0.11;
 
-            $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3) 
-            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            $insertM = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,versi) 
+            values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, ?)";
             DB::connection($this->sql)->insert($insertM, [
                 $id,
                 $kode_lokasi,
@@ -598,7 +600,8 @@ class Pembelian3Controller extends Controller
                 '-',
                 '-',
                 $request->kode_vendor,
-                $akunHutang
+                $akunHutang,
+                $versi
             ]);
 			
             $insertB = "insert into brg_belihut_d(no_beli,kode_lokasi,tanggal,keterangan,kode_vendor,kode_curr,kurs,kode_pp,nilai,periode,nik_user,tgl_input,akun_hutang,nilai_ppn,no_fp,due_date, nilai_pph, diskon, modul,kode_gudang) 
