@@ -1056,8 +1056,8 @@ class LaporanController extends Controller
 
             $sql5 = "SELECT DISTINCT a.kode_gudang
             FROM brg_trans_d a 
-            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
-            WHERE modul='BRGJUAL' $where
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang = b.pabrik
+            WHERE a.modul='BRGJUAL' $where
             ORDER BY a.kode_gudang";
             $rs5 = DB::connection($this->sql)->select($sql5);
             $res5 = json_decode(json_encode($rs5), true);
@@ -1065,9 +1065,9 @@ class LaporanController extends Controller
 
             $sql3 = "SELECT a.no_bukti, CONVERT(varchar,a.tgl_ed,103) as tanggal, a.kode_barang, b.nama, a.kode_gudang, a.harga, a.jumlah, a.total
             FROM brg_trans_d a 
-            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
-            WHERE modul='BRGJUAL' $where
-            ORDER BY a.tgl_ed asc";
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang = b.pabrik
+            WHERE a.modul='BRGJUAL' $where
+            ORDER BY a.tgl_ed asc, a.no_bukti asc, a.kode_barang asc";
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs), true);
@@ -1133,8 +1133,8 @@ class LaporanController extends Controller
 
             $sql5 = "SELECT DISTINCT a.kode_gudang
             FROM brg_trans_d a 
-            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
-            WHERE modul='BRGBELI' $where
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang = b.pabrik
+            WHERE a.modul='BRGBELI' $where
             ORDER BY a.kode_gudang";
             $rs5 = DB::connection($this->sql)->select($sql5);
             $res5 = json_decode(json_encode($rs5), true);
@@ -1142,9 +1142,10 @@ class LaporanController extends Controller
 
             $sql3 = "SELECT a.no_bukti, CONVERT(varchar,a.tgl_ed,103) as tanggal, a.kode_barang, b.nama, a.kode_gudang, a.harga, a.jumlah, a.total
             FROM brg_trans_d a 
-            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang 
-            WHERE modul='BRGBELI' $where
-            ORDER BY a.tgl_ed asc";
+            INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang = b.pabrik
+            WHERE a.modul='BRGBELI' $where
+            ORDER BY a.tgl_ed asc, a.no_bukti asc, a.kode_barang asc
+            ";
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs), true);
