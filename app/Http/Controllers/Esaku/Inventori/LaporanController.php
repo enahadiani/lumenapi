@@ -2842,32 +2842,6 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            // $col_array = array('periode', 'tanggal', 'kode_gudang','kode_barang');
-            // $db_col_name = array('a.periode', 'a.tgl_ed', 'a.kode_gudang','a.kode_barang');
-
-            // $where = "and a.kode_lokasi='$kode_lokasi'";
-            // $this_in = "";
-            // for ($i = 0; $i < count($col_array); $i++) {
-            //     if (isset($request->input($col_array[$i])[0])) {
-            //         if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
-            //             $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
-            //         } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
-            //             $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
-            //         } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
-            //             $tmp = explode(",", $request->input($col_array[$i])[1]);
-            //             for ($x = 0; $x < count($tmp); $x++) {
-            //                 if ($x == 0) {
-            //                     $this_in .= "'" . $tmp[$x] . "'";
-            //                 } else {
-
-            //                     $this_in .= "," . "'" . $tmp[$x] . "'";
-            //                 }
-            //             }
-            //             $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
-            //         }
-            //     }
-            // }
-
             $nik_user = $nik . "_" . uniqid();
             $tanggal = $request->input('tanggal')[1];
             $periode = substr($tanggal,0,4).substr($tanggal,5,2);
