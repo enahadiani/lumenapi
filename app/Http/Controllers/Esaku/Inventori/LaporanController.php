@@ -985,13 +985,13 @@ class LaporanController extends Controller
             $sth = $dbh->prepare($sqlex2);
             $sth->execute();
 
-            $sql3 = "select a.kode_barang,c.nama, case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
-                round(a.stok * b.h_avg,0) as nilai_stok
+            $sql3 = "SELECT a.kode_barang,c.nama, case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
+            round(a.stok * b.h_avg,0) as nilai_stok
             from brg_stok a
-            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik
-            inner join brg_gudang d on a.kode_gudang=d.kode_gudang
+            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik and c.flag_aktif='1' and a.kode_lokasi=c.kode_lokasi
+            inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
             left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
-            where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang'";
+            where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang' and a.kode_lokasi = '$kode_lokasi'";
 
             $rs = DB::connection($this->sql)->select($sql3);
             $res = json_decode(json_encode($rs), true);
@@ -2828,6 +2828,102 @@ class LaporanController extends Controller
             }
         } catch (\Throwable $e) {
             $success['status'] = false;
+            $success['message'] = "Error " . $e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getRekapStockOpname(Request $request)
+    {
+        try {
+
+            if ($data =  Auth::guard($this->guard)->user()) {
+                $nik = $data->nik;
+                $kode_lokasi = $data->kode_lokasi;
+            }
+
+            // $col_array = array('periode', 'tanggal', 'kode_gudang','kode_barang');
+            // $db_col_name = array('a.periode', 'a.tgl_ed', 'a.kode_gudang','a.kode_barang');
+
+            // $where = "and a.kode_lokasi='$kode_lokasi'";
+            // $this_in = "";
+            // for ($i = 0; $i < count($col_array); $i++) {
+            //     if (isset($request->input($col_array[$i])[0])) {
+            //         if ($request->input($col_array[$i])[0] == "range" and isset($request->input($col_array[$i])[1]) and isset($request->input($col_array[$i])[2])) {
+            //             $where .= " and (" . $db_col_name[$i] . " between '" . $request->input($col_array[$i])[1] . "' AND '" . $request->input($col_array[$i])[2] . "') ";
+            //         } else if ($request->input($col_array[$i])[0] == "=" and isset($request->input($col_array[$i])[1])) {
+            //             $where .= " and " . $db_col_name[$i] . " = '" . $request->input($col_array[$i])[1] . "' ";
+            //         } else if ($request->input($col_array[$i])[0] == "in" and isset($request->input($col_array[$i])[1])) {
+            //             $tmp = explode(",", $request->input($col_array[$i])[1]);
+            //             for ($x = 0; $x < count($tmp); $x++) {
+            //                 if ($x == 0) {
+            //                     $this_in .= "'" . $tmp[$x] . "'";
+            //                 } else {
+
+            //                     $this_in .= "," . "'" . $tmp[$x] . "'";
+            //                 }
+            //             }
+            //             $where .= " and " . $db_col_name[$i] . " in ($this_in) ";
+            //         }
+            //     }
+            // }
+
+            $nik_user = $nik . "_" . uniqid();
+            $tanggal = $request->input('tanggal')[1];
+            $periode = substr($tanggal,0,4).substr($tanggal,5,2);
+            $kode_gudang = $request->input('kode_gudang')[1];
+            if ($tanggal == "") {
+                $periode = date('Ym');
+            }
+
+            $sql1 = "exec sp_brg_stok_gudang '$kode_gudang', '$periode','$kode_lokasi', '$nik_user';";
+
+            $sqlex="SET NOCOUNT ON; ".$sql1;
+            $dbh = DB::connection($this->sql)->getPdo();
+            $sth = $dbh->prepare($sqlex);
+            $sth->execute();
+
+            $sql5 = "SELECT DISTINCT case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang
+            from brg_stok a
+            left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
+            inner join brg_barang c on a.kode_lokasi = c.kode_lokasi and a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik
+            inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
+            where a.nik_user = '$nik_user' and a.kode_gudang = '$kode_gudang'
+            ";
+            $rs5 = DB::connection($this->sql)->select($sql5);
+            $res5 = json_decode(json_encode($rs5), true);
+
+
+            $sql3 = "SELECT a.kode_barang,c.barcode,c.nama as nama_barang, a.kode_gudang,
+            case when c.no_rak is not null then c.no_rak else '-' end as kode_rak,
+            a.stok,0 as stok_real
+            from brg_stok a
+            left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
+            inner join brg_barang c on a.kode_lokasi = c.kode_lokasi and a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik
+            inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
+            where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang'";
+
+            $rs = DB::connection($this->sql)->select($sql3);
+            $res = json_decode(json_encode($rs), true);
+
+            if (count($res) > 0) { //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res5;
+                $success['data_detail'] = $res;
+                $success['message'] = "Success!";
+                $success["auth_status"] = 1;
+
+                return response()->json($success, $this->successStatus);
+            } else {
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['data'] = [];
+            $success['data_detail'] = [];
             $success['message'] = "Error " . $e;
             return response()->json($success, $this->successStatus);
         }
