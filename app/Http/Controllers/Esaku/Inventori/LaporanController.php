@@ -988,7 +988,7 @@ class LaporanController extends Controller
             $sql3 = "SELECT a.kode_barang,c.nama, case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
             round(a.stok * b.h_avg,0) as nilai_stok
             from brg_stok a
-            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik and c.flag_aktif='1' and a.kode_lokasi=c.kode_lokasi
+            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik and a.kode_lokasi=c.kode_lokasi
             inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
             left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
             where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang' and a.kode_lokasi = '$kode_lokasi'";
