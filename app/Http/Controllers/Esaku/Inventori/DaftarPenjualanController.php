@@ -32,7 +32,7 @@ class DaftarPenjualanController extends Controller
             WHERE kode_lokasi = '".$kode_lokasi."' and no_jual = '".$request->query('no_bukti')."'";
 
             $sql2="SELECT a.kode_barang, b.nama AS nama_brg, a.harga, a.jumlah, (a.harga*a.jumlah) AS subtotal, 
-            a.diskon, ISNULL(a.ppn, 0) AS ppn
+            a.diskon, ISNULL(b.ppn, 0) AS ppn
             FROM brg_trans_d a
             INNER JOIN brg_barang b ON a.kode_barang=b.kode_barang AND a.kode_lokasi=b.kode_lokasi
             WHERE a.kode_lokasi = '".$kode_lokasi."' and a.no_bukti = '".$request->query('no_bukti')."' and b.pabrik='$pabrik' ";

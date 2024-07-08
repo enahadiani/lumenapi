@@ -85,7 +85,11 @@ class FilterController extends Controller
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql="select distinct no_bukti, keterangan from trans_m where kode_lokasi='$kode_lokasi' and no_bukti like 'MK%' ";
+            $sql="SELECT distinct a.no_bukti, a.keterangan, a.param1 as gudang_asal, b.nama as nama_gudang_asal, a.param2 as gudang_tujuan, c.nama as nama_gudang_tujuan, isnull(a.nilai1,0) as total_trans
+            from trans_m a
+            left join brg_gudang b on a.kode_lokasi=b.kode_lokasi and a.param1 = b.kode_gudang
+            left join brg_gudang c on a.kode_lokasi=c.kode_lokasi and a.param2 = c.kode_gudang
+            where a.kode_lokasi=$kode_lokasi and a.no_bukti like 'MK%' and a.no_ref2 = '-' ";
             $res = DB::connection($this->db)->select($sql);
             $res = json_decode(json_encode($res),true);
             
@@ -179,7 +183,7 @@ class FilterController extends Controller
             }
             
             $gudang = "G01";
-            if(isset($request->periode) && $request->periode != ""){ 
+            if(isset($request->kode_gudang) && $request->kode_gudang != ""){ 
                 $gudang = $request->kode_gudang;
             }
             
@@ -457,6 +461,65 @@ class FilterController extends Controller
             }
             
             $sql="select a.no_jual,a.keterangan 
+            from brg_jualpiu_dloc a 
+            where a.kode_lokasi='$kode_lokasi' $filter";
+            $res = DB::connection($this->db)->select($sql);
+            $res = json_decode(json_encode($res),true);
+            
+            if(count($res) > 0){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['data'] = $res;
+                $success['message'] = "Success!";
+                return response()->json($success, $this->successStatus);     
+            }
+            else{
+                $success['message'] = "Data Kosong!";
+                $success['data'] = [];
+                $success['status'] = true;
+                return response()->json($success, $this->successStatus);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, $this->successStatus);
+        }
+    }
+
+    function getFilterNoBuktiFaktur(Request $request){
+        try {
+            
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $filter = "";
+            if(isset($request->periode) && $request->periode != ""){
+                $filter .= " and a.periode='".$request->periode."' ";
+            }else{
+                $filter .= "";
+            }
+
+            if(isset($request->tanggal) && $request->tanggal != ""){
+                $filter .= " and a.tanggal='".$request->tanggal."' ";
+            }else{
+                $filter .= "";
+            }
+
+            // if(isset($request->nik_kasir) && $request->nik_kasir != ""){
+            //     $filter .= " and a.nik_user='".$request->nik_kasir."' ";
+            // }else{
+            //     $filter .= "";
+            // }
+
+            if(isset($request->nik_kasir) && $request->nik_kasir != ""){
+                $filter .= " and a.kode_gudang='".$request->nik_kasir."' ";
+            }else{
+                $filter .= "";
+            }
+
+            
+            $sql="select a.no_jual as no_bukti,a.keterangan 
             from brg_jualpiu_dloc a 
             where a.kode_lokasi='$kode_lokasi' $filter";
             $res = DB::connection($this->db)->select($sql);

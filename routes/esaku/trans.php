@@ -21,6 +21,7 @@ $router->options('{all:.*}', ['middleware' => 'cors', function () {
 $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     //Mutasi Barang//
     $router->get('generate-mutasi', 'Esaku\Inventori\MutasiController@handleNoBukti');
+    $router->get('generate-hpp-mutasi', 'Esaku\Inventori\MutasiController@generateHpp');
     $router->get('filter-barang-mutasi', 'Esaku\Keuangan\FilterController@getFilterBarangMutasi');
     $router->get('filter-bukti-mutasi-kirim', 'Esaku\Keuangan\FilterController@getFilterBuktiMutasiKirim');
     $router->get('filter-bukti-mutasi-terima', 'Esaku\Keuangan\FilterController@getFilterBuktiMutasiTerima');
@@ -38,6 +39,13 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->post('penjualan-ubah', 'Esaku\Inventori\PenjualanController@update');
     $router->get('penjualan-nota', 'Esaku\Inventori\PenjualanController@getNota');
     $router->get('penjualan-bonus', 'Esaku\Inventori\PenjualanController@cekBonus');
+
+    //Penjualan (POS)
+    $router->get('brghilang-open', 'Esaku\Inventori\BarangHilangController@getNoOpen');
+    $router->post('brghilang', 'Esaku\Inventori\BarangHilangController@store');
+    $router->post('brghilang-ubah', 'Esaku\Inventori\BarangHilangController@update');
+    $router->get('brghilang-nota', 'Esaku\Inventori\BarangHilangController@getNota');
+    $router->get('brghilang-bonus', 'Esaku\Inventori\BarangHilangController@cekBonus');
 
     //Open Kasir
     $router->get('open-kasir', 'Esaku\Inventori\OpenKasirController@index');

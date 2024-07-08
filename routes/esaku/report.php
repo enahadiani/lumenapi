@@ -23,6 +23,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-tanggal','Esaku\Keuangan\FilterController@getFilterTanggal');
     $router->get('filter-bukti','Esaku\Keuangan\FilterController@getFilterNoBukti');
     $router->get('filter-barang','Esaku\Keuangan\FilterController@getFilterBarang');
+    $router->get('filter-bukti-faktur','Esaku\Keuangan\FilterController@getFilterNoBuktiFaktur');
     $router->get('filter-tanggal-close','Esaku\Keuangan\FilterController@getFilterTanggalClose');
     $router->get('filter-periode-close','Esaku\Keuangan\FilterController@getFilterPeriodeClose');
     $router->get('filter-nik-close','Esaku\Keuangan\FilterController@getFilterNIKClose');
@@ -53,6 +54,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-bukti-kontrol-mutasi','Esaku\Keuangan\FilterController@getFilterBuktiKontrolMutasi');
     $router->get('filter-pp-keu','Esaku\Keuangan\FilterController@getFilterPP');
     $router->get('filter-vendor','Esaku\Inventori\FilterController@getFilterVendor');
+    $router->get('filter-barang-hpp','Esaku\Keuangan\FilterController@getFilterBarangHpp');
+
 
     $router->get('filter-periode-jualstr','Esaku\Inventori\FilterController@getPeriodeJualSetor');
     $router->get('filter-tahun-jualstr','Esaku\Inventori\FilterController@getTahunJualSetor');
@@ -65,6 +68,7 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('filter-lokasi','Esaku\Inventori\FilterController@getFilterLokasi');
     $router->get('filter-default','Esaku\Inventori\FilterController@getFilterDefault');
     //Laporan
+    $router->get('lap-faktur-pnj','Esaku\Inventori\LaporanController@getReportFakturPnj');
     $router->get('lap-barang','Esaku\Inventori\LaporanController@getReportBarang');
     $router->get('lap-closing','Esaku\Inventori\LaporanController@getReportClosing');
     $router->get('lap-penjualan','Esaku\Inventori\LaporanController@getReportPenjualan');
@@ -83,6 +87,8 @@ $router->group(['middleware' => 'auth:toko'], function () use ($router) {
     $router->get('lap-rekap-jualstr','Esaku\Inventori\LaporanController@getRekapJualSetor');
     $router->get('lap-rekap-jual-perbrg','Esaku\Inventori\LaporanController@getRekapJualBarang');
     $router->get('lap-rekap-beli-perbrg','Esaku\Inventori\LaporanController@getRekapBeliBarang');
+    $router->get('lap-stock-opname','Esaku\Inventori\LaporanController@getRekapStockOpname');
+
 
     $router->get('lap_kartu','Esaku\Inventori\LaporanController@getGlReportBukuBesar');
     $router->get('lap_saldo','Esaku\Inventori\LaporanController@getGlReportNeracaLajur');

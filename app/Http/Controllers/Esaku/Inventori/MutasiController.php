@@ -28,8 +28,8 @@ class MutasiController extends Controller {
                 $nik= $data->nik;
                 $kode_lokasi= $data->kode_lokasi;
             }
-            $sql1 = "select b.kode_barang,b.nama,a.satuan,a.jumlah as stok
-                from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+            $sql1 = "select b.kode_barang,b.nama,a.satuan,a.jumlah as stok, a.hpp, a.total
+                from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and a.kode_gudang=b.pabrik
                 where a.no_bukti = '$no_bukti' and a.kode_lokasi= '$kode_lokasi' order by a.nu";
             $res = DB::connection($this->sql)->select($sql1);
             $res = json_decode(json_encode($res),true);
@@ -83,6 +83,10 @@ class MutasiController extends Controller {
                     inner join brg_stok c on a.kode_barang=c.kode_barang and a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi and c.nik_user='$nik'
                     where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'";
             } else {
+                // $sql2 = "select a.kode_barang,b.nama,a.satuan,a.jumlah,c.stok+a.jumlah as stok
+                //     from brg_trans_d a inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
+                //     inner join brg_stok c on a.kode_barang=c.kode_barang and a.kode_gudang=c.kode_gudang and a.kode_lokasi=c.kode_lokasi and c.nik_user='$nik'
+                //     where a.no_bukti='$no_bukti' and a.kode_lokasi='$kode_lokasi'";
                 $sql2 = "select b.kode_barang,b.nama,a.satuan,c.jumlah as stok, a.jumlah
                     from brg_trans_d a
                     inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi
@@ -215,18 +219,21 @@ class MutasiController extends Controller {
         $this->validate($request, [
             'mutasi' => 'required|array',
             'mutasi.*.tanggal' => 'required',
-            'mutasi.*.bukti_kirim' => 'required',
+            // 'mutasi.*.bukti_kirim' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
             'mutasi.*.no_dokumen' => 'required',
             'mutasi.*.keterangan' => 'required',
             'mutasi.*.gudang_asal' => 'required',
             'mutasi.*.gudang_tujuan' => 'required',
+            'mutasi.*.total_trans' => 'required',
             'mutasi.*.detail' => 'required|array',
             'mutasi.*.detail.*.kode_barang' => 'required',
             'mutasi.*.detail.*.satuan' => 'required',
             'mutasi.*.detail.*.stok' => 'required',
-            'mutasi.*.detail.*.jumlah' => 'required'
+            'mutasi.*.detail.*.hpp' => 'required',
+            'mutasi.*.detail.*.jumlah' => 'required',
+            'mutasi.*.detail.*.total' => 'required'
         ]);
 
         try {
@@ -263,12 +270,11 @@ class MutasiController extends Controller {
                 $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
                     posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null,null)";
+                    values (?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null,null)";
                 
                 DB::connection($this->sql)->insert($sql2, [
                     $data[0]['no_bukti'],
                     $kode_lokasi, 
-                    date('Y-m-d H:i:s'), 
                     $nik, 
                     $periode, 
                     'IV', 
@@ -308,7 +314,7 @@ class MutasiController extends Controller {
                         //     '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
                             kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                            diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?)";
                         DB::connection($this->sql)->insert($sql3, [
                             $data[0]['no_bukti'], 
                             $kode_lokasi, 
@@ -346,11 +352,10 @@ class MutasiController extends Controller {
                 $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
                 posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
                 nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, null, null, null)";
+                values (?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, null, null, null)";
                 DB::connection($this->sql)->insert($sql2, [
                     $data[0]['no_bukti'], 
                     $kode_lokasi, 
-                    date('Y-m-d H:i:s'), 
                     $nik, 
                     $periode, 
                     'IV', 
@@ -371,7 +376,7 @@ class MutasiController extends Controller {
                     '-', 
                     '-', 
                     '-', 
-                    $data[0]['bukti_kirim'], 
+                    '-', 
                     '-', 
                     $data[0]['gudang_asal'], 
                     $data[0]['gudang_tujuan'], 
@@ -390,7 +395,7 @@ class MutasiController extends Controller {
                         //     '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
                         kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                        diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?)";
                         DB::connection($this->sql)->insert($sql3, [
                             $data[0]['no_bukti'], 
                             $kode_lokasi, 
@@ -401,7 +406,6 @@ class MutasiController extends Controller {
                             $data[0]['gudang_asal'], 
                             $data2[$i]['kode_barang'], 
                             '-', 
-                            date('Y-m-d H:i:s'), 
                             $data2[$i]['satuan'], 
                             'C', 
                             $stok, 
@@ -421,7 +425,7 @@ class MutasiController extends Controller {
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
-            $success['no_kirim'] = $data[0]['bukti_kirim'];
+            // $success['no_kirim'] = $data[0]['bukti_kirim']; /* Tanggal 20/02/2024 */
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
             
@@ -437,18 +441,21 @@ class MutasiController extends Controller {
         $this->validate($request, [
             'mutasi' => 'required|array',
             'mutasi.*.tanggal' => 'required',
-            'mutasi.*.bukti_kirim' => 'required',
+            // 'mutasi.*.bukti_kirim' => 'required',
             'mutasi.*.jenis' => 'required',
             'mutasi.*.no_bukti' => 'required',
             'mutasi.*.no_dokumen' => 'required',
             'mutasi.*.keterangan' => 'required',
             'mutasi.*.gudang_asal' => 'required',
             'mutasi.*.gudang_tujuan' => 'required',
+            'mutasi.*.total_trans' => 'required',
             'mutasi.*.detail' => 'required|array',
             'mutasi.*.detail.*.kode_barang' => 'required',
             'mutasi.*.detail.*.satuan' => 'required',
             'mutasi.*.detail.*.stok' => 'required',
-            'mutasi.*.detail.*.jumlah' => 'required'
+            'mutasi.*.detail.*.hpp' => 'required',
+            'mutasi.*.detail.*.jumlah' => 'required',
+            'mutasi.*.detail.*.total' => 'required'
         ]);
 
         try {
@@ -485,12 +492,11 @@ class MutasiController extends Controller {
                  $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
                     posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
                     nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                    values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null,null)";
+                    values (?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,null,null,null)";
                 
                 DB::connection($this->sql)->insert($sql2, [
                     $data[0]['no_bukti'],
                     $kode_lokasi, 
-                    date('Y-m-d H:i:s'), 
                     $nik, 
                     $periode, 
                     'IV', 
@@ -504,7 +510,7 @@ class MutasiController extends Controller {
                     $data[0]['keterangan'], 
                     'IDR', 
                     '1', 
-                    '0', 
+                    $data[0]['total_trans'], 
                     '0', 
                     '0', 
                     '-', 
@@ -530,7 +536,7 @@ class MutasiController extends Controller {
                             // '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
                             kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                            diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                            diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?)";
                         DB::connection($this->sql)->insert($sql3, [
                             $data[0]['no_bukti'], 
                             $kode_lokasi, 
@@ -541,18 +547,17 @@ class MutasiController extends Controller {
                             $data[0]['gudang_asal'], 
                             $data2[$i]['kode_barang'], 
                             '-', 
-                            date('Y-m-d H:i:s'), 
                             $data2[$i]['satuan'], 
                             'C', 
                             $stok, 
                             $jumlah, 
                             '0',
+                            $data2[$i]['hpp'],
+                            $data2[$i]['hpp'],
                             '0',
                             '0',
                             '0',
-                            '0',
-                            '0',
-                            '0'
+                            $data2[$i]['total']
                         ]);
                     }
                 }
@@ -567,11 +572,10 @@ class MutasiController extends Controller {
                 $sql2 = "insert into trans_m (no_bukti,kode_lokasi,tgl_input,nik_user,periode,modul,form,
                 posted,prog_seb,progress,kode_pp,tanggal,no_dokumen,keterangan,kode_curr,kurs,nilai1,nilai2,nilai3,
                 nik1,nik2,nik3,no_ref1,no_ref2,no_ref3,param1,param2,param3,due_date,file_dok,id_sync) 
-                values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, null, null, null)";
+                values (?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?, null, null, null)";
                 DB::connection($this->sql)->insert($sql2, [
                     $data[0]['no_bukti'], 
-                    $kode_lokasi, 
-                    date('Y-m-d H:i:s'), 
+                    $kode_lokasi,  
                     $nik, 
                     $periode, 
                     'IV', 
@@ -585,19 +589,23 @@ class MutasiController extends Controller {
                     $data[0]['keterangan'], 
                     'IDR', 
                     '1', 
+                    $data[0]['total_trans'], // total
                     '0', 
                     '0', 
-                    '0', 
                     '-', 
                     '-', 
                     '-', 
                     '-', 
-                    $data[0]['bukti_kirim'], 
+                    '-', 
                     '-', 
                     $data[0]['gudang_asal'], 
                     $data[0]['gudang_tujuan'], 
                     '-'
                 ]);
+
+                $upd = DB::connection($this->sql)->table("trans_m")
+                ->where('no_bukti',$data[0]['bukti_kirim'])
+                ->update(['no_ref2'=> $data[0]['no_bukti']]);
 
                 $data2 = $data[0]['detail'];
                 if(count($data2) > 0) {
@@ -611,7 +619,7 @@ class MutasiController extends Controller {
                         //     '".$data2[$i]['satuan']."', 'C', '$stok', '$jumlah', '0','0','0','0','0','0','0')";
                         $sql3 = "insert into brg_trans_d (no_bukti,kode_lokasi,periode,modul,form,nu,kode_gudang,
                         kode_barang,no_batch,tgl_ed,satuan,dc,stok,jumlah,bonus,harga,hpp,p_disk,
-                        diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        diskon,tot_diskon,total) values (?,?,?,?,?,?,?,?,?,getdate(),?,?,?,?,?,?,?,?,?,?,?)";
                         DB::connection($this->sql)->insert($sql3, [
                             $data[0]['no_bukti'], 
                             $kode_lokasi, 
@@ -619,21 +627,20 @@ class MutasiController extends Controller {
                             'BRGTERIMA',
                             'BRGTERIMA', 
                             $i, 
-                            $data[0]['gudang_asal'], 
+                            $data[0]['gudang_tujuan'], 
                             $data2[$i]['kode_barang'], 
                             '-', 
-                            date('Y-m-d H:i:s'), 
                             $data2[$i]['satuan'], 
-                            'C', 
+                            'D', 
                             $stok, 
                             $jumlah, 
                             '0',
+                            $data2[$i]['hpp'], //harga
+                            $data2[$i]['hpp'], //hpp
                             '0',
                             '0',
-                            '0',
-                            '0',
-                            '0',
-                            '0'
+                            '0', 
+                            $data2[$i]['total'] // total
                         ]);
                     }
                 }
@@ -642,7 +649,7 @@ class MutasiController extends Controller {
             DB::connection($this->sql)->commit();
             $success['status'] = true;
             $success['no_bukti'] = $no_bukti;
-            $success['no_kirim'] = $data[0]['bukti_kirim'];
+            // $success['no_kirim'] = $data[0]['bukti_kirim']; /* Tanggal 20/02/2024 */
             $success['message'] = "Data Mutasi Barang berhasil disimpan ";
             return response()->json(['success'=>$success], $this->successStatus);
             
@@ -659,7 +666,8 @@ class MutasiController extends Controller {
         $this->validate($request, [            
             'kode_barang' => 'required',                             
             'kode_gudang' => 'required', 
-            'periode' => 'required'
+            'periode' => 'required',
+            'nik_user' => 'required'
         ]);
 
         try {
@@ -671,15 +679,24 @@ class MutasiController extends Controller {
             $kode_barang = $request->kode_barang;
             $kode_gudang = $request->kode_gudang;
             $periode = $request->periode;
+            $nik_user = $request->nik_user;
 
             $sql1 = "exec sp_brg_stok '$periode', '$kode_lokasi', '$nik'";
             DB::connection($this->sql)->update($sql1);
 
-            $sql = "select distinct a.nama,a.sat_kecil,b.stok
-                from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
-                and b.kode_gudang='$kode_gudang'
-                where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi' and b.nik_user='$nik'";
-
+            // $sql = "select distinct a.nama,a.sat_kecil,b.stok
+            //     from brg_barang a inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi 
+            //     and b.kode_gudang='$kode_gudang'
+            //     where a.kode_barang='$kode_barang' and a.kode_lokasi='$kode_lokasi' and b.nik_user='$nik'";
+            
+            $sql = "SELECT distinct a.nama,a.sat_kecil,b.stok, ROUND(ISNULL(c.h_avg,0),0) as harga_hpp
+            from brg_barang a 
+            inner join brg_stok b on a.kode_barang=b.kode_barang and a.kode_lokasi=b.kode_lokasi and b.kode_gudang = '$kode_gudang'
+            left join brg_hpp c on a.kode_lokasi=c.kode_lokasi and a.kode_barang=c.kode_barang and c.nik_user = '$nik_user'
+            where a.kode_barang = '$kode_barang' and a.kode_lokasi = '$kode_lokasi' and b.nik_user = '$nik'
+            ";
+            
+            
             $res = DB::connection($this->sql)->select($sql);
             $res = json_decode(json_encode($res),true);
                 
@@ -733,6 +750,43 @@ class MutasiController extends Controller {
         $success['kode'] = $no_bukti;
         
         return response()->json($success, 200);
+    }
+
+    public function generateHpp(Request $request) {
+        $this->validate($request, [            
+            'periode' => 'required',                                    
+            'kode_gudang' => 'required',                                    
+            'nik_user' => 'required',                                    
+        ]);
+
+        try {
+            if($data =  Auth::guard($this->guard)->user()){
+                $nik= $data->nik;
+                $kode_lokasi= $data->kode_lokasi;
+            }
+
+            $kode_gudang = $request->kode_gudang;
+            $periode = $request->periode;
+            $nik_user = $request->nik_user;
+
+            $sql1 = "exec sp_brg_hpp_periodik '$periode','$kode_lokasi','$nik_user','$kode_gudang';";
+            DB::connection($this->sql)->update($sql1);
+                
+            if($sql1){ //mengecek apakah data kosong atau tidak
+                $success['status'] = true;
+                $success['message'] = "Generate Berhasil!";
+                return response()->json($success, 200);     
+            }
+            else{
+                $success['message'] = "Generate Gagal!";
+                $success['status'] = false;
+                return response()->json($success, 200);
+            }
+        } catch (\Throwable $e) {
+            $success['status'] = false;
+            $success['message'] = "Error ".$e;
+            return response()->json($success, 200);
+        }
     }
 
 }
