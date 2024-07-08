@@ -366,10 +366,10 @@ class SppdController extends Controller
             'AJU.*.nip' =>'max:20',
             'AJU.*.nama_perjalanan' =>'max:200',
             'AJU.*.pp_code' =>'max:10',
-            'REK' => 'array',
-            'REK.*.nama' => 'max:50',
-            'REK.*.no_rekening' => 'max:50',
-            'REK.*.bank' =>'max:100'
+            'REK' => 'required|array',
+            'REK.*.nama' => 'required|max:50',
+            'REK.*.no_rekening' => 'required|max:50',
+            'REK.*.bank' =>'required|max:100'
         ]);
         if($data =  Auth::guard('ypt')->user()){
             $nik= $data->nik;
@@ -570,10 +570,10 @@ class SppdController extends Controller
             'AJU.*.nip' =>'max:20',
             'AJU.*.nama_perjalanan' =>'max:200',
             'AJU.*.pp_code' =>'max:10',
-            'REK' => 'array',
-            'REK.*.nama' => 'max:50',
-            'REK.*.no_rekening' => 'max:50',
-            'REK.*.bank' =>'max:100'
+            'REK' => 'required|array',
+            'REK.*.nama' => 'required|max:50',
+            'REK.*.no_rekening' => 'required|max:50',
+            'REK.*.bank' =>'required|max:100'
         ]);
         if($data =  Auth::guard('ypt')->user()){
             $nik= $data->nik;
