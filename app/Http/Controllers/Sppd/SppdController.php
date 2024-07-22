@@ -361,7 +361,7 @@ class SppdController extends Controller
             'PBYR.*.kode_akun' =>'max:20',
             'PBYR.*.kode_drk' =>'max:30',
             'PBYR.*.periode' =>'max:6',
-            'PBYR.*.no_ref1' =>'max:20',
+            'PBYR.*.no_ref1' =>'required|max:20',
             'AJU' =>'required|array',
             'AJU.*.nip' =>'max:20',
             'AJU.*.nama_perjalanan' =>'max:200',
@@ -434,8 +434,8 @@ class SppdController extends Controller
                                 $msg ="Periode transaksi tidak valid. Periode transaksi tidak boleh kurang dari periode aktif sistem.[".$periode[0]['periode']."]";
                                 $sts= false;
                             } else {
-                                $sts=true;
                                 $msg="Transaksi Berhasil";
+                                $sts=true;
                                 $exec = array();
                                 //if ($stsGar == "1") {
                                     $nilaiGar = $datam[0]['total'];
@@ -503,26 +503,35 @@ class SppdController extends Controller
                                 // where a.no_aju='".$no_agenda."' and a.kode_lokasi='".$kode_lokasi."'";
                                 
                                 // array_push($exec,$sql4);
-                                $no_ref1 = (isset($datam[0]['no_ref1']) ? $datam[0]['no_ref1'] : '-');
-                                $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
-                                //$success['tmp7']=$sql;
-                                $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
-    
-                                //insert it_aju_dok
-                                $dataDok = $request->input("URL_DOK");
-                                $nu=1;
-                                if(count($dataDok) > 0 ){
-                                    for ($i=0;$i < count($dataDok);$i++){
-                                      
-                                        $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
-                                        $upload = DB::connection('sqlsrvypt')->insert($sql);
-                                        $nu++;
-                                    }	
+                                // $no_ref1 = (isset($datam[0]['no_ref1']) ? $datam[0]['no_ref1'] : '-');
+                                $no_ref1 = $datam[0]['no_ref1'];
+                                $ck_ref1 = DB::connection($this->db)->select("select no_aju from it_aju_m where no_ref1=? ",[$no_ref1]);
+                                if(count($ck_ref1) > 0){
+                                    $sts = false;
+                                    $msg = "Transaksi tidak valid. Terdapat data duplikat. Kode SPPD ".$no_ref1." sudah terdaftar dengan No Agenda = ".$ck_ref1[0]->no_aju.".";
+                                    DB::connection('sqlsrvypt')->rollback();
+                                }else{
+                                    $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
+                                    //$success['tmp7']=$sql;
+                                    $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
+        
+                                    //insert it_aju_dok
+                                    $dataDok = $request->input("URL_DOK");
+                                    $nu=1;
+                                    if(count($dataDok) > 0 ){
+                                        for ($i=0;$i < count($dataDok);$i++){
+                                          
+                                            $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
+                                            $upload = DB::connection('sqlsrvypt')->insert($sql);
+                                            $nu++;
+                                        }	
+                                    }
+        
+                                    DB::connection('sqlsrvypt')->commit();
+                                    $success['no_agenda']=$no_agenda;
+                                    $success['no_bukti']=$no_bukti;
                                 }
-    
-                                DB::connection('sqlsrvypt')->commit();
-                                $success['no_agenda']=$no_agenda;
-                                $success['no_bukti']=$no_bukti;
+
                             } 
                         }
                     }
@@ -564,7 +573,7 @@ class SppdController extends Controller
             'PBYR.*.kode_akun' =>'max:20',
             'PBYR.*.kode_drk' =>'max:30',
             'PBYR.*.periode' =>'max:6',
-            'PBYR.*.no_ref1' =>'max:20',
+            'PBYR.*.no_ref1' =>'required|max:20',
             'AJU' =>'required|array',
             'AJU.*.no_spj_igracias' => 'required', 
             'AJU.*.nip' =>'max:20',
@@ -721,26 +730,34 @@ class SppdController extends Controller
                                     // where a.no_aju='".$no_agenda."' and a.kode_lokasi='".$kode_lokasi."'";
                                     
                                     // array_push($exec,$sql4);
-                                    $no_ref1 = isset($data[0]['no_ref1']) ? $data[0]['no_ref1'] : '-';
-                                    $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
-                                    //$success['tmp7']=$sql;
-                                    $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
-        
-                                    //insert it_aju_dok
-                                    $dataDok = $request->input("URL_DOK");
-                                    $nu=1;
-                                    if(count($dataDok) > 0 ){
-                                        for ($i=0;$i < count($dataDok);$i++){
-                                        
-                                            $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
-                                            $upload = DB::connection('sqlsrvypt')->insert($sql);
-                                            $nu++;
-                                        }	
+                                    // $no_ref1 = isset($data[0]['no_ref1']) ? $data[0]['no_ref1'] : '-';
+                                    $no_ref1 = $datam[0]['no_ref1'];
+                                    $ck_ref1 = DB::connection($this->db)->select("select no_aju from it_aju_m where no_ref1=? ",[$no_ref1]);
+                                    if(count($ck_ref1) > 0){
+                                        $sts = false;
+                                        $msg = "Transaksi tidak valid. Terdapat data duplikat. Kode SPPD ".$no_ref1." sudah terdaftar dengan No Agenda = ".$ck_ref1[0]->no_aju.".";
+                                        DB::connection('sqlsrvypt')->rollback();
+                                    }else{
+                                        $sql="insert into it_aju_m(no_aju,kode_lokasi,periode,tanggal,modul,kode_akun,kode_pp,kode_drk,keterangan,nilai,tgl_input,nik_user,no_kpa,no_app,no_ver,no_fiat,no_kas,progress,nik_panjar,no_ptg,user_input,form,sts_pajak,npajak,nik_app,no_ref1) values ('".$no_agenda."','".$kode_lokasi."','".$datam[0]['periode']."','".$datam[0]['tanggal']."','".$datam[0]['jenis_trans']."','".$datam[0]['kode_akun']."','".$datam[0]['kode_pp']."','".$datam[0]['kode_drk']."','".$datam[0]['keterangan']."',".$datam[0]['total'].",getdate(),'".$nik."','-','-','-','-','-','A','-','-','".$datam[0]['nik_buat']."','SPPD','NON',0,'".$datam[0]['nik_app']."','".$no_ref1."')";
+                                        //$success['tmp7']=$sql;
+                                        $sql5 = DB::connection('sqlsrvypt')->insert($sql);	
+            
+                                        //insert it_aju_dok
+                                        $dataDok = $request->input("URL_DOK");
+                                        $nu=1;
+                                        if(count($dataDok) > 0 ){
+                                            for ($i=0;$i < count($dataDok);$i++){
+                                            
+                                                $sql ="insert into it_aju_dok(no_bukti,modul,no_gambar,kode_lokasi,jenis) values ('".$no_agenda."','SPPD','".$dataDok[$i]."','$kode_lokasi',1)";
+                                                $upload = DB::connection('sqlsrvypt')->insert($sql);
+                                                $nu++;
+                                            }	
+                                        }
+            
+                                        DB::connection('sqlsrvypt')->commit();
+                                        $success['no_agenda']=$no_agenda;
+                                        $success['no_bukti']=$no_bukti;
                                     }
-        
-                                    DB::connection('sqlsrvypt')->commit();
-                                    $success['no_agenda']=$no_agenda;
-                                    $success['no_bukti']=$no_bukti;
                                 }else{
                                     DB::connection('sqlsrvypt')->rollback();
                                     $sts = false;
