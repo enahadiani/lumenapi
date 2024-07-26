@@ -505,7 +505,7 @@ class SppdController extends Controller
                                 // array_push($exec,$sql4);
                                 // $no_ref1 = (isset($datam[0]['no_ref1']) ? $datam[0]['no_ref1'] : '-');
                                 $no_ref1 = $datam[0]['no_ref1'];
-                                $ck_ref1 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where no_ref1=? ",[$no_ref1]);
+                                $ck_ref1 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where no_ref1=? ",[strval($no_ref1)]);
                                 if(count($ck_ref1) > 0){
                                     $sts = false;
                                     $msg = "Transaksi tidak valid. Terdapat data duplikat. Kode SPPD ".$no_ref1." sudah terdaftar dengan No Agenda = ".$ck_ref1[0]->no_aju.".";
@@ -732,7 +732,7 @@ class SppdController extends Controller
                                     // array_push($exec,$sql4);
                                     // $no_ref1 = isset($data[0]['no_ref1']) ? $data[0]['no_ref1'] : '-';
                                     $no_ref1 = $datam[0]['no_ref1'];
-                                    $ck_ref1 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where no_ref1=? ",[$no_ref1]);
+                                    $ck_ref1 = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where no_ref1=? ",[strval($no_ref1)]);
                                     if(count($ck_ref1) > 0){
                                         $sts = false;
                                         $msg = "Transaksi tidak valid. Terdapat data duplikat. Kode SPPD ".$no_ref1." sudah terdaftar dengan No Agenda = ".$ck_ref1[0]->no_aju.".";
