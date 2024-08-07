@@ -799,6 +799,12 @@ class SppdController extends Controller
           
             $cek = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress not in ('A','R','D') ");
             if(count($cek) > 0){
+                
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.','RELEASE-GAGAL'));
+                // END SAVE
+                DB::connection('sqlsrv')->commit();
+
                 $success['status'] = false;
                 $success['message'] = "Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.";
             }else{
@@ -826,6 +832,11 @@ class SppdController extends Controller
                     $success['message'] = "Release Budget Sukses";
 
                 }else{
+                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak valid','RELEASE-GAGAL'));
+                    // END SAVE
+                    DB::connection('sqlsrvypt')->commit();
+
                     $success['status'] = false;
                     $success['message'] = "Release Budget Gagal. No Agenda tidak valid.";
                 }
@@ -835,9 +846,18 @@ class SppdController extends Controller
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
+            
+            DB::connection('sqlsrvypt')->beginTransaction();
+            $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
+            values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,print_r($e->getMessage(), true),'RELEASE-GAGAL'));
+            // END SAVE
+            DB::connection('sqlsrvypt')->commit();
+
             $success['status'] = false;
             $success['message'] = "Internal Server Error";
             Log::error($e);
+
+
             return response()->json($success, $this->successStatus);
         }
     }
