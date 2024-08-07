@@ -964,36 +964,21 @@ class LaporanController extends Controller
                 $kode_lokasi = $data->kode_lokasi;
             }
 
-            $nik_user = $nik . "_" . uniqid();
-            $periode = $request->input('periode')[1];
+            $tanggal = $request->input('tanggal')[1];
             $kode_lokasi = isset($request->kode_lokasi) && $request->kode_lokasi[1] != "" ? $request->input('kode_lokasi')[1] : $kode_lokasi;
             $kode_gudang = $request->input('kode_gudang')[1];
-            if ($periode == "") {
-                $periode = date('Ym');
+            if ($tanggal == "") {
+                $tanggal = date('Y-m-d');
             }
 
-            $sql1 = "exec sp_brg_stok_gudang_bulan '$kode_gudang', '$periode','$kode_lokasi', '$nik_user';";
-            $sql2 = "exec sp_brg_hpp_periodik '$periode','$kode_lokasi','$nik_user','$kode_gudang';";
+            $sql3 = "SELECT a.kode_barang, b.nama, a.kode_gudang, case when b.no_rak is not null then b.no_rak else '-' end as kode_rak,
+            a.sawal as so_awal, a.masuk as debet, a.keluar as kredit, a.sakhir as stok, round(a.h_avg,0) as h_avg, 
+            round(a.sakhir * a.h_avg,0) as nilai_stok
+            from dbo.udf_brg_stok_tgl (?, ?, ?) a 
+            inner join brg_barang b on a.kode_barang=b.kode_barang and a.kode_gudang=b.pabrik
+            where b.kode_lokasi=? ";
 
-            $sqlex="SET NOCOUNT ON; ".$sql1;
-            $dbh = DB::connection($this->sql)->getPdo();
-            $sth = $dbh->prepare($sqlex);
-            $sth->execute();
-
-            $sqlex2="SET NOCOUNT ON; ".$sql2;
-            $dbh = DB::connection($this->sql)->getPdo();
-            $sth = $dbh->prepare($sqlex2);
-            $sth->execute();
-
-            $sql3 = "SELECT a.kode_barang,c.nama, case when c.no_rak is not null then c.no_rak else '-' end as kode_rak, a.kode_gudang,d.nama as gudang,a.so_awal,a.debet,a.kredit,a.stok,round(b.h_avg,0) as h_avg,
-            round(a.stok * b.h_avg,0) as nilai_stok
-            from brg_stok a
-            inner join brg_barang c on a.kode_barang=c.kode_barang and a.kode_gudang=c.pabrik and a.kode_lokasi=c.kode_lokasi
-            inner join brg_gudang d on a.kode_gudang=d.kode_gudang and a.kode_lokasi=d.kode_lokasi
-            left join brg_hpp b on a.kode_barang=b.kode_barang and a.kode_gudang='$kode_gudang' and a.kode_lokasi=b.kode_lokasi and b.nik_user='$nik_user'
-            where a.nik_user = '$nik_user' and a.kode_gudang='$kode_gudang' and a.kode_lokasi = '$kode_lokasi'";
-
-            $rs = DB::connection($this->sql)->select($sql3);
+            $rs = DB::connection($this->sql)->select($sql3,[$kode_lokasi,$kode_gudang,$tanggal, $kode_lokasi]);
             $res = json_decode(json_encode($rs), true);
 
             if (count($res) > 0) { //mengecek apakah data kosong atau tidak
