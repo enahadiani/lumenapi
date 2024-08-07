@@ -395,8 +395,8 @@ class SppdController extends Controller
 
                 // SAVE LOG TO DB
                 $log = print_r($request->input(), true); 
-                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-                values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP'));
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+                values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP',$datam[0]['no_ref1']));
                 // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
@@ -608,8 +608,8 @@ class SppdController extends Controller
 
                 // SAVE LOG TO DB
                 $log = print_r($request->input(), true); 
-                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-                values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP21'));
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+                values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,$log,'KEEP21',$datam[0]['no_ref1']));
                 // END SAVE
     
                 $res = DB::connection('sqlsrvypt')->select("select status_gar from masakun where kode_akun='".$datam[0]['kode_akun']."' and kode_lokasi='$kode_lokasi' ");
@@ -796,12 +796,16 @@ class SppdController extends Controller
         try {
 
             //$exec = array();
+
+            $ckr = DB::connection('sqlsrvypt')->select("select no_ref1 from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda'");
+            $no_ref1 = count($ckr) > 0 ? $ckr[0]->no_ref1 : '-';
           
             $cek = DB::connection('sqlsrvypt')->select("select no_aju from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda' and progress not in ('A','R','D') ");
             if(count($cek) > 0){
                 
-                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.','RELEASE-GAGAL'));
+                // SAVE LOG TO DB
+                $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+                    values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.','RELEASE-GAGAL',$no_ref1));
                 // END SAVE
                 DB::connection('sqlsrvypt')->commit();
 
@@ -813,8 +817,8 @@ class SppdController extends Controller
                 if(count($cek2) > 0){
 
                     // SAVE LOG TO DB
-                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'','RELEASE'));
+                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+                    values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'','RELEASE',$no_ref1));
                     // END SAVE
 
                     $del = DB::connection('sqlsrvypt')->table('it_aju_m')->where('kode_lokasi', $kode_lokasi)->where('no_aju', $no_agenda)->delete();
@@ -832,8 +836,8 @@ class SppdController extends Controller
                     $success['message'] = "Release Budget Sukses";
 
                 }else{
-                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-                    values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak valid','RELEASE-GAGAL'));
+                    $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+                    values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak valid','RELEASE-GAGAL',$no_ref1));
                     // END SAVE
                     DB::connection('sqlsrvypt')->commit();
 
@@ -848,8 +852,12 @@ class SppdController extends Controller
             DB::connection('sqlsrvypt')->rollback();
 
             DB::connection('sqlsrvypt')->beginTransaction();
-            $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
-            values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,print_r($e->getMessage(), true),'RELEASE-GAGAL'));
+
+            $ckr = DB::connection('sqlsrvypt')->select("select no_ref1 from it_aju_m where kode_lokasi='$kode_lokasi' and no_aju='$no_agenda'");
+            $no_ref1 = count($ckr) > 0 ? $ckr[0]->no_ref1 : '-';
+
+            $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis,no_ref1)
+            values (?, ?, getdate(), ?, ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,print_r($e->getMessage(), true),'RELEASE-GAGAL',$no_ref1));
             // END SAVE
             DB::connection('sqlsrvypt')->commit();
 
