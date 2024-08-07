@@ -803,7 +803,7 @@ class SppdController extends Controller
                 $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
                     values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,'Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.','RELEASE-GAGAL'));
                 // END SAVE
-                DB::connection('sqlsrv')->commit();
+                DB::connection('sqlsrvypt')->commit();
 
                 $success['status'] = false;
                 $success['message'] = "Release Budget Gagal. No Agenda tidak dapat dihapus karena sudah diproses di Keuangan.";
@@ -846,7 +846,7 @@ class SppdController extends Controller
             return response()->json($success, $this->successStatus);     
         } catch (\Throwable $e) {
             DB::connection('sqlsrvypt')->rollback();
-            
+
             DB::connection('sqlsrvypt')->beginTransaction();
             $save_log = DB::connection('sqlsrvypt')->insert("insert into sppd_log (no_bukti,kode_lokasi,tgl_input,nik_user,datalog,jenis)
             values (?, ?, getdate(), ?, ?, ?) ",array($no_agenda,$kode_lokasi,$nik,print_r($e->getMessage(), true),'RELEASE-GAGAL'));
